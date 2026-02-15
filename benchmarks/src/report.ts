@@ -1,10 +1,10 @@
-import type { Dataset, EfficiencyRanking, EvaluationResult, FormatResult, Question } from './types'
-import { FORMATTER_DISPLAY_NAMES, QUESTION_TYPE_LABELS, QUESTION_TYPES } from './constants'
-import { ACCURACY_DATASETS } from './datasets'
-import { models, PRIMERS } from './evaluate'
-import { supportsCSV } from './formatters'
-import { generateQuestions } from './questions'
-import { createProgressBar, tokenize } from './utils'
+import type { Dataset, EfficiencyRanking, EvaluationResult, FormatResult, Question } from './types.ts'
+import { FORMATTER_DISPLAY_NAMES, QUESTION_TYPE_LABELS, QUESTION_TYPES } from './constants.ts'
+import { ACCURACY_DATASETS } from './datasets.ts'
+import { models, PRIMERS } from './evaluate.ts'
+import { supportsCSV } from './formatters.ts'
+import { generateQuestions } from './questions/index.ts'
+import { createProgressBar, tokenize } from './utils.ts'
 
 const EFFICIENCY_CHART_STYLE: 'vertical' | 'horizontal' = 'horizontal'
 

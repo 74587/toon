@@ -1,15 +1,15 @@
 import type { FileHandle } from 'node:fs/promises'
-import type { DecodeOptions, DecodeStreamOptions, EncodeOptions } from '../../toon/src'
-import type { InputSource } from './types'
+import type { DecodeOptions, DecodeStreamOptions, EncodeOptions } from '../../toon/src/index.ts'
+import type { InputSource } from './types.ts'
 import * as fsp from 'node:fs/promises'
 import * as path from 'node:path'
 import process from 'node:process'
 import { consola } from 'consola'
 import { estimateTokenCount } from 'tokenx'
-import { decode, decodeStream, encode, encodeLines } from '../../toon/src'
-import { jsonStreamFromEvents } from './json-from-events'
-import { jsonStringifyLines } from './json-stringify-stream'
-import { formatInputLabel, readInput, readLinesFromSource } from './utils'
+import { decode, decodeStream, encode, encodeLines } from '../../toon/src/index.ts'
+import { jsonStreamFromEvents } from './json-from-events.ts'
+import { jsonStringifyLines } from './json-stringify-stream.ts'
+import { formatInputLabel, readInput, readLinesFromSource } from './utils.ts'
 
 export async function encodeToToon(config: {
   input: InputSource

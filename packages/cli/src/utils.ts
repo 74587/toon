@@ -1,4 +1,4 @@
-import type { InputSource } from './types'
+import type { InputSource } from './types.ts'
 import { createReadStream } from 'node:fs'
 import * as fsp from 'node:fs/promises'
 import * as path from 'node:path'

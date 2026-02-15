@@ -1,4 +1,4 @@
-import { FALSE_LITERAL, NULL_LITERAL, TRUE_LITERAL } from '../constants'
+import { FALSE_LITERAL, NULL_LITERAL, TRUE_LITERAL } from '../constants.ts'
 
 const NUMERIC_LITERAL_PATTERN = /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:e[+-]?\d+)?$/i
 

@@ -1,5 +1,5 @@
-import type { ArrayHeaderInfo, BlankLineInfo, Delimiter, Depth, ParsedLine } from '../types'
-import { COLON, LIST_ITEM_PREFIX } from '../constants'
+import type { ArrayHeaderInfo, BlankLineInfo, Delimiter, Depth, ParsedLine } from '../types.ts'
+import { COLON, LIST_ITEM_PREFIX } from '../constants.ts'
 
 // #region Count and structure validation
 

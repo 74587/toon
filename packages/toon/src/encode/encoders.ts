@@ -1,8 +1,8 @@
-import type { Depth, JsonArray, JsonObject, JsonPrimitive, JsonValue, ResolvedEncodeOptions } from '../types'
-import { DOT, LIST_ITEM_MARKER, LIST_ITEM_PREFIX } from '../constants'
-import { tryFoldKeyChain } from './folding'
-import { isArrayOfArrays, isArrayOfObjects, isArrayOfPrimitives, isEmptyObject, isJsonArray, isJsonObject, isJsonPrimitive } from './normalize'
-import { encodeAndJoinPrimitives, encodeKey, encodePrimitive, formatHeader } from './primitives'
+import type { Depth, JsonArray, JsonObject, JsonPrimitive, JsonValue, ResolvedEncodeOptions } from '../types.ts'
+import { DOT, LIST_ITEM_MARKER, LIST_ITEM_PREFIX } from '../constants.ts'
+import { tryFoldKeyChain } from './folding.ts'
+import { isArrayOfArrays, isArrayOfObjects, isArrayOfPrimitives, isEmptyObject, isJsonArray, isJsonObject, isJsonPrimitive } from './normalize.ts'
+import { encodeAndJoinPrimitives, encodeKey, encodePrimitive, formatHeader } from './primitives.ts'
 
 // #region Encode normalized JsonValue
 

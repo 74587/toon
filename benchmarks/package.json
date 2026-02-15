@@ -3,9 +3,9 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "benchmark:tokens": "tsx scripts/token-efficiency-benchmark.ts",
-    "benchmark:accuracy": "tsx --env-file=.env scripts/accuracy-benchmark.ts",
-    "fetch:github-repos": "tsx scripts/fetch-github-repos.ts"
+    "benchmark:tokens": "node scripts/token-efficiency-benchmark.ts",
+    "benchmark:accuracy": "node --env-file=.env scripts/accuracy-benchmark.ts",
+    "fetch:github-repos": "node scripts/fetch-github-repos.ts"
   },
   "devDependencies": {
     "@ai-sdk/anthropic": "^2.0.56",

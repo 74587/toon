@@ -1,11 +1,11 @@
 import type { LanguageModelV2 } from '@ai-sdk/provider'
-import type { EvaluationResult, Question } from './types'
+import type { EvaluationResult, Question } from './types.ts'
 import { anthropic } from '@ai-sdk/anthropic'
 import { google } from '@ai-sdk/google'
 import { openai } from '@ai-sdk/openai'
 import { xai } from '@ai-sdk/xai'
 import { generateText } from 'ai'
-import { compareAnswers } from './normalize'
+import { compareAnswers } from './normalize.ts'
 
 /**
  * Models used for evaluation

@@ -1,7 +1,7 @@
-import type { ArrayHeaderInfo, Delimiter, JsonPrimitive } from '../types'
-import { BACKSLASH, CLOSE_BRACE, CLOSE_BRACKET, COLON, DELIMITERS, DOUBLE_QUOTE, FALSE_LITERAL, NULL_LITERAL, OPEN_BRACE, OPEN_BRACKET, PIPE, TAB, TRUE_LITERAL } from '../constants'
-import { isBooleanOrNullLiteral, isNumericLiteral } from '../shared/literal-utils'
-import { findClosingQuote, findUnquotedChar, unescapeString } from '../shared/string-utils'
+import type { ArrayHeaderInfo, Delimiter, JsonPrimitive } from '../types.ts'
+import { BACKSLASH, CLOSE_BRACE, CLOSE_BRACKET, COLON, DELIMITERS, DOUBLE_QUOTE, FALSE_LITERAL, NULL_LITERAL, OPEN_BRACE, OPEN_BRACKET, PIPE, TAB, TRUE_LITERAL } from '../constants.ts'
+import { isBooleanOrNullLiteral, isNumericLiteral } from '../shared/literal-utils.ts'
+import { findClosingQuote, findUnquotedChar, unescapeString } from '../shared/string-utils.ts'
 
 // #region Array header parsing
 

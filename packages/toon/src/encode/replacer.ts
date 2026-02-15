@@ -1,5 +1,5 @@
-import type { EncodeReplacer, JsonArray, JsonObject, JsonValue } from '../types'
-import { isJsonArray, isJsonObject, normalizeValue } from './normalize'
+import type { EncodeReplacer, JsonArray, JsonObject, JsonValue } from '../types.ts'
+import { isJsonArray, isJsonObject, normalizeValue } from './normalize.ts'
 
 /**
  * Applies a replacer function to a `JsonValue` and all its descendants.

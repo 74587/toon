@@ -1,4 +1,4 @@
-import type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from '../types'
+import type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from '../types.ts'
 
 // #region Normalization (unknown → JsonValue)
 

@@ -1,10 +1,10 @@
-import type { ArrayHeaderInfo, DecodeStreamOptions, Depth, JsonPrimitive, JsonStreamEvent, ParsedLine } from '../types'
-import type { StreamingScanState } from './scanner'
-import { COLON, DEFAULT_DELIMITER, LIST_ITEM_MARKER, LIST_ITEM_PREFIX } from '../constants'
-import { findClosingQuote } from '../shared/string-utils'
-import { isArrayHeaderContent, isKeyValueContent, mapRowValuesToPrimitives, parseArrayHeaderLine, parseDelimitedValues, parseKeyToken, parsePrimitiveToken } from './parser'
-import { createScanState, parseLinesAsync, parseLinesSync } from './scanner'
-import { assertExpectedCount, validateNoBlankLinesInRange, validateNoExtraListItems, validateNoExtraTabularRows } from './validation'
+import type { ArrayHeaderInfo, DecodeStreamOptions, Depth, JsonPrimitive, JsonStreamEvent, ParsedLine } from '../types.ts'
+import type { StreamingScanState } from './scanner.ts'
+import { COLON, DEFAULT_DELIMITER, LIST_ITEM_MARKER, LIST_ITEM_PREFIX } from '../constants.ts'
+import { findClosingQuote } from '../shared/string-utils.ts'
+import { isArrayHeaderContent, isKeyValueContent, mapRowValuesToPrimitives, parseArrayHeaderLine, parseDelimitedValues, parseKeyToken, parsePrimitiveToken } from './parser.ts'
+import { createScanState, parseLinesAsync, parseLinesSync } from './scanner.ts'
+import { assertExpectedCount, validateNoBlankLinesInRange, validateNoExtraListItems, validateNoExtraTabularRows } from './validation.ts'
 
 interface DecoderContext { indent: number, strict: boolean }
 

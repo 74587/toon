@@ -1,14 +1,16 @@
 import type { CommandDef } from 'citty'
-import type { DecodeOptions, Delimiter, EncodeOptions } from '../../toon/src'
-import type { InputSource } from './types'
+import type { DecodeOptions, Delimiter, EncodeOptions } from '../../toon/src/index.ts'
+import type { InputSource } from './types.ts'
 import * as path from 'node:path'
 import process from 'node:process'
 import { defineCommand } from 'citty'
 import { consola } from 'consola'
-import { DEFAULT_DELIMITER, DELIMITERS } from '../../toon/src'
-import { name, version } from '../package.json' with { type: 'json' }
-import { decodeToJson, encodeToToon } from './conversion'
-import { detectMode } from './utils'
+import { DEFAULT_DELIMITER, DELIMITERS } from '../../toon/src/index.ts'
+import pkg from '../package.json' with { type: 'json' }
+import { decodeToJson, encodeToToon } from './conversion.ts'
+import { detectMode } from './utils.ts'
+
+const { name, version } = pkg
 
 export const mainCommand: CommandDef<{
   input: {

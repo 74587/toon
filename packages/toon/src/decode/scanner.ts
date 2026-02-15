@@ -1,5 +1,5 @@
-import type { BlankLineInfo, Depth, ParsedLine } from '../types'
-import { SPACE, TAB } from '../constants'
+import type { BlankLineInfo, Depth, ParsedLine } from '../types.ts'
+import { SPACE, TAB } from '../constants.ts'
 
 // #region Scan state
 

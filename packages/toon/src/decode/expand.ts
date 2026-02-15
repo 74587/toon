@@ -1,7 +1,7 @@
-import type { JsonObject, JsonValue } from '../types'
-import { DOT } from '../constants'
-import { isJsonObject } from '../encode/normalize'
-import { isIdentifierSegment } from '../shared/validation'
+import type { JsonObject, JsonValue } from '../types.ts'
+import { DOT } from '../constants.ts'
+import { isJsonObject } from '../encode/normalize.ts'
+import { isIdentifierSegment } from '../shared/validation.ts'
 
 // #region Path expansion (safe)
 

@@ -1,13 +1,13 @@
-import type { DecodeOptions, DecodeStreamOptions, EncodeOptions, JsonStreamEvent, JsonValue, ResolvedDecodeOptions, ResolvedEncodeOptions } from './types'
-import { DEFAULT_DELIMITER } from './constants'
-import { decodeStream as decodeStreamCore, decodeStreamSync as decodeStreamSyncCore } from './decode/decoders'
-import { buildValueFromEvents } from './decode/event-builder'
-import { expandPathsSafe } from './decode/expand'
-import { encodeJsonValue } from './encode/encoders'
-import { normalizeValue } from './encode/normalize'
-import { applyReplacer } from './encode/replacer'
+import type { DecodeOptions, DecodeStreamOptions, EncodeOptions, JsonStreamEvent, JsonValue, ResolvedDecodeOptions, ResolvedEncodeOptions } from './types.ts'
+import { DEFAULT_DELIMITER } from './constants.ts'
+import { decodeStream as decodeStreamCore, decodeStreamSync as decodeStreamSyncCore } from './decode/decoders.ts'
+import { buildValueFromEvents } from './decode/event-builder.ts'
+import { expandPathsSafe } from './decode/expand.ts'
+import { encodeJsonValue } from './encode/encoders.ts'
+import { normalizeValue } from './encode/normalize.ts'
+import { applyReplacer } from './encode/replacer.ts'
 
-export { DEFAULT_DELIMITER, DELIMITERS } from './constants'
+export { DEFAULT_DELIMITER, DELIMITERS } from './constants.ts'
 export type {
   DecodeOptions,
   DecodeStreamOptions,
@@ -22,7 +22,7 @@ export type {
   JsonValue,
   ResolvedDecodeOptions,
   ResolvedEncodeOptions,
-} from './types'
+} from './types.ts'
 
 /**
  * Encodes a JavaScript value into TOON format string.

@@ -1,5 +1,5 @@
-import type { JsonObject, JsonStreamEvent, JsonValue } from '../types'
-import { QUOTED_KEY_MARKER } from './expand'
+import type { JsonObject, JsonStreamEvent, JsonValue } from '../types.ts'
+import { QUOTED_KEY_MARKER } from './expand.ts'
 
 // #region Build context types
 

@@ -1,6 +1,6 @@
 // #region JSON types
 
-import type { Delimiter, DelimiterKey } from './constants'
+import type { Delimiter, DelimiterKey } from './constants.ts'
 
 export type JsonPrimitive = string | number | boolean | null
 export type JsonObject = { [Key in string]: JsonValue } & { [Key in string]?: JsonValue | undefined }

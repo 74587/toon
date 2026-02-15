@@ -1,9 +1,9 @@
 import type { Storage, StorageValue } from 'unstorage'
-import type { EvaluationResult } from './types'
+import type { EvaluationResult } from './types.ts'
 import * as path from 'node:path'
 import { createStorage } from 'unstorage'
 import fsDriver from 'unstorage/drivers/fs'
-import { BENCHMARKS_DIR } from './constants'
+import { BENCHMARKS_DIR } from './constants.ts'
 
 /**
  * Storage instance for model results
