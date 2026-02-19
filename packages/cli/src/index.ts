@@ -67,7 +67,7 @@ const args: ArgsDef = {
     description: 'Show token statistics',
     default: false,
   },
-} as const satisfies ArgsDef
+} as const
 
 export const mainCommand: CommandDef<ArgsDef> = defineCommand({
   meta: {
