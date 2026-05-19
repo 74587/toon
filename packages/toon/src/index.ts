@@ -39,9 +39,12 @@ export type {
  * // age: 30
  *
  * encode({ users: [{ id: 1 }, { id: 2 }] })
- * // users[]:
- * //   - id: 1
- * //   - id: 2
+ * // users[2]{id}:
+ * //   1
+ * //   2
+ *
+ * encode({ tags: [] })
+ * // tags: []
  *
  * encode(data, { indent: 4, keyFolding: 'safe' })
  * ```
@@ -62,8 +65,11 @@ export function encode(input: unknown, options?: EncodeOptions): string {
  * decode('name: Alice\nage: 30')
  * // { name: 'Alice', age: 30 }
  *
- * decode('users[]:\n  - id: 1\n  - id: 2')
+ * decode('users[2]:\n  - id: 1\n  - id: 2')
  * // { users: [{ id: 1 }, { id: 2 }] }
+ *
+ * decode('tags: []')
+ * // { tags: [] }
  *
  * decode(toonString, { strict: false, expandPaths: 'safe' })
  * ```
