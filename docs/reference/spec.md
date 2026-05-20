@@ -13,11 +13,11 @@ You don't need this page to *use* TOON. It's mainly for implementers and contrib
 
 ## Current Version
 
-**Spec v{{ $spec.version }}** (2025-11-24) is the current published Working Draft. It is stable for implementation but not yet finalized; see "Status of This Document" in the spec for details.
+**Spec v{{ $spec.version }}** (2026-05-20) is the current published Working Draft. It is stable for implementation but not yet finalized; see "Status of This Document" in the spec for details.
 
 ## Media Type & File Extension
 
-The spec defines a provisional media type and file extension in [§18.2](https://github.com/toon-format/spec/blob/main/SPEC.md#182-provisional-media-type):
+The spec defines a provisional media type and file extension in [§17](https://github.com/toon-format/spec/blob/main/SPEC.md#17-iana-considerations):
 
 - **Media type:** `text/toon` (provisional, not yet IANA‑registered; UTF‑8 only)
 - **File extension:** `.toon`
@@ -75,7 +75,7 @@ Defines conformance classes (encoder, decoder, validator), standardized options,
 Optional encoder feature (key folding) and decoder feature (path expansion) for collapsing/expanding dotted paths, with deep-merge semantics and strict/non-strict conflict resolution.
 
 [§14 Strict Mode Errors and Diagnostics](https://github.com/toon-format/spec/blob/main/SPEC.md#14-strict-mode-errors-and-diagnostics-authoritative-checklist):
-**Authoritative checklist** of all strict-mode errors: array count mismatches, syntax errors, indentation errors, structural errors, and path expansion conflicts.
+**Authoritative checklist** of all strict-mode errors: array count and width mismatches (§14.1), syntax and structural errors (§14.2), path expansion conflicts (§14.3), and duplicate sibling keys (§14.4).
 
 ### Implementation Guidance
 
@@ -85,16 +85,16 @@ Injection risks, quoting rules, and strict-mode checks relevant to security.
 [§16 Internationalization](https://github.com/toon-format/spec/blob/main/SPEC.md#16-internationalization):
 Unicode handling and locale-independent number formatting.
 
-[§17 Interoperability and Mappings](https://github.com/toon-format/spec/blob/main/SPEC.md#17-interoperability-and-mappings):
-JSON/CSV/YAML mappings and conversion guidance.
-
-[§18 IANA Considerations](https://github.com/toon-format/spec/blob/main/SPEC.md#18-iana-considerations):
+[§17 IANA Considerations](https://github.com/toon-format/spec/blob/main/SPEC.md#17-iana-considerations):
 Media type registration plans and provisional status.
 
-[§19 TOON Core Profile](https://github.com/toon-format/spec/blob/main/SPEC.md#19-toon-core-profile-normative-subset):
-Normative subset of the most common, memory-friendly rules. Useful for minimal implementations.
+[§18 Versioning and Extensibility](https://github.com/toon-format/spec/blob/main/SPEC.md#18-versioning-and-extensibility):
+How the spec evolves: major vs minor bumps and the extensibility policy.
 
-[Appendix G: Host Type Normalization Examples](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-g-host-type-normalization-examples-informative):
+[§19 Intellectual Property Considerations](https://github.com/toon-format/spec/blob/main/SPEC.md#19-intellectual-property-considerations):
+Licensing and IP terms for the specification.
+
+[Appendix F: Host Type Normalization Examples](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-f-host-type-normalization-examples-informative):
 Non-normative guidance for Go, JavaScript, Python, and Rust implementations on normalizing language-specific types.
 
 [Appendix C: Test Suite and Compliance](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-c-test-suite-and-compliance-informative):
@@ -111,9 +111,8 @@ Reference test suite at [github.com/toon-format/spec/tree/main/tests](https://gi
 | §11-12 | Delimiters, indentation, whitespace | Implementing formatting and validation |
 | §13 | Conformance, options, key folding/path expansion | Implementing options and features |
 | §14 | Strict-mode errors | Implementing validators |
-| §15-18 | Security, i18n, interoperability, media type | Operational and ecosystem considerations |
-| §19 | Core profile | Minimal implementations |
-| §20-21 | Versioning, extensibility, IP | Long-term stability and licensing |
+| §15-16 | Security, internationalization | Operational considerations |
+| §17-19 | IANA, versioning, IP | Ecosystem and licensing |
 
 ## Conformance Checklists
 
@@ -124,7 +123,7 @@ The spec includes three conformance checklists:
 Key requirements:
 - Produce UTF-8 with LF line endings
 - Use consistent indentation (default 2 spaces, no tabs)
-- Escape only `\\`, `\"`, `\n`, `\r`, `\t` in quoted strings; any other escape is invalid
+- Escape `\\`, `\"`, `\n`, `\r`, `\t` in quoted strings, and use `\uXXXX` for any other U+0000–U+001F control character; lone surrogates are rejected
 - Quote strings with active delimiter, colon, or structural characters
 - Emit array lengths `[N]` matching actual count
 - Preserve object key order
@@ -150,7 +149,7 @@ Key requirements:
   - Split on `.`, only expand when all segments are IdentifierSegments,
   - Deep-merge overlapping paths (object + object),
   - Do not perform element-wise array merges.
-- With `expandPaths="safe"` and `strict=true` (default), MUST error on any expansion conflict (§14.5).
+- With `expandPaths="safe"` and `strict=true` (default), MUST error on any expansion conflict (§14.3).
 - With `expandPaths="safe"` and `strict=false`, MUST apply deterministic last-write-wins (LWW) conflict resolution (§13.4).
 
 ### Validator Checklist (§13.3) <sup>[↗ SPEC.md](https://github.com/toon-format/spec/blob/main/SPEC.md#133-validator-conformance-checklist)</sup>
@@ -165,8 +164,8 @@ Validators should verify:
 ## Versioning
 
 The spec uses semantic versioning (major.minor):
-- **Major version** (e.g., v{{ $spec.version }}): Breaking changes, incompatible with previous versions
-- **Minor version** (e.g., v1.5 → v1.6): Clarifications, additional requirements, or backward-compatible additions
+- **Major version** (e.g., v2 → v3): Breaking changes, incompatible with previous versions
+- **Minor version** (e.g., v3.1 → v3.2): Clarifications, additional requirements, or backward-compatible additions
 
 See [Appendix D: Document Changelog](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-d-document-changelog-informative) for detailed version history.
 
