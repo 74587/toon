@@ -1,8 +1,21 @@
+minimumReleaseAgeExclude:
+  - '@ai-sdk/gateway@3.0.151'
+  - '@ai-sdk/google@3.0.94'
+  - '@ai-sdk/openai-compatible@2.0.61'
+  - '@ai-sdk/xai@3.0.108'
+  - ai@6.0.228
+  - tsdown@0.22.8
+
+shellEmulator: true
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - vite@5.4.21
+
 packages:
   - docs
   - benchmarks
   - packages/*
 
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - esbuild
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
