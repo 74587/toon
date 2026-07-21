@@ -1,7 +1,7 @@
 import type { ArrayHeaderInfo, DecodeStreamOptions, Depth, JsonPrimitive, JsonStreamEvent, ParsedLine } from '../types.ts'
 import type { StreamingScanState } from './scanner.ts'
 import { COLON, DEFAULT_DELIMITER, LIST_ITEM_MARKER, LIST_ITEM_PREFIX } from '../constants.ts'
-import { findClosingQuote } from '../shared/string-utils.ts'
+import { findClosingQuote, trimSpaces } from '../shared/string-utils.ts'
 import { ToonDecodeError, withLine } from './errors.ts'
 import { isArrayHeaderContent, isKeyValueContent, mapRowValuesToPrimitives, parseArrayHeaderLine, parseDelimitedValues, parseKeyToken, parsePrimitiveToken } from './parser.ts'
 import { createScanState, parseLinesAsync, parseLinesSync } from './scanner.ts'
@@ -135,7 +135,7 @@ export function* decodeStreamSync(
     return
   }
 
-  if (first.content.trim() === '[]') {
+  if (trimSpaces(first.content) === '[]') {
     cursor.advanceSync()
     yield { type: 'startArray', length: 0 }
     yield { type: 'endArray' }
@@ -157,7 +157,7 @@ export function* decodeStreamSync(
   const hasMore = !cursor.atEndSync()
   if (!hasMore && !isKeyValueLineSync(first)) {
     // Single non-key-value line is root primitive
-    yield { type: 'primitive', value: withLine(first, () => parsePrimitiveToken(first.content.trim())) }
+    yield { type: 'primitive', value: withLine(first, () => parsePrimitiveToken(first.content)) }
     return
   }
 
@@ -228,7 +228,7 @@ function* decodeKeyValueSync(
 
   // Regular key-value pair
   const { key, end } = withLine(line, () => parseKeyToken(content, 0))
-  const rest = content.slice(end).trim()
+  const rest = trimSpaces(content.slice(end))
 
   assertNoDuplicateKey(key, line, seenKeys)
   yield { type: 'key', key }
@@ -323,7 +323,7 @@ function* decodeInlinePrimitiveArraySync(
   options: DecoderContext,
   headerLine: ParsedLine,
 ): Generator<JsonStreamEvent> {
-  if (!inlineValues.trim()) {
+  if (!trimSpaces(inlineValues)) {
     assertExpectedCount(0, header.length, 'inline array items', options, headerLine)
     return
   }
@@ -477,13 +477,13 @@ function* decodeListItemSync(
     )
   }
 
-  if (!afterHyphen.trim()) {
+  if (!trimSpaces(afterHyphen)) {
     yield { type: 'startObject' }
     yield { type: 'endObject' }
     return
   }
 
-  if (afterHyphen.trim() === '[]') {
+  if (trimSpaces(afterHyphen) === '[]') {
     yield { type: 'startArray', length: 0 }
     yield { type: 'endArray' }
     return
@@ -607,7 +607,7 @@ export async function* decodeStream(
       return
     }
 
-    if (first.content.trim() === '[]') {
+    if (trimSpaces(first.content) === '[]') {
       await cursor.advance()
       yield { type: 'startArray', length: 0 }
       yield { type: 'endArray' }
@@ -628,7 +628,7 @@ export async function* decodeStream(
     await cursor.advance()
     const hasMore = !(await cursor.atEnd())
     if (!hasMore && !isKeyValueLineSync(first)) {
-      yield { type: 'primitive', value: withLine(first, () => parsePrimitiveToken(first.content.trim())) }
+      yield { type: 'primitive', value: withLine(first, () => parsePrimitiveToken(first.content)) }
       return
     }
 
@@ -682,7 +682,7 @@ async function* decodeKeyValueAsync(
 
   // Regular key-value pair
   const { key, end } = withLine(line, () => parseKeyToken(content, 0))
-  const rest = content.slice(end).trim()
+  const rest = trimSpaces(content.slice(end))
 
   assertNoDuplicateKey(key, line, seenKeys)
   yield { type: 'key', key }
@@ -910,13 +910,13 @@ async function* decodeListItemAsync(
     )
   }
 
-  if (!afterHyphen.trim()) {
+  if (!trimSpaces(afterHyphen)) {
     yield { type: 'startObject' }
     yield { type: 'endObject' }
     return
   }
 
-  if (afterHyphen.trim() === '[]') {
+  if (trimSpaces(afterHyphen) === '[]') {
     yield { type: 'startArray', length: 0 }
     yield { type: 'endArray' }
     return

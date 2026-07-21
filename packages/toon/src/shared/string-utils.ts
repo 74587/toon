@@ -1,4 +1,26 @@
-import { BACKSLASH, CARRIAGE_RETURN, DOUBLE_QUOTE, NEWLINE, TAB } from '../constants.ts'
+import { BACKSLASH, CARRIAGE_RETURN, DOUBLE_QUOTE, NEWLINE, SPACE, TAB } from '../constants.ts'
+
+/**
+ * Trims surrounding ASCII spaces (U+0020) from a token.
+ *
+ * @remarks
+ * Token trimming removes spaces only: any other whitespace (NBSP, or tabs
+ * outside their delimiter role) is part of the token, so a host `trim()`
+ * that strips the full Unicode whitespace set must not be used here.
+ */
+export function trimSpaces(value: string): string {
+  let start = 0
+  let end = value.length
+
+  while (start < end && value[start] === SPACE) {
+    start++
+  }
+  while (end > start && value[end - 1] === SPACE) {
+    end--
+  }
+
+  return start === 0 && end === value.length ? value : value.slice(start, end)
+}
 
 /**
  * Escapes special characters in a string for encoding.

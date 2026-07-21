@@ -1,7 +1,7 @@
 import type { ArrayHeaderInfo, Delimiter, JsonPrimitive } from '../types.ts'
 import { BACKSLASH, CLOSE_BRACE, CLOSE_BRACKET, COLON, DELIMITERS, DOUBLE_QUOTE, FALSE_LITERAL, NULL_LITERAL, OPEN_BRACE, OPEN_BRACKET, PIPE, TAB, TRUE_LITERAL } from '../constants.ts'
 import { isBooleanOrNullLiteral, isNumericLiteral } from '../shared/literal-utils.ts'
-import { findClosingQuote, findUnquotedChar, unescapeString } from '../shared/string-utils.ts'
+import { findClosingQuote, findUnquotedChar, trimSpaces, unescapeString } from '../shared/string-utils.ts'
 
 // #region Array header parsing
 
@@ -101,7 +101,7 @@ export function parseArrayHeaderLine(
     key = rawKey.startsWith(DOUBLE_QUOTE) ? parseStringLiteral(rawKey) : rawKey
   }
 
-  const afterColon = content.slice(colonIndex + 1).trim()
+  const afterColon = trimSpaces(content.slice(colonIndex + 1))
   const bracketContent = content.slice(bracketStart + 1, bracketEnd)
 
   let parsedBracket: ReturnType<typeof parseBracketSegment>
@@ -225,7 +225,7 @@ export function parseDelimitedValues(input: string, delimiter: Delimiter): strin
     }
 
     if (char === delimiter && !inQuotes) {
-      values.push(valueBuffer.trim())
+      values.push(trimSpaces(valueBuffer))
       valueBuffer = ''
       i++
       continue
@@ -237,7 +237,7 @@ export function parseDelimitedValues(input: string, delimiter: Delimiter): strin
 
   // Add last value
   if (valueBuffer || values.length > 0) {
-    values.push(valueBuffer.trim())
+    values.push(trimSpaces(valueBuffer))
   }
 
   return values
@@ -252,7 +252,7 @@ export function mapRowValuesToPrimitives(values: string[]): JsonPrimitive[] {
 // #region Primitive and key parsing
 
 export function parsePrimitiveToken(token: string): JsonPrimitive {
-  const trimmedToken = token.trim()
+  const trimmedToken = trimSpaces(token)
 
   // Empty token
   if (!trimmedToken) {
@@ -286,7 +286,7 @@ export function parsePrimitiveToken(token: string): JsonPrimitive {
 }
 
 export function parseStringLiteral(token: string): string {
-  const trimmedToken = token.trim()
+  const trimmedToken = trimSpaces(token)
 
   if (trimmedToken.startsWith(DOUBLE_QUOTE)) {
     // Find the closing quote, accounting for escaped quotes
