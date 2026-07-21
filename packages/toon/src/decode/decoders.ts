@@ -187,6 +187,15 @@ export function* decodeStreamSync(
   yield { type: 'endObject' }
 }
 
+function assertNoDepthJump(firstNestedLine: ParsedLine, parentDepth: Depth, strict: boolean): void {
+  if (strict && firstNestedLine.depth > parentDepth + 1) {
+    throw new ToonDecodeError(
+      `Indentation depth jump: expected depth ${parentDepth + 1}, but found ${firstNestedLine.depth}`,
+      { line: firstNestedLine.lineNumber, source: firstNestedLine.raw },
+    )
+  }
+}
+
 function assertNoDuplicateKey(key: string, line: ParsedLine, seenKeys: Set<string> | undefined): void {
   if (!seenKeys)
     return
@@ -228,6 +237,7 @@ function* decodeKeyValueSync(
   if (!rest) {
     const nextLine = cursor.peekSync()
     if (nextLine && nextLine.depth > baseDepth) {
+      assertNoDepthJump(nextLine, baseDepth, options.strict)
       yield { type: 'startObject' }
       yield* decodeObjectFieldsSync(cursor, baseDepth + 1, options)
       yield { type: 'endObject' }
@@ -681,6 +691,7 @@ async function* decodeKeyValueAsync(
   if (!rest) {
     const nextLine = await cursor.peek()
     if (nextLine && nextLine.depth > baseDepth) {
+      assertNoDepthJump(nextLine, baseDepth, options.strict)
       yield { type: 'startObject' }
       yield* decodeObjectFieldsAsync(cursor, baseDepth + 1, options)
       yield { type: 'endObject' }
