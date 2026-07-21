@@ -349,12 +349,10 @@ export function parseQuotedKey(content: string, start: number): { key: string, e
   return { key, end: parsePosition }
 }
 
-export function parseKeyToken(content: string, start: number): { key: string, end: number, isQuoted: boolean } {
-  const isQuoted = content[start] === DOUBLE_QUOTE
-  const result = isQuoted
+export function parseKeyToken(content: string, start: number): { key: string, end: number } {
+  return content[start] === DOUBLE_QUOTE
     ? parseQuotedKey(content, start)
     : parseUnquotedKey(content, start)
-  return { ...result, isQuoted }
 }
 
 // #endregion

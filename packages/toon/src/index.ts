@@ -2,7 +2,6 @@ import type { DecodeOptions, DecodeStreamOptions, EncodeOptions, JsonStreamEvent
 import { DEFAULT_DELIMITER } from './constants.ts'
 import { decodeStream as decodeStreamCore, decodeStreamSync as decodeStreamSyncCore } from './decode/decoders.ts'
 import { buildValueFromEvents } from './decode/event-builder.ts'
-import { expandPathsSafe } from './decode/expand.ts'
 import { encodeJsonValue } from './encode/encoders.ts'
 import { normalizeValue } from './encode/normalize.ts'
 import { applyReplacer } from './encode/replacer.ts'
@@ -46,7 +45,7 @@ export type {
  * encode({ tags: [] })
  * // tags: []
  *
- * encode(data, { indent: 4, keyFolding: 'safe' })
+ * encode(data, { indent: 4 })
  * ```
  */
 export function encode(input: unknown, options?: EncodeOptions): string {
@@ -71,7 +70,7 @@ export function encode(input: unknown, options?: EncodeOptions): string {
  * decode('tags: []')
  * // { tags: [] }
  *
- * decode(toonString, { strict: false, expandPaths: 'safe' })
+ * decode(toonString, { strict: false })
  * ```
  */
 export function decode(input: string, options?: DecodeOptions): JsonValue {
@@ -120,10 +119,10 @@ export function encodeLines(input: unknown, options?: EncodeOptions): Iterable<s
  *
  * This is a convenience wrapper around the streaming decoder that builds
  * the full value in memory. Useful when you already have lines as an array
- * or iterable and want the standard decode behavior with path expansion support.
+ * or iterable and want the standard decode behavior.
  *
  * @param lines - Iterable of TOON lines (without newlines)
- * @param options - Optional decoding configuration (supports expandPaths)
+ * @param options - Optional decoding configuration
  * @returns Parsed JavaScript value (object, array, or primitive)
  *
  * @example
@@ -135,22 +134,8 @@ export function encodeLines(input: unknown, options?: EncodeOptions): Iterable<s
  */
 export function decodeFromLines(lines: Iterable<string>, options?: DecodeOptions): JsonValue {
   const resolvedOptions = resolveDecodeOptions(options)
-
-  // Use streaming decoder without expandPaths
-  const streamOptions: DecodeStreamOptions = {
-    indent: resolvedOptions.indent,
-    strict: resolvedOptions.strict,
-  }
-
-  const events = decodeStreamSyncCore(lines, streamOptions)
-  const decodedValue = buildValueFromEvents(events)
-
-  // Apply path expansion if enabled
-  if (resolvedOptions.expandPaths === 'safe') {
-    return expandPathsSafe(decodedValue, resolvedOptions.strict)
-  }
-
-  return decodedValue
+  const events = decodeStreamSyncCore(lines, resolvedOptions)
+  return buildValueFromEvents(events)
 }
 
 /**
@@ -160,11 +145,8 @@ export function decodeFromLines(lines: Iterable<string>, options?: DecodeOptions
  * key, primitive) that represent the JSON data model without building the full value tree.
  * Useful for streaming processing, custom transformations, or memory-efficient parsing.
  *
- * @remarks
- * Path expansion (`expandPaths: 'safe'`) is not supported in streaming mode.
- *
  * @param lines - Iterable of TOON lines (without newlines)
- * @param options - Optional decoding configuration (expandPaths not supported)
+ * @param options - Optional decoding configuration
  * @returns Iterable of JSON stream events
  *
  * @example
@@ -191,11 +173,8 @@ export function decodeStreamSync(lines: Iterable<string>, options?: DecodeStream
  * Supports both sync and async iterables for maximum flexibility with file streams,
  * network responses, or other async sources.
  *
- * @remarks
- * Path expansion (`expandPaths: 'safe'`) is not supported in streaming mode.
- *
  * @param source - Async or sync iterable of TOON lines (without newlines)
- * @param options - Optional decoding configuration (expandPaths not supported)
+ * @param options - Optional decoding configuration
  * @returns Async iterable of JSON stream events
  *
  * @example
@@ -223,8 +202,6 @@ function resolveOptions(options?: EncodeOptions): ResolvedEncodeOptions {
   return {
     indent: options?.indent ?? 2,
     delimiter: options?.delimiter ?? DEFAULT_DELIMITER,
-    keyFolding: options?.keyFolding ?? 'off',
-    flattenDepth: options?.flattenDepth ?? Number.POSITIVE_INFINITY,
     replacer: options?.replacer,
   }
 }
@@ -233,6 +210,5 @@ function resolveDecodeOptions(options?: DecodeOptions): ResolvedDecodeOptions {
   return {
     indent: options?.indent ?? 2,
     strict: options?.strict ?? true,
-    expandPaths: options?.expandPaths ?? 'off',
   }
 }

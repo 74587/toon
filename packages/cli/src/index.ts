@@ -1,5 +1,5 @@
 import type { ArgsDef, CommandDef } from 'citty'
-import type { DecodeOptions, Delimiter, EncodeOptions } from '../../toon/src/index.ts'
+import type { Delimiter } from '../../toon/src/index.ts'
 import type { InputSource } from './types.ts'
 import * as path from 'node:path'
 import process from 'node:process'
@@ -49,20 +49,6 @@ const args: ArgsDef = {
     description: 'Strict decode validation (disable with --no-strict)',
     default: true,
   },
-  keyFolding: {
-    type: 'string',
-    description: 'Enable key folding: off, safe (default: off)',
-    default: 'off',
-  },
-  flattenDepth: {
-    type: 'string',
-    description: 'Maximum folded segment count when key folding is enabled (default: Infinity)',
-  },
-  expandPaths: {
-    type: 'string',
-    description: 'Enable path expansion: off, safe (default: off)',
-    default: 'off',
-  },
   stats: {
     type: 'boolean',
     description: 'Show token statistics',
@@ -102,27 +88,6 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
       throw new Error(`Invalid delimiter "${delimiter}". Valid delimiters are: comma (,), tab (\\t), pipe (|)`)
     }
 
-    // Validate `keyFolding`
-    const keyFolding = args.keyFolding || 'off'
-    if (keyFolding !== 'off' && keyFolding !== 'safe') {
-      throw new Error(`Invalid keyFolding value "${keyFolding}". Valid values are: off, safe`)
-    }
-
-    // Parse and validate `flattenDepth`
-    let flattenDepth: number | undefined
-    if (args.flattenDepth !== undefined) {
-      flattenDepth = Number.parseInt(args.flattenDepth, 10)
-      if (Number.isNaN(flattenDepth) || flattenDepth < 0) {
-        throw new Error(`Invalid flattenDepth value: ${args.flattenDepth}`)
-      }
-    }
-
-    // Validate `expandPaths`
-    const expandPaths = args.expandPaths || 'off'
-    if (expandPaths !== 'off' && expandPaths !== 'safe') {
-      throw new Error(`Invalid expandPaths value "${expandPaths}". Valid values are: off, safe`)
-    }
-
     const mode = detectMode(inputSource, args.encode, args.decode)
 
     try {
@@ -132,8 +97,6 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
           output: outputPath,
           delimiter: delimiter as Delimiter,
           indent,
-          keyFolding: keyFolding as NonNullable<EncodeOptions['keyFolding']>,
-          flattenDepth,
           printStats: args.stats === true,
         })
       }
@@ -143,7 +106,6 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
           output: outputPath,
           indent,
           strict: args.strict !== false,
-          expandPaths: expandPaths as NonNullable<DecodeOptions['expandPaths']>,
         })
       }
     }

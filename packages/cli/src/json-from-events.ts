@@ -10,7 +10,6 @@ type JsonContext
 /**
  * Converts a stream of `JsonStreamEvent` into formatted JSON string chunks.
  *
- * Similar to `jsonStringifyLines` but driven by events instead of a value tree.
  * Useful for streaming TOON decode directly to JSON output without building
  * the full data structure in memory.
  *

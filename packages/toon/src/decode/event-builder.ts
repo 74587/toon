@@ -1,11 +1,10 @@
 import type { JsonObject, JsonStreamEvent, JsonValue } from '../types.ts'
 import { setOwnProperty } from '../shared/object-utils.ts'
-import { QUOTED_KEY_MARKER } from './expand.ts'
 
 // #region Build context types
 
 type BuildContext
-  = | { type: 'object', obj: JsonObject, currentKey?: string, quotedKeys: Set<string> }
+  = | { type: 'object', obj: JsonObject, currentKey?: string }
     | { type: 'array', arr: JsonValue[] }
 
 interface BuildState {
@@ -51,11 +50,10 @@ function applyEvent(state: BuildState, event: JsonStreamEvent): void {
   switch (event.type) {
     case 'startObject': {
       const obj: JsonObject = {}
-      const quotedKeys = new Set<string>()
 
       if (stack.length === 0) {
         // Root object
-        stack.push({ type: 'object', obj, quotedKeys })
+        stack.push({ type: 'object', obj })
       }
       else {
         const parent = stack[stack.length - 1]!
@@ -71,7 +69,7 @@ function applyEvent(state: BuildState, event: JsonStreamEvent): void {
           parent.arr.push(obj)
         }
 
-        stack.push({ type: 'object', obj, quotedKeys })
+        stack.push({ type: 'object', obj })
       }
 
       break
@@ -85,16 +83,6 @@ function applyEvent(state: BuildState, event: JsonStreamEvent): void {
       const context = stack.pop()!
       if (context.type !== 'object') {
         throw new Error('Mismatched endObject event')
-      }
-
-      // Attach quoted keys metadata if any keys were quoted
-      if (context.quotedKeys.size > 0) {
-        Object.defineProperty(context.obj, QUOTED_KEY_MARKER, {
-          value: context.quotedKeys,
-          enumerable: false,
-          writable: false,
-          configurable: false,
-        })
       }
 
       if (stack.length === 0) {
@@ -158,11 +146,6 @@ function applyEvent(state: BuildState, event: JsonStreamEvent): void {
       }
 
       parent.currentKey = event.key
-
-      // Track quoted keys for path expansion
-      if (event.wasQuoted) {
-        parent.quotedKeys.add(event.key)
-      }
 
       break
     }

@@ -61,20 +61,6 @@ export interface EncodeOptions {
    */
   delimiter?: Delimiter
   /**
-   * Enable key folding to collapse single-key wrapper chains.
-   * When set to 'safe', nested objects with single keys are collapsed into dotted paths
-   * (e.g., data.metadata.items instead of nested indentation).
-   * @default 'off'
-   */
-  keyFolding?: 'off' | 'safe'
-  /**
-   * Maximum number of segments to fold when keyFolding is enabled.
-   * Controls how deep the folding can go in single-key chains.
-   * Values 0 or 1 have no practical effect (treated as effectively disabled).
-   * @default Infinity
-   */
-  flattenDepth?: number
-  /**
    * A function to transform or filter values during encoding.
    * Called for the root value and every nested property/element.
    * Return `undefined` to omit properties/elements (root cannot be omitted).
@@ -100,31 +86,14 @@ export interface DecodeOptions {
    * @default true
    */
   strict?: boolean
-  /**
-   * Enable path expansion to reconstruct dotted keys into nested objects.
-   * When set to 'safe', keys containing dots are expanded into nested structures
-   * if all segments are valid identifiers (e.g., data.metadata.items becomes nested objects).
-   * Pairs with keyFolding='safe' for lossless round-trips.
-   * @default 'off'
-   */
-  expandPaths?: 'off' | 'safe'
 }
 
 export type ResolvedDecodeOptions = Readonly<Required<DecodeOptions>>
 
 /**
  * Options for streaming decode operations.
- *
- * @remarks
- * Path expansion is not supported in streaming mode.
  */
-export interface DecodeStreamOptions extends Omit<DecodeOptions, 'expandPaths'> {
-  /**
-   * Path expansion is not supported in streaming decode.
-   * This option is explicitly omitted.
-   */
-  expandPaths?: never
-}
+export type DecodeStreamOptions = DecodeOptions
 
 // #endregion
 
@@ -135,7 +104,7 @@ export type JsonStreamEvent
     | { type: 'endObject' }
     | { type: 'startArray', length: number }
     | { type: 'endArray' }
-    | { type: 'key', key: string, wasQuoted?: boolean }
+    | { type: 'key', key: string }
     | { type: 'primitive', value: JsonPrimitive }
 
 // #endregion

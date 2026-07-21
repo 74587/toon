@@ -6,9 +6,8 @@ import * as path from 'node:path'
 import process from 'node:process'
 import { consola } from 'consola'
 import { estimateTokenCount } from 'tokenx'
-import { decode, decodeStream, encode, encodeLines } from '../../toon/src/index.ts'
+import { decodeStream, encode, encodeLines } from '../../toon/src/index.ts'
 import { jsonStreamFromEvents } from './json-from-events.ts'
-import { jsonStringifyLines } from './json-stringify-stream.ts'
 import { formatInputLabel, readInput, readLinesFromSource } from './utils.ts'
 
 export async function encodeToToon(config: {
@@ -16,8 +15,6 @@ export async function encodeToToon(config: {
   output?: string
   indent: NonNullable<EncodeOptions['indent']>
   delimiter: NonNullable<EncodeOptions['delimiter']>
-  keyFolding?: NonNullable<EncodeOptions['keyFolding']>
-  flattenDepth?: number
   printStats: boolean
 }): Promise<void> {
   const jsonContent = await readInput(config.input)
@@ -33,8 +30,6 @@ export async function encodeToToon(config: {
   const encodeOptions: EncodeOptions = {
     delimiter: config.delimiter,
     indent: config.indent,
-    keyFolding: config.keyFolding,
-    flattenDepth: config.flattenDepth,
   }
 
   // When printing stats, we need the full string for token counting
@@ -79,34 +74,18 @@ export async function decodeToJson(config: {
   output?: string
   indent: NonNullable<DecodeOptions['indent']>
   strict: NonNullable<DecodeOptions['strict']>
-  expandPaths?: NonNullable<DecodeOptions['expandPaths']>
 }): Promise<void> {
-  // Path expansion requires full value in memory, so use non-streaming path
-  if (config.expandPaths === 'safe') {
-    const toonContent = await readInput(config.input)
+  const lineSource = readLinesFromSource(config.input)
 
-    const decodeOptions: DecodeOptions = {
-      indent: config.indent,
-      strict: config.strict,
-      expandPaths: config.expandPaths,
-    }
-    const data = decode(toonContent, decodeOptions)
-
-    await writeStreamingJson(jsonStringifyLines(data, config.indent), config.output)
+  const decodeStreamOptions: DecodeStreamOptions = {
+    indent: config.indent,
+    strict: config.strict,
   }
-  else {
-    const lineSource = readLinesFromSource(config.input)
 
-    const decodeStreamOptions: DecodeStreamOptions = {
-      indent: config.indent,
-      strict: config.strict,
-    }
+  const events = decodeStream(lineSource, decodeStreamOptions)
+  const jsonChunks = jsonStreamFromEvents(events, config.indent)
 
-    const events = decodeStream(lineSource, decodeStreamOptions)
-    const jsonChunks = jsonStreamFromEvents(events, config.indent)
-
-    await writeStreamingJson(jsonChunks, config.output)
-  }
+  await writeStreamingJson(jsonChunks, config.output)
 
   if (config.output) {
     const relativeInputPath = formatInputLabel(config.input)

@@ -156,14 +156,6 @@ describe('streaming decode', () => {
       ])
     })
 
-    it('throws on expandPaths option', () => {
-      const input = 'name: Alice'
-      const lines = input.split('\n')
-
-      expect(() => Array.from(decodeStreamSync(lines, { expandPaths: 'safe' } as any)))
-        .toThrow('expandPaths is not supported in streaming decode')
-    })
-
     it('enforces strict mode validation', () => {
       const input = 'items[2]:\n  - Apple'
       const lines = input.split('\n')
@@ -216,7 +208,7 @@ describe('streaming decode', () => {
 
       expect(events).toEqual([
         { type: 'startObject' },
-        { type: 'key', key: '\t:x', wasQuoted: true },
+        { type: 'key', key: '\t:x' },
         { type: 'primitive', value: 'v' },
         { type: 'endObject' },
       ])
@@ -271,14 +263,6 @@ describe('streaming decode', () => {
       expect(Object.hasOwn(result, prototypeKey)).toBe(true)
       expect(result[prototypeKey]).toEqual({ safe: true })
       expect(Object.getPrototypeOf(result)).toBe(Object.prototype)
-    })
-
-    it('rejects expandPaths option', async () => {
-      const lines = ['name: Alice']
-
-      await expect(async () => {
-        await collect(decodeStream(asyncLines(lines), { expandPaths: 'safe' } as any))
-      }).rejects.toThrow('expandPaths is not supported in streaming decode')
     })
 
     it('enforces strict mode validation', async () => {
@@ -409,14 +393,6 @@ describe('streaming decode', () => {
       const lines = input.split('\n')
 
       expect(decodeFromLines(lines)).toEqual(decode(input))
-    })
-
-    it('supports expandPaths option', () => {
-      const lines = ['user.name: Alice', 'user.age: 30']
-
-      expect(decodeFromLines(lines, { expandPaths: 'safe' })).toEqual({
-        user: { name: 'Alice', age: 30 },
-      })
     })
 
     it('handles list item objects with empty string keyed tabular fields', () => {

@@ -14,9 +14,6 @@ export interface TestCase {
     delimiter?: ',' | '\t' | '|'
     indent?: number
     strict?: boolean
-    keyFolding?: 'off' | 'safe'
-    flattenDepth?: number
-    expandPaths?: 'off' | 'safe'
   }
   specSection?: string
   note?: string

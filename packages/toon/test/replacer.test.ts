@@ -366,24 +366,6 @@ describe('replacer function', () => {
   })
 
   describe('integration with other options', () => {
-    it('works with keyFolding', () => {
-      const input = {
-        user: {
-          profile: {
-            name: 'Alice',
-          },
-        },
-      }
-      const replacer: EncodeReplacer = (key, value) => {
-        if (typeof value === 'string')
-          return value.toUpperCase()
-        return value
-      }
-
-      const result = encode(input, { replacer, keyFolding: 'safe' })
-      expect(result).toContain('user.profile.name: ALICE')
-    })
-
     it('works with custom delimiters', () => {
       const input = { items: [1, 2, 3] }
       const replacer: EncodeReplacer = (key, value) => {

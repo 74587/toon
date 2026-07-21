@@ -117,11 +117,6 @@ export function* decodeStreamSync(
   source: Iterable<string>,
   options?: DecodeStreamOptions,
 ): Generator<JsonStreamEvent> {
-  // Validate options
-  if (options?.expandPaths !== undefined) {
-    throw new Error('expandPaths is not supported in streaming decode')
-  }
-
   const resolvedOptions: DecoderContext = {
     indent: options?.indent ?? 2,
     strict: options?.strict ?? true,
@@ -223,11 +218,11 @@ function* decodeKeyValueSync(
   }
 
   // Regular key-value pair
-  const { key, isQuoted, end } = withLine(line, () => parseKeyToken(content, 0))
+  const { key, end } = withLine(line, () => parseKeyToken(content, 0))
   const rest = content.slice(end).trim()
 
   assertNoDuplicateKey(key, line, seenKeys)
-  yield isQuoted ? { type: 'key', key, wasQuoted: true } : { type: 'key', key }
+  yield { type: 'key', key }
 
   // No value after colon - expect nested object or empty
   if (!rest) {
@@ -581,11 +576,6 @@ export async function* decodeStream(
   source: AsyncIterable<string> | Iterable<string>,
   options?: DecodeStreamOptions,
 ): AsyncGenerator<JsonStreamEvent> {
-  // Validate options
-  if (options?.expandPaths !== undefined) {
-    throw new Error('expandPaths is not supported in streaming decode')
-  }
-
   const resolvedOptions = {
     indent: options?.indent ?? 2,
     strict: options?.strict ?? true,
@@ -681,11 +671,11 @@ async function* decodeKeyValueAsync(
   }
 
   // Regular key-value pair
-  const { key, isQuoted, end } = withLine(line, () => parseKeyToken(content, 0))
+  const { key, end } = withLine(line, () => parseKeyToken(content, 0))
   const rest = content.slice(end).trim()
 
   assertNoDuplicateKey(key, line, seenKeys)
-  yield isQuoted ? { type: 'key', key, wasQuoted: true } : { type: 'key', key }
+  yield { type: 'key', key }
 
   // No value after colon - expect nested object or empty
   if (!rest) {
