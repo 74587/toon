@@ -64,9 +64,6 @@ cat data.toon | toon --decode
 | `--indent <number>` | Indentation size (default: `2`) |
 | `--stats` | Show token count estimates and savings (encode only) |
 | `--no-strict` | Skip decode validation (array counts, indentation, header delimiter); last-write-wins on duplicate keys |
-| `--keyFolding <mode>` | Enable key folding: `off`, `safe` (default: `off`) |
-| `--flattenDepth <number>` | Maximum folded segment count when key folding is enabled (default: `Infinity`) |
-| `--expandPaths <mode>` | Enable path expansion: `off`, `safe` (default: `off`) |
 | `--verbose` | Show full stack traces and cause chains for errors (default: `false`) |
 
 ## Advanced Examples
@@ -154,78 +151,9 @@ cat million-records.toon | toon --decode > output.json
 - **Encode (JSON → TOON)**: Streams TOON lines to output without full string in memory
 - **Decode (TOON → JSON)**: Uses the same event-based streaming decoder as the `decodeStream` API in `@toon-format/toon`, streaming JSON tokens to output without full string in memory
 - Peak memory usage scales with data depth, not total size
-- When `--expandPaths safe` is enabled, decode falls back to non-streaming mode internally to apply deep-merge expansion before writing JSON
 
 > [!TIP]
 > When using `--stats` with encode, the full output string is kept in memory for token counting. Omit `--stats` for maximum memory efficiency with very large datasets.
-
-### Key Folding (Since v1.5)
-
-Collapse nested wrapper chains to reduce tokens:
-
-#### Basic key folding
-
-```bash
-# Encode with key folding
-toon input.json --keyFolding safe -o output.toon
-```
-
-For data like:
-```json
-{
-  "data": {
-    "metadata": {
-      "items": ["a", "b"]
-    }
-  }
-}
-```
-
-Output becomes:
-```
-data.metadata.items[2]: a,b
-```
-
-Instead of:
-```
-data:
-  metadata:
-    items[2]: a,b
-```
-
-#### Limit folding depth
-
-```bash
-# Fold maximum 2 levels deep
-toon input.json --keyFolding safe --flattenDepth 2 -o output.toon
-```
-
-#### Path expansion on decode
-
-```bash
-# Reconstruct nested structure from folded keys
-toon data.toon --expandPaths safe -o output.json
-```
-
-#### Round-trip workflow
-
-```bash
-# Encode with folding
-toon input.json --keyFolding safe -o compressed.toon
-
-# Decode with expansion (restores original structure)
-toon compressed.toon --expandPaths safe -o output.json
-
-# Verify round-trip
-diff input.json output.json
-```
-
-#### Combined with other options
-
-```bash
-# Key folding + tab delimiter + stats
-toon data.json --keyFolding safe --delimiter $'\t' --stats -o output.toon
-```
 
 ## Why Use the CLI?
 
@@ -233,7 +161,6 @@ toon data.json --keyFolding safe --delimiter $'\t' --stats -o output.toon
 - **Token analysis** to see potential savings before sending to LLMs
 - **Pipeline integration** with existing JSON-based workflows
 - **Flexible formatting** with delimiter and indentation options
-- **Key folding** to collapse nested wrappers for additional token savings
 - **Memory-efficient streaming** for both encode and decode operations - process large datasets without loading entire outputs into memory
 
 ## Related

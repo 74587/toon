@@ -1,5 +1,5 @@
 ---
-description: TOON syntax with concrete examples – objects, arrays, headers, key folding, and quoting rules.
+description: TOON syntax with concrete examples – objects, arrays, tabular headers, comments, and quoting rules.
 ---
 
 # Format Overview
@@ -54,6 +54,28 @@ When a key ends with `:` and has no value on the same line, it opens a nested ob
 
 An empty object at the root yields an empty document (no lines). A nested empty object is `key:` alone, with no children.
 
+### Keyed Tabular Objects
+
+When an object has at least two entries whose values are uniform objects (same keys, primitive or nested-uniform values), it collapses into a keyed tabular form: the shared field structure appears once in the header, and each entry becomes one row that carries its own key:
+
+```yaml
+users[2:]{age,city}:
+  alice: 30,Berlin
+  bob: 25,Paris
+```
+
+The colon immediately after the length (`[2:]`) marks the keyed header, and `[N]` declares the entry count. Each entry row is `entrykey: cell,cell,…` – the entry key followed by the entry value's leaf values in field order.
+
+When the root object itself is eligible, the key is omitted:
+
+```text
+[2:]{age,city}:
+  alice: 30,Berlin
+  bob: 25,Paris
+```
+
+Objects that don't qualify keep the nested form unchanged: single-entry objects, objects whose values mix shapes or include primitives, arrays, or empty objects. In practice this leaves most configuration-style maps as they are ([spec §9.5](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form)).
+
 ## Arrays
 
 TOON detects array structure and chooses the most efficient representation. Arrays always declare their length in brackets: `[N]`.
@@ -96,7 +118,19 @@ The header `items[2]{sku,qty,price}:` declares:
 Each row contains values in the same order as the field list. Values are encoded as primitives (strings, numbers, booleans, null) and separated by the delimiter.
 
 > [!NOTE]
-> Tabular format requires identical field sets across all objects (same keys, order per object may vary), primitive values only (no nested arrays/objects), and at least one key per object – arrays that contain an empty `{}` element fall back to the expanded list form below.
+> Tabular format requires identical field sets across all objects (same keys, order per object may vary), at least one key per object, and every column either primitive-valued or a uniform nested object (see below) – arrays that contain an empty `{}` element or mix value shapes within a column fall back to the expanded list form.
+
+### Nested Field Groups
+
+A column whose values are uniform sub-objects (same keys in every element, recursively primitive or nested-uniform) folds into the header as a nested field group, while rows stay flat:
+
+```yaml
+orders[2]{id,customer{name,country},total}:
+  1,Ada,DE,9.99
+  2,Bob,FR,14.5
+```
+
+The header `customer{name,country}` declares a nested-object column; each row's cells follow a depth-first walk of the field list, so `Ada,DE` fills `customer.name` and `customer.country` of the first order. Nesting depth is unbounded ([spec §9.3](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form)).
 
 ### Mixed and Non-Uniform Arrays
 
@@ -231,70 +265,17 @@ Tab and pipe delimiters are explicitly encoded in the header brackets and field 
 > [!TIP]
 > Tab delimiters often tokenize more efficiently than commas, especially for data with few quoted strings. Use `encode(data, { delimiter: '\t' })` for additional token savings.
 
-## Key Folding (Optional)
+## Comments
 
-Key folding is an optional encoder feature (since spec v1.5) that collapses chains of single-key objects into dotted paths, reducing tokens for deeply nested data.
-
-### Basic Folding
-
-Standard nesting:
+Decoders strip every line whose first non-space character is `#` in a lexical pre-pass, before anything else:
 
 ```yaml
-data:
-  metadata:
-    items[2]: a,b
+# Server configuration
+host: example.com
+port: 8080
 ```
 
-With key folding (`keyFolding: 'safe'`):
-
-```yaml
-data.metadata.items[2]: a,b
-```
-
-The three nested objects collapse into a single dotted key `data.metadata.items`.
-
-### When Folding Applies
-
-A chain of objects is foldable when:
-- Each object in the chain has exactly one key (leading to the next object or a leaf value)
-- The leaf value is a primitive, array, or empty object
-- All segments are valid identifier segments (letters, digits, underscores only; no dots within segments)
-- The resulting folded key doesn't collide with existing keys
-
-::: details Advanced Folding Rules
-**Segment Requirements (safe mode):**
-- All folded segments must match `^[A-Za-z_][A-Za-z0-9_]*$` (no dots, hyphens, or other special characters)
-- No segment may require quoting per §7.3 of the spec
-- The resulting folded key must not equal any existing sibling literal key at the same depth (collision avoidance)
-
-**Depth Limit:**
-- The `flattenDepth` option (default: `Infinity`) controls how many segments to fold
-- `flattenDepth: 2` folds only two-segment chains: `{a: {b: val}}` → `a.b: val`
-- Values less than 2 have no practical effect
-
-**Round-Trip with Path Expansion:**
-To reconstruct the original structure when decoding, use `expandPaths: 'safe'`. This splits dotted keys back into nested objects using the same safety rules ([spec §13.4](https://github.com/toon-format/spec/blob/main/SPEC.md#134-key-folding-and-path-expansion)).
-:::
-
-### Round-Trip with Path Expansion
-
-When decoding TOON that used key folding, enable path expansion to restore the nested structure:
-
-```ts
-import { decode, encode } from '@toon-format/toon'
-
-const original = { data: { metadata: { items: ['a', 'b'] } } }
-
-// Encode with folding
-const toon = encode(original, { keyFolding: 'safe' })
-// → "data.metadata.items[2]: a,b"
-
-// Decode with expansion
-const restored = decode(toon, { expandPaths: 'safe' })
-// → { data: { metadata: { items: ['a', 'b'] } } }
-```
-
-Path expansion is off by default, so dotted keys are treated as literal keys unless explicitly enabled.
+Comments are full-line only – a `#` anywhere else on a line is ordinary content – and decode-side only: encoders never emit them, and string values starting with `#` are always quoted so encoder output never contains a line that reads as a comment. A comment between tabular rows or entry rows does not end them ([spec §5.1](https://github.com/toon-format/spec/blob/main/SPEC.md#51-comment-lines)).
 
 ## Quoting and Types
 
@@ -305,10 +286,11 @@ TOON quotes strings **only when necessary** to maximize token efficiency. A stri
 - It's empty (`""`)
 - It has leading or trailing whitespace
 - It equals `true`, `false`, or `null` (case-sensitive)
-- It looks like a number (e.g., `"42"`, `"-3.14"`, `"1e-6"`, `"05"`)
+- It looks like a number (e.g., `"42"`, `"-3.14"`, `"1e-6"`, `"05"`, `"+1"`)
 - It contains special characters: colon (`:`), quote (`"`), backslash (`\`), brackets, braces, or any control character in U+0000–U+001F
 - It contains the relevant delimiter (the active delimiter inside an array scope, or the document delimiter elsewhere)
 - It equals `"-"` or starts with `"-"` followed by any character
+- It equals `"#"` or starts with `"#"` (the line would read as a comment)
 
 Otherwise, strings can be unquoted. Unicode, emoji, and strings with internal (non-leading/trailing) spaces are safe unquoted:
 

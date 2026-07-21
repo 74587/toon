@@ -1,5 +1,5 @@
 ---
-description: JSON-to-TOON mappings at a glance for objects, arrays, quoting, key folding, and type conversions.
+description: JSON-to-TOON mappings at a glance for objects, arrays, tabular forms, quoting, and type conversions.
 ---
 
 # Syntax Cheatsheet
@@ -262,10 +262,11 @@ Strings **must** be quoted if they:
 - Are empty (`""`)
 - Have leading or trailing whitespace
 - Equal `true`, `false`, or `null` (case-sensitive)
-- Look like numbers (e.g., `"42"`, `"-3.14"`, `"1e-6"`, `"05"`)
+- Look like numbers (e.g., `"42"`, `"-3.14"`, `"1e-6"`, `"05"`, `"+1"`)
 - Contain special characters: `:`, `"`, `\`, `[`, `]`, `{`, `}`, or any control character (U+0000–U+001F, including newline/tab/CR)
 - Contain the relevant delimiter – the active delimiter inside an array scope, or the document delimiter (comma by default) for object field values
 - Equal `"-"` or start with `"-"` followed by any character
+- Equal `"#"` or start with `"#"` (the line would read as a comment)
 
 Otherwise, strings can be unquoted. Unicode and emoji are safe:
 
@@ -330,23 +331,26 @@ items[2|]{id|name}:
 
 The delimiter symbol appears inside the brackets and braces.
 
-## Key Folding (Optional)
+## Keyed Tabular Objects
 
-Standard nesting:
-
-```yaml
-data:
-  metadata:
-    items[2]: a,b
-```
-
-With key folding (`keyFolding: 'safe'`):
+An object of uniform objects collapses into a keyed header with one entry row per entry:
 
 ```yaml
-data.metadata.items[2]: a,b
+users[2:]{age,city}:
+  alice: 30,Berlin
+  bob: 25,Paris
 ```
 
-See [Format Overview – Key Folding](/guide/format-overview#key-folding-optional) for details.
+See [Format Overview – Keyed Tabular Objects](/guide/format-overview#keyed-tabular-objects) for details.
+
+## Comments
+
+Lines whose first non-space character is `#` are stripped before decoding:
+
+```yaml
+# Full-line comments only; encoders never emit them
+host: example.com
+```
 
 ## Type Conversions
 
