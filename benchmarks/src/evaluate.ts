@@ -27,7 +27,7 @@ export const MODELS: ModelDescriptor[] = [
   { id: 'claude-haiku-4-5-20251001', rpm: 50, create: () => anthropic('claude-haiku-4-5-20251001') },
   { id: 'gemini-3.6-flash', rpm: 25, create: () => google('gemini-3.6-flash') },
   { id: 'gpt-5.4-nano', rpm: 50, create: () => openai('gpt-5.4-nano') },
-  { id: 'grok-4-1-fast-non-reasoning', rpm: 25, create: () => xai('grok-4-1-fast-non-reasoning') },
+  { id: 'grok-4.5', rpm: 25, create: () => xai('grok-4.5') },
 ]
 
 /**
@@ -68,15 +68,10 @@ Answer:
 `.trim()
 
   const startTime = performance.now()
-  // The benchmark measures format comprehension, not reasoning – each provider
-  // reads only its own namespace, so unrelated entries are ignored
   const { text, usage } = await generateText({
     model,
     prompt,
-    providerOptions: {
-      google: { thinkingConfig: { thinkingLevel: 'minimal' } },
-      openai: { reasoningEffort: 'none' },
-    },
+    reasoning: 'none',
   })
 
   const actual = text.trim()
