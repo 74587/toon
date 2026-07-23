@@ -12,8 +12,8 @@ import { compareAnswers } from './normalize.ts'
  */
 export const models: LanguageModelV4[] = [
   anthropic('claude-haiku-4-5-20251001'),
-  google('gemini-3-flash-preview'),
-  openai('gpt-5-nano'),
+  google('gemini-3.6-flash'),
+  openai('gpt-5.4-nano'),
   xai('grok-4-1-fast-non-reasoning'),
 ]
 
@@ -85,7 +85,16 @@ Answer:
 `.trim()
 
   const startTime = performance.now()
-  const { text, usage } = await generateText({ model, prompt })
+  // The benchmark measures format comprehension, not reasoning – each provider
+  // reads only its own namespace, so unrelated entries are ignored
+  const { text, usage } = await generateText({
+    model,
+    prompt,
+    providerOptions: {
+      google: { thinkingConfig: { thinkingLevel: 'minimal' } },
+      openai: { reasoningEffort: 'none' },
+    },
+  })
 
   const actual = text.trim()
   const latencyMs = performance.now() - startTime

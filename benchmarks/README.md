@@ -44,10 +44,10 @@ Tests how well LLMs can answer questions about data in different formats (TOON, 
 
 1. Edit [`src/evaluate.ts`](./src/evaluate.ts) and add models to the exported `models` array:
    ```ts
-   export const models: LanguageModelV3[] = [
-     openai('gpt-5-nano'),
+   export const models: LanguageModelV4[] = [
+     openai('gpt-5.4-nano'),
      anthropic('claude-haiku-4-5-20251001'),
-     google('gemini-3-flash-preview'),
+     google('gemini-3.6-flash'),
      xai('grok-4-1-fast-non-reasoning'),
      // Add your models here
    ]
