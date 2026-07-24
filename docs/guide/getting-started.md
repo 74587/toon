@@ -104,6 +104,8 @@ hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
 
 Notice how TOON combines YAML's indentation for the `context` object with inline format for the primitive `friends` array and tabular format for the structured `hikes` array. Each format is chosen automatically based on the data structure.
 
+The same idea extends further: uniform nested-object columns fold into the header as [nested field groups](/guide/format-overview#nested-field-groups), and maps of uniform objects collapse into the [keyed tabular form](/guide/format-overview#keyed-tabular-objects) whose rows carry their own keys.
+
 ### Design Goals
 
 TOON is optimized for specific use cases. It aims to:

@@ -38,6 +38,37 @@ The indentation and headers are usually enough – models treat TOON like famili
 > [!NOTE]
 > Most models don't have built-in TOON syntax highlighting, so ` ```toon` or ` ```yaml` both work fine. The structure is what matters.
 
+### Nested and Keyed Data
+
+Uniform nested objects don't break the tabular form: a nested-object column folds into the header as a [nested field group](/guide/format-overview#nested-field-groups), and rows stay flat:
+
+```toon
+orders[2]{id,customer{name,country},total}:
+  1,Ada,DK,99
+  2,Bob,UK,149
+```
+
+Maps of uniform objects – feature flags, users by ID, per-environment config – collapse into the [keyed tabular form](/guide/format-overview#keyed-tabular-objects), where each entry row carries its own key:
+
+```toon
+environments[2:]{region,replicas,debug}:
+  production: eu-central-1,6,false
+  staging: eu-central-1,2,true
+```
+
+The same prompting rules apply: one example is enough, the header tells the model how to read the rows.
+
+### Annotating Data with Comments
+
+Decoders strip full-line `#` [comment lines](/guide/format-overview#comments) before parsing, so you can annotate prompt data by hand – and model output that includes `#` explainer lines still decodes cleanly. Encoders never emit comments, so round-trips stay canonical.
+
+```toon
+# Only active users, exported 2025-01-15
+users[2]{id,name,role}:
+  1,Ada,admin
+  2,Bob,user
+```
+
 ## Generating TOON from LLMs
 
 For output, be more explicit. When you want the model to **generate** TOON:
