@@ -875,7 +875,7 @@ const safe = encode(user, {
   replacer: (key, value) => key === 'password' ? undefined : value
 })
 // name: Ada
-// email: alice@example.com
+// email: ada@example.com
 
 // Transform values
 const data = { status: 'active', count: 5 }

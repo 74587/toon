@@ -27,7 +27,7 @@ Data is in TOON format (2-space indent, arrays show length and fields).
 users[3]{id,name,role,lastLogin}:
   1,Ada,admin,"2025-01-15T10:30:00Z"
   2,Bob,user,"2025-01-14T15:22:00Z"
-  3,Alice,user,"2025-01-13T09:45:00Z"
+  3,Cleo,user,"2025-01-13T09:45:00Z"
 ```
 
 Task: Summarize the user roles and their last activity.
@@ -85,7 +85,7 @@ Data is in TOON format (2-space indent, arrays show length and fields).
 users[3]{id,name,role,lastLogin}:
   1,Ada,admin,"2025-01-15T10:30:00Z"
   2,Bob,user,"2025-01-14T15:22:00Z"
-  3,Alice,user,"2025-01-13T09:45:00Z"
+  3,Cleo,user,"2025-01-13T09:45:00Z"
 ```
 
 Task: Return only users with role "user" as TOON. Use the same header format. Set [N] to match the row count. Output only the code block.
@@ -96,7 +96,7 @@ Task: Return only users with role "user" as TOON. Use the same header format. Se
 ```toon
 users[2]{id,name,role,lastLogin}:
   2,Bob,user,"2025-01-14T15:22:00Z"
-  3,Alice,user,"2025-01-13T09:45:00Z"
+  3,Cleo,user,"2025-01-13T09:45:00Z"
 ```
 
 The model adjusts `[N]` to `2` and generates two rows.

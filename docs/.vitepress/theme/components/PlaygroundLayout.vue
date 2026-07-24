@@ -41,7 +41,7 @@ const PRESETS = {
     orders: [
       {
         orderId: 'ORD-001',
-        customer: { name: 'Alice Chen', country: 'DK' },
+        customer: { name: 'Ada Chen', country: 'DK' },
         total: 109.97,
         status: 'shipped',
       },

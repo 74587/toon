@@ -61,7 +61,7 @@ When an object has at least two entries whose values are uniform objects (same k
 ```yaml
 users[2:]{age,city}:
   alice: 30,Berlin
-  bob: 25,Paris
+  bob: 25,Oslo
 ```
 
 The colon immediately after the length (`[2:]`) marks the keyed header, and `[N]` declares the entry count. Each entry row is `entrykey: cell,cell,…` – the entry key followed by the entry value's leaf values in field order.
@@ -71,7 +71,7 @@ When the root object itself is eligible, the key is omitted:
 ```text
 [2:]{age,city}:
   alice: 30,Berlin
-  bob: 25,Paris
+  bob: 25,Oslo
 ```
 
 Objects that don't qualify keep the nested form unchanged: single-entry objects, objects whose values mix shapes or include primitives, arrays, or empty objects. In practice this leaves most configuration-style maps as they are ([spec §9.5](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form)).
@@ -126,11 +126,11 @@ A column whose values are uniform sub-objects (same keys in every element, recur
 
 ```yaml
 orders[2]{id,customer{name,country},total}:
-  1,Ada,DE,9.99
-  2,Bob,FR,14.5
+  1,Ada,DK,99
+  2,Bob,UK,149
 ```
 
-The header `customer{name,country}` declares a nested-object column; each row's cells follow a depth-first walk of the field list, so `Ada,DE` fills `customer.name` and `customer.country` of the first order. Nesting depth is unbounded ([spec §9.3](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form)).
+The header `customer{name,country}` declares a nested-object column; each row's cells follow a depth-first walk of the field list, so `Ada,DK` fills `customer.name` and `customer.country` of the first order. Nesting depth is unbounded ([spec §9.3](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form)).
 
 ### Mixed and Non-Uniform Arrays
 
