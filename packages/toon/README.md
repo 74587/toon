@@ -945,6 +945,60 @@ npx @toon-format/cli data.json --stats
 
 ## Format Overview
 
+Uniform arrays of objects collapse into tables – and so do two more shapes that show up constantly in LLM payloads.
+
+**Nested field groups** ([SPEC §9.3](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form)): a uniform nested-object column folds into the header; rows stay flat.
+
+<table>
+<tr><th>JSON</th><th>TOON</th></tr>
+<tr><td>
+
+```json
+{
+  "orders": [
+    { "id": 1, "customer": { "name": "Ada", "country": "DK" }, "total": 99 },
+    { "id": 2, "customer": { "name": "Bob", "country": "UK" }, "total": 149 }
+  ]
+}
+```
+
+</td><td>
+
+```toon
+orders[2]{id,customer{name,country},total}:
+  1,Ada,DK,99
+  2,Bob,UK,149
+```
+
+</td></tr>
+</table>
+
+**Keyed tabular form** ([SPEC §9.5](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form)): maps of uniform objects – feature flags, users by ID, per-environment config – become tables whose rows carry their own keys. The colon after the length (`[2:]`) marks the keyed header.
+
+<table>
+<tr><th>JSON</th><th>TOON</th></tr>
+<tr><td>
+
+```json
+{
+  "environments": {
+    "production": { "region": "eu-central-1", "replicas": 6, "debug": false },
+    "staging": { "region": "eu-central-1", "replicas": 2, "debug": true }
+  }
+}
+```
+
+</td><td>
+
+```toon
+environments[2:]{region,replicas,debug}:
+  production: eu-central-1,6,false
+  staging: eu-central-1,2,true
+```
+
+</td></tr>
+</table>
+
 Detailed syntax references, implementation guides, and quick lookups for understanding and using the TOON format.
 
 - [Format Overview](https://toonformat.dev/guide/format-overview) – Complete syntax documentation
@@ -953,7 +1007,7 @@ Detailed syntax references, implementation guides, and quick lookups for underst
 
 ## Using TOON with LLMs
 
-TOON works best when you show the format instead of describing it. Once a model sees one tabular example, the header (`[N]` length + `{fields}`) tells it how to read the rest. Wrap data in ` ```toon` code blocks for input, and show the expected header template when asking models to generate TOON. Use tab delimiters for even better token efficiency.
+TOON works best when you show the format instead of describing it. Once a model sees one tabular example, the header (`[N]` length + `{fields}`) tells it how to read the rest. Wrap data in ` ```toon` code blocks for input, and show the expected header template when asking models to generate TOON. Use tab delimiters for even better token efficiency. Full-line `#` comments are stripped on decode, so hand-annotated prompt data – and model output with explainer lines – still decodes cleanly.
 
 Follow the detailed [LLM integration guide](https://toonformat.dev/guide/llm-prompts) for strategies, examples, and validation techniques.
 
