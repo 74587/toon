@@ -45,24 +45,30 @@ const PRESETS = {
     orders: [
       {
         orderId: 'ORD-001',
-        customer: { name: 'Alice Chen', email: 'alice@example.com' },
-        items: [
-          { sku: 'WIDGET-A', quantity: 2, price: 29.99 },
-          { sku: 'GADGET-B', quantity: 1, price: 49.99 },
-        ],
+        customer: { name: 'Alice Chen', country: 'DK' },
         total: 109.97,
         status: 'shipped',
       },
       {
         orderId: 'ORD-002',
-        customer: { name: 'Bob Smith', email: 'bob@example.com' },
-        items: [
-          { sku: 'THING-C', quantity: 3, price: 15.00 },
-        ],
+        customer: { name: 'Bob Smith', country: 'UK' },
         total: 45.00,
         status: 'delivered',
       },
+      {
+        orderId: 'ORD-003',
+        customer: { name: 'Cleo Faron', country: 'FR' },
+        total: 249.00,
+        status: 'pending',
+      },
     ],
+  },
+  environments: {
+    environments: {
+      production: { region: 'eu-central-1', replicas: 6, debug: false },
+      staging: { region: 'eu-central-1', replicas: 2, debug: true },
+      development: { region: 'local', replicas: 1, debug: true },
+    },
   },
   metrics: {
     metrics: [
@@ -313,7 +319,10 @@ async function loadTokenizer() {
               Hikes (mixed structure)
             </option>
             <option value="orders">
-              Orders (nested objects)
+              Orders (nested field groups)
+            </option>
+            <option value="environments">
+              Environments (keyed tabular)
             </option>
             <option value="metrics">
               Metrics (tabular data)
