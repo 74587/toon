@@ -51,60 +51,66 @@ For a more realistic example, here's how TOON handles a dataset with both nested
 
 ::: code-group
 
-```json [JSON (235 tokens)]
+```json [JSON (196 tokens)]
 {
-  "context": {
-    "task": "Our favorite hikes together",
-    "location": "Boulder",
-    "season": "spring_2025"
+  "location": {
+    "city": "Berlin",
+    "country": "DE",
+    "units": "metric"
   },
-  "friends": ["ana", "luis", "sam"],
-  "hikes": [
+  "alerts": [
+    "frost",
+    "wind"
+  ],
+  "forecast": [
     {
-      "id": 1,
-      "name": "Blue Lake Trail",
-      "distanceKm": 7.5,
-      "elevationGain": 320,
-      "companion": "ana",
-      "wasSunny": true
+      "day": "Mon",
+      "temp": {
+        "min": -2,
+        "max": 4
+      },
+      "condition": "snow",
+      "rainChance": 80
     },
     {
-      "id": 2,
-      "name": "Ridge Overlook",
-      "distanceKm": 9.2,
-      "elevationGain": 540,
-      "companion": "luis",
-      "wasSunny": false
+      "day": "Tue",
+      "temp": {
+        "min": 1,
+        "max": 7
+      },
+      "condition": "cloudy",
+      "rainChance": 20
     },
     {
-      "id": 3,
-      "name": "Wildflower Loop",
-      "distanceKm": 5.1,
-      "elevationGain": 180,
-      "companion": "sam",
-      "wasSunny": true
+      "day": "Wed",
+      "temp": {
+        "min": 3,
+        "max": 11
+      },
+      "condition": "sunny",
+      "rainChance": 5
     }
   ]
 }
 ```
 
-```yaml [TOON (106 tokens)]
-context:
-  task: Our favorite hikes together
-  location: Boulder
-  season: spring_2025
-friends[3]: ana,luis,sam
-hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
-  1,Blue Lake Trail,7.5,320,ana,true
-  2,Ridge Overlook,9.2,540,luis,false
-  3,Wildflower Loop,5.1,180,sam,true
+```yaml [TOON (74 tokens)]
+location:
+  city: Berlin
+  country: DE
+  units: metric
+alerts[2]: frost,wind
+forecast[3]{day,temp{min,max},condition,rainChance}:
+  Mon,-2,4,snow,80
+  Tue,1,7,cloudy,20
+  Wed,3,11,sunny,5
 ```
 
 :::
 
-Notice how TOON combines YAML's indentation for the `context` object with inline format for the primitive `friends` array and tabular format for the structured `hikes` array. Each format is chosen automatically based on the data structure.
+Notice how TOON combines YAML's indentation for the `location` object with inline format for the primitive `alerts` array and tabular format for the structured `forecast` array – where the uniform nested `temp` objects fold into the header as a [nested field group](/guide/format-overview#nested-field-groups) (`temp{min,max}`). Each format is chosen automatically based on the data structure.
 
-The same idea extends further: uniform nested-object columns fold into the header as [nested field groups](/guide/format-overview#nested-field-groups), and maps of uniform objects collapse into the [keyed tabular form](/guide/format-overview#keyed-tabular-objects) whose rows carry their own keys.
+Maps of uniform objects collapse as well: the [keyed tabular form](/guide/format-overview#keyed-tabular-objects) turns them into tables whose rows carry their own keys.
 
 ### Design Goals
 

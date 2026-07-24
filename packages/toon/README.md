@@ -39,36 +39,42 @@ AI is becoming cheaper and more accessible, but larger context windows allow for
 
 ```json
 {
-  "context": {
-    "task": "Our favorite hikes together",
-    "location": "Boulder",
-    "season": "spring_2025"
+  "location": {
+    "city": "Berlin",
+    "country": "DE",
+    "units": "metric"
   },
-  "friends": ["ana", "luis", "sam"],
-  "hikes": [
+  "alerts": [
+    "frost",
+    "wind"
+  ],
+  "forecast": [
     {
-      "id": 1,
-      "name": "Blue Lake Trail",
-      "distanceKm": 7.5,
-      "elevationGain": 320,
-      "companion": "ana",
-      "wasSunny": true
+      "day": "Mon",
+      "temp": {
+        "min": -2,
+        "max": 4
+      },
+      "condition": "snow",
+      "rainChance": 80
     },
     {
-      "id": 2,
-      "name": "Ridge Overlook",
-      "distanceKm": 9.2,
-      "elevationGain": 540,
-      "companion": "luis",
-      "wasSunny": false
+      "day": "Tue",
+      "temp": {
+        "min": 1,
+        "max": 7
+      },
+      "condition": "cloudy",
+      "rainChance": 20
     },
     {
-      "id": 3,
-      "name": "Wildflower Loop",
-      "distanceKm": 5.1,
-      "elevationGain": 180,
-      "companion": "sam",
-      "wasSunny": true
+      "day": "Wed",
+      "temp": {
+        "min": 3,
+        "max": 11
+      },
+      "condition": "sunny",
+      "rainChance": 5
     }
   ]
 }
@@ -78,33 +84,32 @@ AI is becoming cheaper and more accessible, but larger context windows allow for
 <summary>YAML already conveys the same information with <strong>fewer tokens</strong>.</summary>
 
 ```yaml
-context:
-  task: Our favorite hikes together
-  location: Boulder
-  season: spring_2025
-friends:
-  - ana
-  - luis
-  - sam
-hikes:
-  - id: 1
-    name: Blue Lake Trail
-    distanceKm: 7.5
-    elevationGain: 320
-    companion: ana
-    wasSunny: true
-  - id: 2
-    name: Ridge Overlook
-    distanceKm: 9.2
-    elevationGain: 540
-    companion: luis
-    wasSunny: false
-  - id: 3
-    name: Wildflower Loop
-    distanceKm: 5.1
-    elevationGain: 180
-    companion: sam
-    wasSunny: true
+location:
+  city: Berlin
+  country: DE
+  units: metric
+alerts:
+  - frost
+  - wind
+forecast:
+  - day: Mon
+    temp:
+      min: -2
+      max: 4
+    condition: snow
+    rainChance: 80
+  - day: Tue
+    temp:
+      min: 1
+      max: 7
+    condition: cloudy
+    rainChance: 20
+  - day: Wed
+    temp:
+      min: 3
+      max: 11
+    condition: sunny
+    rainChance: 5
 ```
 
 </details>
@@ -112,16 +117,18 @@ hikes:
 TOON conveys the same information with **even fewer tokens** – combining YAML-like indentation with CSV-style tabular arrays:
 
 ```yaml
-context:
-  task: Our favorite hikes together
-  location: Boulder
-  season: spring_2025
-friends[3]: ana,luis,sam
-hikes[3]{id,name,distanceKm,elevationGain,companion,wasSunny}:
-  1,Blue Lake Trail,7.5,320,ana,true
-  2,Ridge Overlook,9.2,540,luis,false
-  3,Wildflower Loop,5.1,180,sam,true
+location:
+  city: Berlin
+  country: DE
+  units: metric
+alerts[2]: frost,wind
+forecast[3]{day,temp{min,max},condition,rainChance}:
+  Mon,-2,4,snow,80
+  Tue,1,7,cloudy,20
+  Wed,3,11,sunny,5
 ```
+
+Note `temp{min,max}` in the header: the uniform nested `temp` objects fold into a nested field group while rows stay flat – see [Format Overview](#format-overview) for this and the keyed tabular form.
 
 ## Key Features
 
