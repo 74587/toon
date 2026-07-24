@@ -28,17 +28,13 @@ function stringifyInputYaml(value: unknown): string {
 }
 
 const PRESETS = {
-  hikes: {
-    context: {
-      task: 'Our favorite hikes together',
-      location: 'Boulder',
-      season: 'spring_2025',
-    },
-    friends: ['ana', 'luis', 'sam'],
-    hikes: [
-      { id: 1, name: 'Blue Lake Trail', distanceKm: 7.5, elevationGain: 320, companion: 'ana', wasSunny: true },
-      { id: 2, name: 'Ridge Overlook', distanceKm: 9.2, elevationGain: 540, companion: 'luis', wasSunny: false },
-      { id: 3, name: 'Wildflower Loop', distanceKm: 5.1, elevationGain: 180, companion: 'sam', wasSunny: true },
+  weather: {
+    location: { city: 'Berlin', country: 'DE', units: 'metric' },
+    alerts: ['frost', 'wind'],
+    forecast: [
+      { day: 'Mon', temp: { min: -2, max: 4 }, condition: 'snow', rainChance: 80 },
+      { day: 'Tue', temp: { min: 1, max: 7 }, condition: 'cloudy', rainChance: 20 },
+      { day: 'Wed', temp: { min: 3, max: 11 }, condition: 'sunny', rainChance: 5 },
     ],
   },
   orders: {
@@ -98,7 +94,7 @@ const JSON_FORMAT_OPTIONS: { value: JsonFormat, label: string, indent: string | 
   { value: 'pretty-tab', label: 'Pretty (tabs)', indent: '\t' },
   { value: 'compact', label: 'Compact', indent: undefined },
 ]
-const DEFAULT_JSON = JSON.stringify(PRESETS.hikes, undefined, 2)
+const DEFAULT_JSON = JSON.stringify(PRESETS.weather, undefined, 2)
 const SHARE_URL_LIMIT = 8 * 1024
 
 // Input state
@@ -315,8 +311,8 @@ async function loadTokenizer() {
             <option value="" disabled selected>
               Load example…
             </option>
-            <option value="hikes">
-              Hikes (mixed structure)
+            <option value="weather">
+              Weather (mixed structure)
             </option>
             <option value="orders">
               Orders (nested field groups)
