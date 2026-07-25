@@ -91,7 +91,7 @@ How the spec evolves: major vs minor bumps and the extensibility policy.
 [§19 Intellectual Property Considerations](https://github.com/toon-format/spec/blob/main/SPEC.md#19-intellectual-property-considerations):
 Licensing and IP terms for the specification.
 
-[Appendix F: Host Type Normalization Examples](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-f-host-type-normalization-examples-informative):
+[Appendix E: Host Type Normalization Examples](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-e-host-type-normalization-examples-informative):
 Non-normative guidance for Go, JavaScript, Python, Rust, and Java implementations on normalizing language-specific types.
 
 [Appendix C: Test Suite and Compliance](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-c-test-suite-and-compliance-informative):
@@ -156,7 +156,7 @@ The spec uses semantic versioning (major.minor):
 - **Major version** (e.g., v2 → v3): Breaking changes, incompatible with previous versions
 - **Minor version** (e.g., v3.1 → v3.2): Clarifications, additional requirements, or backward-compatible additions
 
-See [Appendix D: Document Changelog](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-d-document-changelog-informative) for detailed version history.
+See [CHANGELOG.md](https://github.com/toon-format/spec/blob/main/CHANGELOG.md) for detailed version history, and [VERSIONING.md](https://github.com/toon-format/spec/blob/main/VERSIONING.md) for the policy.
 
 ## Contributing to the Spec
 
