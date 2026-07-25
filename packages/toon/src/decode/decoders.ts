@@ -101,6 +101,7 @@ function* decodeDocument(reader: LineReader, options: DecoderContext): LineRule 
       if (options.strict) {
         throw overIndentedLineError(line, 0)
       }
+      assertNotScalarLine(line)
       yield* readLine(reader)
       continue
     }
@@ -128,6 +129,20 @@ function assertNoDepthJump(firstNestedLine: ParsedLine, parentDepth: Depth, stri
 function overIndentedLineError(line: ParsedLine, expectedDepth: Depth): ToonDecodeError {
   return new ToonDecodeError(
     `Over-indented line: expected depth ${expectedDepth}, but found ${line.depth}`,
+    { line: line.lineNumber, source: line.raw },
+  )
+}
+
+// A bare token outside root primitive position is an error in both modes, so it must never
+// reach the non-strict paths that drop an over-indented line
+function assertNotScalarLine(line: ParsedLine): void {
+  const isListItem = line.content.startsWith(LIST_ITEM_PREFIX) || line.content === LIST_ITEM_MARKER
+  if (isListItem || findUnquotedChar(line.content, COLON) !== -1) {
+    return
+  }
+
+  throw new ToonDecodeError(
+    'Unexpected bare token line outside root primitive position',
     { line: line.lineNumber, source: line.raw },
   )
 }
@@ -264,6 +279,7 @@ function* decodeObjectFields(
       if (options.strict) {
         throw overIndentedLineError(line, computedDepth)
       }
+      assertNotScalarLine(line)
       yield* readLine(reader)
     }
     else {
