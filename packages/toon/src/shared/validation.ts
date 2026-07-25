@@ -1,7 +1,15 @@
-import { COMMENT_MARKER, DEFAULT_DELIMITER, LIST_ITEM_MARKER } from '../constants.ts'
+import type { Delimiter } from '../types.ts'
+import { COMMENT_MARKER, DEFAULT_DELIMITER, DELIMITERS, LIST_ITEM_MARKER } from '../constants.ts'
 import { isBooleanOrNullLiteral } from './literal-utils.ts'
 
 const NUMERIC_LIKE_PATTERN = /^[+-]?\d+(?:\.\d+)?(?:e[+-]?\d+)?$/i
+
+/** Narrows an arbitrary delimiter option, shared by the library and the CLI so both report it alike. */
+export function assertValidDelimiter(delimiter: string): asserts delimiter is Delimiter {
+  if (!(Object.values(DELIMITERS) as string[]).includes(delimiter)) {
+    throw new TypeError(`Invalid delimiter ${JSON.stringify(delimiter)}. Valid delimiters are: comma (,), tab (\\t), pipe (|)`)
+  }
+}
 
 /**
  * Checks if a key can be used without quotes.

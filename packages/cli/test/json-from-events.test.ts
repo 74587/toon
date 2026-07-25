@@ -383,7 +383,7 @@ describe('jsonStreamFromEvents', () => {
 
       await expect(async () => {
         await join(jsonStreamFromEvents(asyncEvents(events), 0))
-      }).rejects.toThrow('Primitive event in object without preceding key')
+      }).rejects.toThrow('Primitive event without preceding key in object')
     })
 
     it('throws on incomplete event stream', async () => {

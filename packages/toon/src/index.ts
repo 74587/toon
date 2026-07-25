@@ -1,10 +1,11 @@
 import type { DecodeOptions, DecodeStreamOptions, EncodeOptions, JsonStreamEvent, JsonValue, ResolvedDecodeOptions, ResolvedEncodeOptions } from './types.ts'
-import { DEFAULT_DELIMITER, DELIMITERS } from './constants.ts'
+import { DEFAULT_DELIMITER } from './constants.ts'
 import { decodeStream as decodeStreamCore, decodeStreamSync as decodeStreamSyncCore } from './decode/decoders.ts'
 import { buildValueFromEvents } from './decode/event-builder.ts'
 import { encodeJsonValue } from './encode/encoders.ts'
 import { normalizeValue } from './encode/normalize.ts'
 import { applyReplacer } from './encode/replacer.ts'
+import { assertValidDelimiter } from './shared/validation.ts'
 
 export { DEFAULT_DELIMITER, DELIMITERS } from './constants.ts'
 export { ToonDecodeError } from './decode/errors.ts'
@@ -199,10 +200,7 @@ export function decodeStream(
 
 function resolveOptions(options?: EncodeOptions): ResolvedEncodeOptions {
   const delimiter = options?.delimiter ?? DEFAULT_DELIMITER
-
-  if (!(Object.values(DELIMITERS) as string[]).includes(delimiter)) {
-    throw new TypeError(`Invalid delimiter ${JSON.stringify(delimiter)}. Valid delimiters are: comma (,), tab (\\t), pipe (|)`)
-  }
+  assertValidDelimiter(delimiter)
 
   return {
     indentSize: options?.indentSize ?? options?.indent ?? 2,

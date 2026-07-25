@@ -91,7 +91,7 @@ export function unescapeString(value: string): string {
         }
         const codeUnit = Number.parseInt(hex, 16)
         if (codeUnit >= 0xD800 && codeUnit <= 0xDFFF) {
-          throw new SyntaxError(`Invalid escape sequence: \\u${hex} is a lone surrogate; supplementary code points MUST appear as literal UTF-8`)
+          throw new SyntaxError(`Invalid escape sequence: \\u${hex} is a lone surrogate. Supplementary code points MUST appear as literal UTF-8`)
         }
         unescaped += String.fromCodePoint(codeUnit)
         i += 6

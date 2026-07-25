@@ -1,11 +1,11 @@
 import type { ArgsDef, CommandDef } from 'citty'
-import type { Delimiter } from '../../toon/src/index.ts'
 import type { InputSource } from './types.ts'
 import * as path from 'node:path'
 import process from 'node:process'
 import { defineCommand } from 'citty'
 import { consola } from 'consola'
-import { DEFAULT_DELIMITER, DELIMITERS } from '../../toon/src/index.ts'
+import { DEFAULT_DELIMITER } from '../../toon/src/index.ts'
+import { assertValidDelimiter } from '../../toon/src/shared/validation.ts'
 import pkg from '../package.json' with { type: 'json' }
 import { decodeToJson, encodeToToon } from './conversion.ts'
 import { formatError } from './format-error.ts'
@@ -82,9 +82,7 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
     }
 
     const delimiter = args.delimiter || DEFAULT_DELIMITER
-    if (!(Object.values(DELIMITERS)).includes(delimiter as Delimiter)) {
-      throw new Error(`Invalid delimiter "${delimiter}". Valid delimiters are: comma (,), tab (\\t), pipe (|)`)
-    }
+    assertValidDelimiter(delimiter)
 
     const mode = detectMode(inputSource, args.encode, args.decode)
 
@@ -93,7 +91,7 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
         await encodeToToon({
           input: inputSource,
           output: outputPath,
-          delimiter: delimiter as Delimiter,
+          delimiter,
           indentSize,
           printStats: args.stats === true,
         })

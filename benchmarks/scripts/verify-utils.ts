@@ -19,7 +19,7 @@ export function assert(condition: boolean, message: string): void {
 export function findDataset(datasets: Dataset[], name: string): Dataset {
   const dataset = datasets.find(d => d.name === name)
   if (!dataset)
-    throw new Error(`Dataset '${name}' not found`)
+    throw new Error(`Dataset "${name}" not found`)
 
   return dataset
 }

@@ -108,6 +108,6 @@ function decodeUtf8(decoder: TextDecoder, chunk?: Uint8Array): string {
     return chunk === undefined ? decoder.decode() : decoder.decode(chunk, { stream: true })
   }
   catch {
-    throw new Error('Input is not valid UTF-8; pass --no-strict to replace ill-formed bytes')
+    throw new Error('Input is not valid UTF-8. Pass --no-strict to replace ill-formed bytes')
   }
 }

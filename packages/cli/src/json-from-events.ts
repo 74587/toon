@@ -135,7 +135,7 @@ export async function* jsonStreamFromEvents(
 
       case 'primitive': {
         if (parent?.type === 'object' && !parent.expectValue) {
-          throw new Error('Primitive event in object without preceding key')
+          throw new Error('Primitive event without preceding key in object')
         }
 
         yield* emitValuePrefix(parent, depth, indent)
