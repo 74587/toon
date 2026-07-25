@@ -27,7 +27,7 @@ export function validateNoExtraListItems(
 ): void {
   if (nextLine?.depth === itemDepth && nextLine.content.startsWith(LIST_ITEM_PREFIX)) {
     throw new ToonDecodeError(
-      `Expected ${expectedCount} list array items, but found more`,
+      `Expected ${expectedCount} list-form items, but found more`,
       { line: nextLine.lineNumber, source: nextLine.raw },
     )
   }

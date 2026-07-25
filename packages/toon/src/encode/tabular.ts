@@ -37,7 +37,7 @@ export function extractTabularHeader(rows: readonly JsonObject[]): FieldNode[] |
 }
 
 /** Classifies an object's values as a keyed tabular header (>=2 uniform non-empty object entries), or undefined. */
-export function extractKeyedFields(value: JsonObject): FieldNode[] | undefined {
+export function extractKeyedTabularHeader(value: JsonObject): FieldNode[] | undefined {
   const entryValues = Object.values(value)
 
   // At least two entries whose values are uniform non-empty objects

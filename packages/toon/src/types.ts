@@ -112,7 +112,7 @@ export type JsonStreamEvent
 // #region Header field types
 
 /**
- * One entry of a tabular header's fields segment.
+ * One entry of a tabular header's field list.
  *
  * @remarks
  * A leaf field (no children) maps to one row cell; a nested field group

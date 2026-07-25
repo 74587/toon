@@ -64,7 +64,7 @@ export function parseArrayHeaderLine(
   let colonIndex = bracketEnd + 1
   let braceEnd = colonIndex
 
-  // Check for fields segment (braces come after bracket)
+  // Check for field list (braces come after bracket)
   const braceStart = findUnquotedChar(content, OPEN_BRACE, bracketEnd)
   if (braceStart !== -1 && braceStart < findUnquotedChar(content, COLON, bracketEnd)) {
     const gapBeforeBrace = content.slice(bracketEnd + 1, braceStart)
@@ -73,8 +73,8 @@ export function parseArrayHeaderLine(
       return {
         kind: 'invalid',
         reason: trimmedGap === ''
-          ? `Unexpected whitespace between bracket and fields segment`
-          : `Unexpected content "${trimmedGap}" between bracket and fields segment`,
+          ? `Unexpected whitespace between bracket segment and field list`
+          : `Unexpected content "${trimmedGap}" between bracket segment and field list`,
       }
     }
 
@@ -135,7 +135,7 @@ export function parseArrayHeaderLine(
       if (mismatchedDelimiter !== undefined) {
         return {
           kind: 'invalid',
-          reason: `Header delimiter mismatch: bracket declares "${formatDelimiter(delimiter)}" but fields segment contains unquoted "${formatDelimiter(mismatchedDelimiter)}"`,
+          reason: `Header delimiter mismatch: bracket declares "${formatDelimiter(delimiter)}" but field list contains unquoted "${formatDelimiter(mismatchedDelimiter)}"`,
         }
       }
 
@@ -155,11 +155,11 @@ export function parseArrayHeaderLine(
   // duplicate before the trailing-content violation.
   const duplicateFieldName = fields ? findDuplicateFieldName(fields) : undefined
   const duplicateReason = duplicateFieldName
-    ? `Duplicate field name "${duplicateFieldName}" in fields segment`
+    ? `Duplicate field name "${duplicateFieldName}" in field list`
     : undefined
 
   if (keyed && !fields) {
-    return { kind: 'invalid', reason: 'Keyed header requires a fields segment' }
+    return { kind: 'invalid', reason: 'Keyed header requires a field list' }
   }
 
   // A fields-bearing header, keyed or not, carries no inline content;
@@ -217,7 +217,7 @@ export function parseBracketSegment(
 }
 
 /**
- * Parses the content of a fields segment into field entries, recursively
+ * Parses the content of a field list into field entries, recursively
  * descending into nested field groups (`field{sub1,sub2}`).
  *
  * @remarks
@@ -230,7 +230,7 @@ export function parseFieldEntries(fieldsContent: string, delimiter: Delimiter): 
   return entries.map((entry) => {
     const trimmedEntry = trimSpaces(entry)
     if (!trimmedEntry) {
-      throw new SyntaxError('Empty field name in fields segment')
+      throw new SyntaxError('Empty field name in field list')
     }
 
     const groupStart = findUnquotedChar(trimmedEntry, OPEN_BRACE)
@@ -245,7 +245,7 @@ export function parseFieldEntries(fieldsContent: string, delimiter: Delimiter): 
 
     const groupEnd = findMatchingBrace(trimmedEntry, groupStart)
     if (groupEnd === -1) {
-      throw new SyntaxError('Unmatched brace in fields segment')
+      throw new SyntaxError('Unmatched brace in field list')
     }
     if (groupEnd !== trimmedEntry.length - 1) {
       throw new SyntaxError('Unexpected content after nested field group')
@@ -257,7 +257,7 @@ export function parseFieldEntries(fieldsContent: string, delimiter: Delimiter): 
 }
 
 /**
- * Splits a fields segment on the active delimiter at brace depth zero,
+ * Splits a field list on the active delimiter at brace depth zero,
  * respecting quoted names and escape sequences.
  */
 function splitFieldEntries(content: string, delimiter: Delimiter): string[] {

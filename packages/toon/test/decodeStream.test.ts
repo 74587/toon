@@ -81,7 +81,7 @@ describe('streaming decode', () => {
       ])
     })
 
-    it('decodes list array', () => {
+    it('decodes an array in list form', () => {
       const input = 'items[2]:\n  - Apple\n  - Banana'
       const lines = input.split('\n')
       const events = Array.from(decodeStreamSync(lines))
@@ -180,7 +180,7 @@ describe('streaming decode', () => {
       { name: 'simple object', input: 'name: Alice\nage: 30' },
       { name: 'nested object', input: 'user:\n  name: Alice\n  age: 30' },
       { name: 'tabular array', input: 'users[2]{name,age}:\n  Alice, 30\n  Bob, 25' },
-      { name: 'list array', input: 'items[2]:\n  - Apple\n  - Banana' },
+      { name: 'list form', input: 'items[2]:\n  - Apple\n  - Banana' },
       { name: 'root primitive', input: 'Hello World' },
       { name: 'root array', input: '[2]:\n  - Apple\n  - Banana' },
       { name: 'empty input', input: '' },
@@ -441,7 +441,7 @@ describe('streaming decode', () => {
       { name: 'simple object', input: 'name: Alice\nage: 30' },
       { name: 'nested objects', input: 'user:\n  profile:\n    name: Alice\n    age: 30' },
       { name: 'mixed structures', input: 'name: Alice\nscores[3]: 95, 87, 92\naddress:\n  city: NYC\n  zip: 10001' },
-      { name: 'list array with objects', input: 'users[2]:\n  - name: Alice\n    age: 30\n  - name: Bob\n    age: 25' },
+      { name: 'list form with objects', input: 'users[2]:\n  - name: Alice\n    age: 30\n  - name: Bob\n    age: 25' },
       { name: 'tabular array', input: 'users[3]{name,age,city}:\n  Alice, 30, NYC\n  Bob, 25, LA\n  Charlie, 35, SF' },
       { name: 'root primitive number', input: '42' },
       { name: 'root primitive string', input: 'Hello World' },

@@ -3,7 +3,7 @@ import type { EncodablePrimitive } from './raw-string.ts'
 import { LIST_ITEM_MARKER, LIST_ITEM_PREFIX } from '../constants.ts'
 import { isArrayOfArrays, isArrayOfObjects, isArrayOfPrimitives, isEmptyObject, isEncodablePrimitive, isJsonArray, isJsonObject } from './normalize.ts'
 import { encodeAndJoinPrimitives, encodeKey, encodePrimitive, formatHeader } from './primitives.ts'
-import { collectRowLeaves, extractKeyedFields, extractTabularHeader } from './tabular.ts'
+import { collectRowLeaves, extractKeyedTabularHeader, extractTabularHeader } from './tabular.ts'
 
 // #region Encode normalized JsonValue
 
@@ -23,7 +23,7 @@ export function* encodeJsonValue(value: JsonValue, options: ResolvedEncodeOption
   }
   else if (isJsonObject(value)) {
     // A keyed-eligible root object uses the keyless keyed form
-    const keyedFields = extractKeyedFields(value)
+    const keyedFields = extractKeyedTabularHeader(value)
     if (keyedFields) {
       yield* encodeKeyedObjectLines(undefined, value, keyedFields, depth, options)
       return
@@ -62,7 +62,7 @@ function* encodeKeyValuePairLines(
     yield* encodeArrayLines(key, value, depth, options)
   }
   else if (isJsonObject(value)) {
-    const keyedFields = extractKeyedFields(value)
+    const keyedFields = extractKeyedTabularHeader(value)
     if (keyedFields) {
       yield* encodeKeyedObjectLines(key, value, keyedFields, depth, options)
       return
@@ -145,13 +145,13 @@ function* encodeArrayLines(
     return
   }
 
-  // Mixed array: fallback to expanded format
+  // Mixed array: fall back to list form
   yield* encodeMixedArrayAsListItemsLines(key, value, depth, options)
 }
 
 // #endregion
 
-// #region Array of arrays (expanded format)
+// #region Array of arrays (list form)
 
 function* encodeArrayOfArraysAsListItemsLines(
   prefix: string | undefined,
@@ -182,7 +182,7 @@ function encodeInlineArrayLine(values: readonly EncodablePrimitive[], delimiter:
 
 // #endregion
 
-// #region Array of objects (tabular format)
+// #region Array of objects (tabular form)
 
 function* encodeArrayOfObjectsAsTabularLines(
   prefix: string | undefined,
@@ -211,7 +211,7 @@ function* writeTabularRowsLines(
 
 // #endregion
 
-// #region Array of objects (expanded format)
+// #region Array of objects (list form)
 
 function* encodeMixedArrayAsListItemsLines(
   prefix: string | undefined,
@@ -259,7 +259,7 @@ function* encodeObjectAsListItemLines(
   // Keyed tabular object as first field: header on the hyphen line, entry
   // rows at depth +2, sibling fields at depth +1
   if (isJsonObject(firstValue)) {
-    const keyedFields = extractKeyedFields(firstValue)
+    const keyedFields = extractKeyedTabularHeader(firstValue)
     if (keyedFields) {
       const keyedEntries = Object.entries(firstValue)
       const formattedHeader = formatHeader(keyedEntries.length, { key: firstKey, fields: keyedFields, delimiter: options.delimiter, keyed: true })

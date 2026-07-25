@@ -148,7 +148,7 @@ function keylessHeaderError(line: ParsedLine): ToonDecodeError {
 
 function keylessFieldsHeaderError(line: ParsedLine): ToonDecodeError {
   return new ToonDecodeError(
-    'Keyless header with a fields segment is only valid at the document root',
+    'Keyless header with a field list is only valid at the document root',
     { line: line.lineNumber, source: line.raw },
   )
 }
@@ -311,14 +311,14 @@ function* decodeInlinePrimitiveArray(
   headerLine: ParsedLine,
 ): Generator<JsonStreamEvent> {
   if (!trimSpaces(inlineValues)) {
-    assertExpectedCount(0, header.length, 'inline array items', options, headerLine)
+    assertExpectedCount(0, header.length, 'inline-form values', options, headerLine)
     return
   }
 
   const values = withLine(headerLine, () => parseDelimitedValues(inlineValues, header.delimiter))
   const primitives = withLine(headerLine, () => mapRowValuesToPrimitives(values))
 
-  assertExpectedCount(primitives.length, header.length, 'inline array items', options, headerLine)
+  assertExpectedCount(primitives.length, header.length, 'inline-form values', options, headerLine)
 
   for (const primitive of primitives) {
     yield { type: 'primitive', value: primitive }
@@ -506,10 +506,10 @@ function* decodeListArray(
     }
   }
 
-  assertExpectedCount(itemCount, header.length, 'list array items', options, lastItemLine)
+  assertExpectedCount(itemCount, header.length, 'list-form items', options, lastItemLine)
 
   if (options.strict && startLine !== undefined && endLine !== undefined) {
-    validateNoBlankLinesInRange(startLine, endLine, reader.scanState.blankLines, options.strict, 'list array')
+    validateNoBlankLinesInRange(startLine, endLine, reader.scanState.blankLines, options.strict, 'list form')
   }
 
   if (options.strict) {

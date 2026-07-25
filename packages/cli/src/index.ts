@@ -36,7 +36,7 @@ const args: ArgsDef = {
   },
   delimiter: {
     type: 'string',
-    description: 'Delimiter for arrays: comma (,), tab (\\t), or pipe (|)',
+    description: 'Delimiter for rows and inline arrays: comma (,), tab (\\t), or pipe (|)',
     default: ',',
   },
   indent: {
@@ -64,7 +64,7 @@ const args: ArgsDef = {
 export const mainCommand: CommandDef<ArgsDef> = defineCommand({
   meta: {
     name,
-    description: 'TOON CLI – Convert between JSON and TOON formats',
+    description: 'TOON CLI – Convert between JSON and TOON',
     version,
   },
   args,
