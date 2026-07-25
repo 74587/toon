@@ -37,8 +37,7 @@ const TOKEN_PADDING = 7
 
 const DEFAULT_DATASET_ICON = '📊'
 
-// One worked example carries the point; the GitHub one repeated it at 3x the length
-const DETAILED_EXAMPLE_DATASETS = ['analytics'] as const
+const DETAILED_EXAMPLE_DATASETS = ['github', 'analytics'] as const
 const GITHUB_REPO_LIMIT = 3
 const GITHUB_DESC_LIMIT = 80
 const ANALYTICS_METRICS_LIMIT = 5

@@ -640,6 +640,69 @@ metrics[5]{date,views,clicks,conversions,revenue,bounceRate}:
   2025-01-05,6428,369,19,1317.24,0.3
 ```
 
+---
+
+#### ⭐ Top 100 GitHub repositories
+
+**Savings:** 6,400 tokens (41.7% reduction vs JSON)
+
+**JSON** (15,337 tokens):
+
+```json
+{
+  "repositories": [
+    {
+      "id": 132750724,
+      "name": "build-your-own-x",
+      "repo": "codecrafters-io/build-your-own-x",
+      "description": "Master programming by recreating your favorite technologies from scratch.",
+      "createdAt": "2018-05-09T12:03:18Z",
+      "updatedAt": "2026-07-23T18:57:15Z",
+      "pushedAt": "2026-07-14T19:25:58Z",
+      "stars": 530712,
+      "watchers": 6778,
+      "forks": 50205,
+      "defaultBranch": "master"
+    },
+    {
+      "id": 21737465,
+      "name": "awesome",
+      "repo": "sindresorhus/awesome",
+      "description": "😎 Awesome lists about all kinds of interesting topics",
+      "createdAt": "2014-07-11T13:42:37Z",
+      "updatedAt": "2026-07-23T18:57:24Z",
+      "pushedAt": "2026-06-30T18:21:16Z",
+      "stars": 488074,
+      "watchers": 8292,
+      "forks": 36010,
+      "defaultBranch": "main"
+    },
+    {
+      "id": 28457823,
+      "name": "freeCodeCamp",
+      "repo": "freeCodeCamp/freeCodeCamp",
+      "description": "freeCodeCamp.org's open-source codebase and curriculum. Learn math, programming,…",
+      "createdAt": "2014-12-24T17:49:19Z",
+      "updatedAt": "2026-07-22T07:01:33Z",
+      "pushedAt": "2026-07-21T18:00:51Z",
+      "stars": 452380,
+      "watchers": 8590,
+      "forks": 45624,
+      "defaultBranch": "main"
+    }
+  ]
+}
+```
+
+**TOON** (8,937 tokens):
+
+```
+repositories[3]{id,name,repo,description,createdAt,updatedAt,pushedAt,stars,watchers,forks,defaultBranch}:
+  132750724,build-your-own-x,codecrafters-io/build-your-own-x,Master programming by recreating your favorite technologies from scratch.,"2018-05-09T12:03:18Z","2026-07-23T18:57:15Z","2026-07-14T19:25:58Z",530712,6778,50205,master
+  21737465,awesome,sindresorhus/awesome,😎 Awesome lists about all kinds of interesting topics,"2014-07-11T13:42:37Z","2026-07-23T18:57:24Z","2026-06-30T18:21:16Z",488074,8292,36010,main
+  28457823,freeCodeCamp,freeCodeCamp/freeCodeCamp,"freeCodeCamp.org's open-source codebase and curriculum. Learn math, programming,…","2014-12-24T17:49:19Z","2026-07-22T07:01:33Z","2026-07-21T18:00:51Z",452380,8590,45624,main
+```
+
 </details>
 
 <!-- /automd -->
