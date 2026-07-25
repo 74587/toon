@@ -501,20 +501,14 @@ export function parseStringLiteral(token: string): string {
 }
 
 export function parseUnquotedKey(content: string, start: number): { key: string, end: number } {
-  let parsePosition = start
-  while (parsePosition < content.length && content[parsePosition] !== COLON) {
-    parsePosition++
-  }
+  // A raw scan would cut `a "b:c" d: 1` at the quoted colon and split the key in two
+  const colonIndex = findUnquotedChar(content, COLON, start)
 
-  if (parsePosition >= content.length || content[parsePosition] !== COLON) {
+  if (colonIndex === -1) {
     throw new SyntaxError('Missing colon after key')
   }
 
-  const key = trimSpaces(content.slice(start, parsePosition))
-
-  parsePosition++
-
-  return { key, end: parsePosition }
+  return { key: trimSpaces(content.slice(start, colonIndex)), end: colonIndex + 1 }
 }
 
 export function parseQuotedKey(content: string, start: number): { key: string, end: number } {
