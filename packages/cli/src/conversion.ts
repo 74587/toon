@@ -75,7 +75,7 @@ export async function decodeToJson(config: {
   indentSize: NonNullable<DecodeOptions['indentSize']>
   strict: NonNullable<DecodeOptions['strict']>
 }): Promise<void> {
-  const lineSource = readLinesFromSource(config.input)
+  const lineSource = readLinesFromSource(config.input, config.strict)
 
   const decodeStreamOptions: DecodeStreamOptions = {
     indentSize: config.indentSize,

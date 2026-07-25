@@ -77,19 +77,17 @@ function readFromStdin(): Promise<string> {
   })
 }
 
-export async function* readLinesFromSource(source: InputSource): AsyncIterable<string> {
+export async function* readLinesFromSource(source: InputSource, strict: boolean): AsyncIterable<string> {
   const stream = source.type === 'stdin'
     ? process.stdin
-    : createReadStream(source.path, { encoding: 'utf-8' })
+    : createReadStream(source.path)
 
-  if (source.type === 'stdin') {
-    stream.setEncoding('utf-8')
-  }
-
+  // Node's own string decoding substitutes U+FFFD, which a strict decoder MUST NOT do
+  const decoder = new TextDecoder('utf-8', { fatal: strict })
   let buffer = ''
 
   for await (const chunk of stream) {
-    buffer += chunk
+    buffer += decodeUtf8(decoder, chunk as Uint8Array | string)
     let index: number
 
     while ((index = buffer.indexOf('\n')) !== -1) {
@@ -99,8 +97,24 @@ export async function* readLinesFromSource(source: InputSource): AsyncIterable<s
     }
   }
 
+  buffer += decodeUtf8(decoder)
+
   // Emit final line when the buffer has no trailing newline
   if (buffer.length > 0) {
     yield buffer
+  }
+}
+
+function decodeUtf8(decoder: TextDecoder, chunk?: Uint8Array | string): string {
+  // A stream that was already given an encoding hands over strings, with the byte errors long gone
+  if (typeof chunk === 'string') {
+    return chunk
+  }
+
+  try {
+    return chunk === undefined ? decoder.decode() : decoder.decode(chunk, { stream: true })
+  }
+  catch {
+    throw new Error('Input is not valid UTF-8; pass --no-strict to replace ill-formed bytes')
   }
 }
