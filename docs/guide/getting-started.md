@@ -8,7 +8,7 @@ description: What TOON is, when to use it, and a first encode/decode example wit
 
 **Token-Oriented Object Notation** is a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow. It is intended for *LLM input* as a drop-in, lossless representation of your existing JSON.
 
-TOON combines YAML's indentation-based structure for nested objects with a CSV-style tabular layout for uniform arrays. TOON's sweet spot is uniform arrays of objects (multiple fields per row, same structure across items), achieving CSV-like compactness while adding explicit structure that helps LLMs parse and validate data reliably.
+TOON combines YAML's indentation-based structure for nested objects with a CSV-style tabular form for uniform arrays. Its sweet spot is uniform arrays of objects (multiple fields per row, same structure across items), reaching CSV-like compactness while adding explicit structure that helps LLMs parse and validate data reliably.
 
 Think of it as a translation layer: use JSON programmatically, and encode it as TOON for LLM input.
 
