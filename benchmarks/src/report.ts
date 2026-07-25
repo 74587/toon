@@ -94,9 +94,7 @@ export function calculateFormatResults(
   }).sort((a, b) => b.accuracy - a.accuracy)
 }
 
-/**
- * Generate consolidated retrieval accuracy report
- */
+/** Generate consolidated retrieval accuracy report */
 export function generateAccuracyReport(
   results: EvaluationResult[],
   tokenCounts: Record<string, number>,
@@ -184,9 +182,7 @@ ${rows}
 `.trim()
 }
 
-/**
- * Generate dataset catalog section
- */
+/** Generate dataset catalog section */
 function generateDatasetCatalog(datasets: Dataset[]): string {
   const rows = datasets.map((dataset) => {
     const csvSupport = supportsCSV(dataset) ? '✓' : '✗'
@@ -221,9 +217,7 @@ ${rows}
 `.trim()
 }
 
-/**
- * Generate efficiency ranking report
- */
+/** Generate efficiency ranking report */
 function generateEfficiencyRankingReport(
   allDatasetsFormatResults: FormatResult[],
   flatOnlyCsvResult: FormatResult | undefined,
@@ -284,9 +278,7 @@ ${csvNote}
 `.trim()
 }
 
-/**
- * Generate detailed accuracy report with breakdowns and methodology
- */
+/** Generate detailed accuracy report with breakdowns and methodology */
 function generateDetailedAccuracyReport(
   formatResults: FormatResult[],
   results: EvaluationResult[],
@@ -344,9 +336,7 @@ What the datasets contain, how the questions are generated, and how answers are 
 `.trim()
 }
 
-/**
- * Generate ASCII bar chart showing per-model accuracy across formats
- */
+/** Generate ASCII bar chart showing per-model accuracy across formats */
 function generateModelBreakdown(
   formatResults: FormatResult[],
   results: EvaluationResult[],
@@ -390,9 +380,7 @@ function generateModelBreakdown(
   }).join('\n')
 }
 
-/**
- * Generate per-dataset performance breakdown tables
- */
+/** Generate per-dataset performance breakdown tables */
 function generateDatasetBreakdown(
   formatResults: FormatResult[],
   results: EvaluationResult[],
@@ -454,9 +442,7 @@ ${tableRows}
   }).filter(Boolean).join('\n').trim()
 }
 
-/**
- * Generate question type breakdown table
- */
+/** Generate question type breakdown table */
 function generateQuestionTypeBreakdown(
   formatResults: FormatResult[],
   results: EvaluationResult[],
@@ -497,9 +483,7 @@ ${rows.join('\n')}
 `.trim()
 }
 
-/**
- * Generate horizontal bar chart for efficiency ranking
- */
+/** Generate horizontal bar chart for efficiency ranking */
 function generateHorizontalEfficiencyChart(
   ranking: EfficiencyRanking[],
 ): string {
@@ -526,9 +510,7 @@ function generateHorizontalEfficiencyChart(
     .join('\n')
 }
 
-/**
- * Generate vertical bar chart for efficiency ranking
- */
+/** Generate vertical bar chart for efficiency ranking */
 function generateVerticalEfficiencyChart(
   ranking: EfficiencyRanking[],
 ): string {

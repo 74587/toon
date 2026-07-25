@@ -3,9 +3,7 @@ import type { Question } from '../types.ts'
 import { QUESTION_LIMITS } from '../constants.ts'
 import { QuestionBuilder, rotateQuestions, SAMPLE_STRIDES } from './utils.ts'
 
-/**
- * Generate keyed feature flag questions
- */
+/** Generate keyed feature flag questions */
 export function generateKeyedQuestions(flags: Record<string, FeatureFlag>, getId: () => string): Question[] {
   const questions: Question[] = []
   const entries = Object.entries(flags)

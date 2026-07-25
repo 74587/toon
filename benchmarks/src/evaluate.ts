@@ -8,9 +8,7 @@ import { xai } from '@ai-sdk/xai'
 import { generateText } from 'ai'
 import { compareAnswers } from './normalize.ts'
 
-/**
- * A model paired with its rate limit and lazy provider constructor.
- */
+/** A model paired with its rate limit and lazy provider constructor. */
 export interface ModelDescriptor {
   /** Provider model id; must equal the underlying LanguageModelV4.modelId */
   id: string
@@ -22,9 +20,7 @@ export interface ModelDescriptor {
   create: () => LanguageModelV4
 }
 
-/**
- * Models used for evaluation
- */
+/** Models used for evaluation */
 export const MODELS: ModelDescriptor[] = [
   { id: 'claude-haiku-4-5-20251001', rpm: 50, create: () => anthropic('claude-haiku-4-5-20251001') },
   { id: 'gemini-3.6-flash', rpm: 25, create: () => google('gemini-3.6-flash') },
@@ -32,9 +28,7 @@ export const MODELS: ModelDescriptor[] = [
   { id: 'grok-4.5', rpm: 25, reasoning: 'low', create: () => xai('grok-4.5') },
 ]
 
-/**
- * Evaluate a single question with a specific format and model
- */
+/** Evaluate a single question with a specific format and model */
 export async function evaluateQuestion(
   {
     question,

@@ -3,9 +3,7 @@ import type { Question } from '../types.ts'
 import { QUESTION_LIMITS } from '../constants.ts'
 import { QuestionBuilder } from './utils.ts'
 
-/**
- * Generate nested configuration questions
- */
+/** Generate nested configuration questions */
 export function generateNestedConfigQuestions(config: NestedConfig | undefined, getId: () => string): Question[] {
   const questions: Question[] = []
 

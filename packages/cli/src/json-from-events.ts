@@ -1,8 +1,6 @@
 import type { JsonStreamEvent } from '../../toon/src/types.ts'
 
-/**
- * Context for tracking JSON structure state during event streaming.
- */
+/** Context for tracking JSON structure state during event streaming. */
 type JsonContext
   = | { type: 'object', needsComma: boolean, expectValue: boolean }
     | { type: 'array', needsComma: boolean }

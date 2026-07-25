@@ -22,9 +22,7 @@ const RATE_LIMIT_INTERVAL_MS = 60_000
 
 prompts.intro('Retrieval Accuracy Benchmark')
 
-/**
- * Generate evaluation tasks for a model
- */
+/** Generate evaluation tasks for a model */
 function generateEvaluationTasks(questions: Question[]): { question: Question, format: Format }[] {
   const tasks: { question: Question, format: Format }[] = []
 
@@ -42,9 +40,7 @@ function generateEvaluationTasks(questions: Question[]): { question: Question, f
   return tasks
 }
 
-/**
- * Check which models already have saved results
- */
+/** Check which models already have saved results */
 async function checkExistingResults(activeModels: ModelDescriptor[]) {
   const existingModelResults: Record<string, boolean> = {}
 
@@ -57,9 +53,7 @@ async function checkExistingResults(activeModels: ModelDescriptor[]) {
   return existingModelResults
 }
 
-/**
- * Create a progress updater function
- */
+/** Create a progress updater function */
 function createProgressUpdater(spinner: ReturnType<typeof prompts.spinner>, total: number) {
   let completed = 0
 
@@ -72,9 +66,7 @@ function createProgressUpdater(spinner: ReturnType<typeof prompts.spinner>, tota
   }
 }
 
-/**
- * Create a rate-limited queue for model evaluation
- */
+/** Create a rate-limited queue for model evaluation */
 function createEvaluationQueue(rpm: number | undefined) {
   return new PQueue({
     concurrency: DEFAULT_CONCURRENCY,

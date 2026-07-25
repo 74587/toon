@@ -98,9 +98,7 @@ export interface DecodeOptions {
 
 export type ResolvedDecodeOptions = Readonly<Required<Omit<DecodeOptions, 'indent'>>>
 
-/**
- * Options for streaming decode operations.
- */
+/** Options for streaming decode operations. */
 export type DecodeStreamOptions = DecodeOptions
 
 // #endregion

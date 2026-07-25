@@ -31,9 +31,7 @@ export type StructuralCorruption
   // Record indices to edit and the field removed from each
     | { kind: 'missing-fields', targetRecordIndices: number[], targetFieldName: string }
 
-/**
- * Kind of structural corruption applied to a dataset's encoded text.
- */
+/** Kind of structural corruption applied to a dataset's encoded text. */
 export type StructuralCorruptionKind = StructuralCorruption['kind']
 
 export interface Dataset {
@@ -56,9 +54,7 @@ export interface Question {
    * @default 'string'
    */
   answerType?: AnswerType
-  /**
-   * Options for answer normalization and comparison.
-   */
+  /** Options for answer normalization and comparison. */
   normalizationOptions?: Partial<NormalizationOptions>
 }
 

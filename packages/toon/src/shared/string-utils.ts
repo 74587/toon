@@ -108,9 +108,7 @@ export function unescapeString(value: string): string {
   return unescaped
 }
 
-/**
- * Finds the index of the closing double quote, accounting for escape sequences.
- */
+/** Finds the index of the closing double quote, accounting for escape sequences. */
 export function findClosingQuote(content: string, start: number): number {
   let i = start + 1
   while (i < content.length) {
@@ -126,9 +124,7 @@ export function findClosingQuote(content: string, start: number): number {
   return -1
 }
 
-/**
- * Finds the index of a character outside of quoted sections.
- */
+/** Finds the index of a character outside of quoted sections. */
 export function findUnquotedChar(content: string, char: string, start = 0): number {
   let inQuotes = false
   let i = start

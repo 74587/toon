@@ -50,9 +50,7 @@ export async function ensureDir(dirPath: string): Promise<void> {
   await fsp.mkdir(dirPath, { recursive: true })
 }
 
-/**
- * Bounds of a Wilson score confidence interval for a proportion.
- */
+/** Bounds of a Wilson score confidence interval for a proportion. */
 export interface WilsonInterval {
   /** Lower bound of the interval, in 0..1 */
   lower: number

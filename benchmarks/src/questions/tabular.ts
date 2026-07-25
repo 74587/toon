@@ -3,9 +3,7 @@ import type { Question } from '../types.ts'
 import { QUESTION_LIMITS, QUESTION_THRESHOLDS } from '../constants.ts'
 import { QuestionBuilder, rotateQuestions, SAMPLE_STRIDES } from './utils.ts'
 
-/**
- * Generate tabular (employee) questions
- */
+/** Generate tabular (employee) questions */
 export function generateTabularQuestions(employees: Employee[], getId: () => string): Question[] {
   const questions: Question[] = []
 

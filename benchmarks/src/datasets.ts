@@ -5,9 +5,7 @@ import githubRepos from '../data/github-repos.json' with { type: 'json' }
 faker.seed(12345)
 faker.setDefaultRefDate('2025-06-01T00:00:00.000Z')
 
-/**
- * Employee record structure for tabular dataset
- */
+/** Employee record structure for tabular dataset */
 export interface Employee {
   id: number
   name: string
@@ -18,9 +16,7 @@ export interface Employee {
   active: boolean
 }
 
-/**
- * E-commerce order structure for nested dataset
- */
+/** E-commerce order structure for nested dataset */
 export interface Order {
   orderId: string
   customer: {
@@ -43,9 +39,7 @@ export interface Order {
   createdAt?: string
 }
 
-/**
- * Analytics metric structure for time-series dataset
- */
+/** Analytics metric structure for time-series dataset */
 export interface AnalyticsMetric {
   date: string
   views: number
@@ -55,9 +49,7 @@ export interface AnalyticsMetric {
   bounceRate: number
 }
 
-/**
- * GitHub repository structure for real-world dataset
- */
+/** GitHub repository structure for real-world dataset */
 export interface Repository {
   id: number
   name: string
@@ -72,9 +64,7 @@ export interface Repository {
   pushedAt: string
 }
 
-/**
- * Event log structure for semi-uniform dataset
- */
+/** Event log structure for semi-uniform dataset */
 export interface EventLog {
   timestamp: string
   level: 'info' | 'warn' | 'error'
@@ -89,9 +79,7 @@ export interface EventLog {
   }
 }
 
-/**
- * Nested configuration structure for deeply nested dataset
- */
+/** Nested configuration structure for deeply nested dataset */
 export interface NestedConfig {
   environment: string
   version: string
@@ -144,9 +132,7 @@ export interface NestedConfig {
   }
 }
 
-/**
- * Product structure for large uniform arrays
- */
+/** Product structure for large uniform arrays */
 export interface Product {
   sku: string
   name: string
@@ -156,9 +142,7 @@ export interface Product {
   lastUpdated: string
 }
 
-/**
- * Feature flag structure for keyed tabular dataset
- */
+/** Feature flag structure for keyed tabular dataset */
 export interface FeatureFlag {
   enabled: boolean
   rollout: number
@@ -166,9 +150,7 @@ export interface FeatureFlag {
   updatedAt: string
 }
 
-/**
- * Contact structure for nested field group dataset
- */
+/** Contact structure for nested field group dataset */
 export interface Contact {
   name: string
   age: number
@@ -183,9 +165,7 @@ export interface Contact {
   }
 }
 
-/**
- * Internal types for structural validation pattern generation
- */
+/** Internal types for structural validation pattern generation */
 type StructuralValidationType = 'truncated' | 'extra-rows' | 'width-mismatch' | 'missing-fields'
 
 interface StructuralValidationFixture {
@@ -195,9 +175,7 @@ interface StructuralValidationFixture {
   corruption: StructuralCorruption
 }
 
-/**
- * Generate analytics time-series data
- */
+/** Generate analytics time-series data */
 export function generateAnalyticsData(days: number, startDate = '2025-01-01'): {
   metrics: AnalyticsMetric[]
 } {
@@ -229,9 +207,7 @@ export function generateAnalyticsData(days: number, startDate = '2025-01-01'): {
   }
 }
 
-/**
- * Generate employee data (uniform, fully tabular-eligible)
- */
+/** Generate employee data (uniform, fully tabular-eligible) */
 const departments = ['Engineering', 'Sales', 'Marketing', 'HR', 'Operations', 'Finance'] as const
 
 function generateEmployees(count: number): { employees: Employee[] } {
@@ -268,9 +244,7 @@ const tabularDataset: Dataset = {
   },
 }
 
-/**
- * Generate e-commerce orders (nested structure)
- */
+/** Generate e-commerce orders (nested structure) */
 const PRODUCT_NAMES = ['Wireless Mouse', 'USB Cable', 'Laptop Stand', 'Keyboard', 'Webcam', 'Headphones', 'Monitor', 'Desk Lamp'] as const
 const ORDER_STATUSES = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'] as const
 
@@ -755,9 +729,7 @@ const structuralValidationDatasets: Dataset[] = generateStructuralValidationFixt
   }
 })
 
-/**
- * Datasets for accuracy benchmarks (smaller sizes for faster evaluation)
- */
+/** Datasets for accuracy benchmarks (smaller sizes for faster evaluation) */
 export const ACCURACY_DATASETS: Dataset[] = [
   tabularDataset, // 100 employees
   nestedDataset, // 50 orders
@@ -768,9 +740,7 @@ export const ACCURACY_DATASETS: Dataset[] = [
   ...structuralValidationDatasets, // 5 validation fixtures
 ]
 
-/**
- * Datasets for token efficiency benchmarks (larger sizes to amplify token differences)
- */
+/** Datasets for token efficiency benchmarks (larger sizes to amplify token differences) */
 export const TOKEN_EFFICIENCY_DATASETS: Dataset[] = [
   // Tabular: 2000 employees
   {

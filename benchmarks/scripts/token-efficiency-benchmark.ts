@@ -44,9 +44,7 @@ const ANALYTICS_METRICS_LIMIT = 5
 
 prompts.intro('Token Efficiency Benchmark')
 
-/**
- * Format a comparison line showing savings vs TOON
- */
+/** Format a comparison line showing savings vs TOON */
 function formatComparisonLine(format: FormatMetrics, isLast: boolean = false): string {
   const label = getFormat(format.name).displayName
   const signedPercent = format.savingsPercent >= 0
@@ -58,9 +56,7 @@ function formatComparisonLine(format: FormatMetrics, isLast: boolean = false): s
   return `${connector} vs ${label.padEnd(13)} ${`(${signedPercent})`.padEnd(20)}   ${tokenStr} tokens`
 }
 
-/**
- * Calculate total tokens and savings for a set of datasets
- */
+/** Calculate total tokens and savings for a set of datasets */
 function calculateTotalMetrics(datasets: BenchmarkResult[], formatNames: readonly string[]) {
   const totalToonTokens = datasets.reduce((sum, r) => {
     const toon = r.formats.find(f => f.name === 'toon')!
@@ -81,9 +77,7 @@ function calculateTotalMetrics(datasets: BenchmarkResult[], formatNames: readonl
   return { totalToonTokens, totals }
 }
 
-/**
- * Generate total lines for a track
- */
+/** Generate total lines for a track */
 function generateTotalLines(
   totalToonTokens: number,
   totals: { name: string, tokens: number, savingsPercent: number }[],
@@ -127,9 +121,7 @@ function generateTotalLines(
   return lines.join('\n')
 }
 
-/**
- * Generate bar chart for a dataset
- */
+/** Generate bar chart for a dataset */
 function generateDatasetChart(result: BenchmarkResult): string {
   const { dataset, formats } = result
   const toon = formats.find(f => f.name === 'toon')!
