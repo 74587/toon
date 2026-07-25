@@ -34,7 +34,7 @@ function verifyKeyed(label: string, dataset: Dataset): void {
   )
 }
 
-// Nested field groups: a tabular header carrying an inner brace group
+// Nested field groups: a tabular header carrying an inner field list
 function verifyNestedGroup(label: string, dataset: Dataset): void {
   const contacts = dataset.data.contacts as Contact[]
   const encoded = encode(dataset.data)

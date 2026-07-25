@@ -2,8 +2,8 @@ import type { FieldNode, JsonObject, JsonValue } from '../types.ts'
 import type { EncodablePrimitive } from './raw-string.ts'
 import { isEmptyObject, isEncodablePrimitive, isJsonObject } from './normalize.ts'
 
-/** Classifies rows into a tabular header, or undefined when they are not uniformly tabular. */
-export function extractTabularHeader(rows: readonly JsonObject[]): FieldNode[] | undefined {
+/** Classifies rows into a tabular field list, or undefined when they are not uniformly tabular. */
+export function extractTabularFields(rows: readonly JsonObject[]): FieldNode[] | undefined {
   if (rows.length === 0)
     return
 
@@ -36,8 +36,8 @@ export function extractTabularHeader(rows: readonly JsonObject[]): FieldNode[] |
   return fieldNodes
 }
 
-/** Classifies an object's values as a keyed tabular header (>=2 uniform non-empty object entries), or undefined. */
-export function extractKeyedTabularHeader(value: JsonObject): FieldNode[] | undefined {
+/** Classifies an object's values as a keyed tabular field list (>=2 uniform non-empty object entries), or undefined. */
+export function extractKeyedTabularFields(value: JsonObject): FieldNode[] | undefined {
   const entryValues = Object.values(value)
 
   // At least two entries whose values are uniform non-empty objects
@@ -49,10 +49,10 @@ export function extractKeyedTabularHeader(value: JsonObject): FieldNode[] | unde
     return
   }
 
-  return extractTabularHeader(entryValues as JsonObject[])
+  return extractTabularFields(entryValues as JsonObject[])
 }
 
-/** Reads one row's leaf cells in the field order extractTabularHeader produced. */
+/** Reads one row's leaf cells in the field order extractTabularFields produced. */
 export function collectRowLeaves(row: JsonObject, fields: readonly FieldNode[]): EncodablePrimitive[] {
   const leaves: EncodablePrimitive[] = []
   collectLeafValues(row, fields, leaves)
@@ -71,7 +71,7 @@ function classifyColumn(name: string, values: readonly JsonValue[]): FieldNode |
     return
   }
 
-  const children = extractTabularHeader(values as JsonObject[])
+  const children = extractTabularFields(values as JsonObject[])
   if (!children) {
     return
   }

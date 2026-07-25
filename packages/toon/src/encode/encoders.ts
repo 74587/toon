@@ -3,7 +3,7 @@ import type { EncodablePrimitive } from './raw-string.ts'
 import { LIST_ITEM_MARKER, LIST_ITEM_PREFIX } from '../constants.ts'
 import { isArrayOfArrays, isArrayOfObjects, isArrayOfPrimitives, isEmptyObject, isEncodablePrimitive, isJsonArray, isJsonObject } from './normalize.ts'
 import { encodeAndJoinPrimitives, encodeKey, encodePrimitive, formatHeader } from './primitives.ts'
-import { collectRowLeaves, extractKeyedTabularHeader, extractTabularHeader } from './tabular.ts'
+import { collectRowLeaves, extractKeyedTabularFields, extractTabularFields } from './tabular.ts'
 
 // #region Encode normalized JsonValue
 
@@ -22,8 +22,8 @@ export function* encodeJsonValue(value: JsonValue, options: ResolvedEncodeOption
     yield* encodeArrayLines(undefined, value, depth, options)
   }
   else if (isJsonObject(value)) {
-    // A keyed-eligible root object uses the keyless keyed form
-    const keyedFields = extractKeyedTabularHeader(value)
+    // A keyed-eligible root object uses the keyless keyed header
+    const keyedFields = extractKeyedTabularFields(value)
     if (keyedFields) {
       yield* encodeKeyedObjectLines(undefined, value, keyedFields, depth, options)
       return
@@ -62,7 +62,7 @@ function* encodeKeyValuePairLines(
     yield* encodeArrayLines(key, value, depth, options)
   }
   else if (isJsonObject(value)) {
-    const keyedFields = extractKeyedTabularHeader(value)
+    const keyedFields = extractKeyedTabularFields(value)
     if (keyedFields) {
       yield* encodeKeyedObjectLines(key, value, keyedFields, depth, options)
       return
@@ -135,9 +135,9 @@ function* encodeArrayLines(
   }
 
   if (isArrayOfObjects(value)) {
-    const header = extractTabularHeader(value)
-    if (header) {
-      yield* encodeArrayOfObjectsAsTabularLines(key, value, header, depth, options)
+    const fields = extractTabularFields(value)
+    if (fields) {
+      yield* encodeArrayOfObjectsAsTabularLines(key, value, fields, depth, options)
     }
     else {
       yield* encodeMixedArrayAsListItemsLines(key, value, depth, options)
@@ -187,24 +187,24 @@ function encodeInlineArrayLine(values: readonly EncodablePrimitive[], delimiter:
 function* encodeArrayOfObjectsAsTabularLines(
   prefix: string | undefined,
   rows: readonly JsonObject[],
-  header: readonly FieldNode[],
+  fields: readonly FieldNode[],
   depth: Depth,
   options: ResolvedEncodeOptions,
 ): Generator<string> {
-  const formattedHeader = formatHeader(rows.length, { key: prefix, fields: header, delimiter: options.delimiter })
-  yield indentedLine(depth, formattedHeader, options.indentSize)
+  const header = formatHeader(rows.length, { key: prefix, fields, delimiter: options.delimiter })
+  yield indentedLine(depth, header, options.indentSize)
 
-  yield* writeTabularRowsLines(rows, header, depth + 1, options)
+  yield* writeTabularRowsLines(rows, fields, depth + 1, options)
 }
 
 function* writeTabularRowsLines(
   rows: readonly JsonObject[],
-  header: readonly FieldNode[],
+  fields: readonly FieldNode[],
   depth: Depth,
   options: ResolvedEncodeOptions,
 ): Generator<string> {
   for (const row of rows) {
-    const leaves = collectRowLeaves(row, header)
+    const leaves = collectRowLeaves(row, fields)
     yield indentedLine(depth, encodeAndJoinPrimitives(leaves, options.delimiter), options.indentSize)
   }
 }
@@ -242,11 +242,11 @@ function* encodeObjectAsListItemLines(
   const restEntries = entries.slice(1)
 
   if (isJsonArray(firstValue) && isArrayOfObjects(firstValue)) {
-    const header = extractTabularHeader(firstValue)
-    if (header) {
-      const formattedHeader = formatHeader(firstValue.length, { key: firstKey, fields: header, delimiter: options.delimiter })
-      yield indentedListItem(depth, formattedHeader, options.indentSize)
-      yield* writeTabularRowsLines(firstValue, header, depth + 2, options)
+    const fields = extractTabularFields(firstValue)
+    if (fields) {
+      const header = formatHeader(firstValue.length, { key: firstKey, fields, delimiter: options.delimiter })
+      yield indentedListItem(depth, header, options.indentSize)
+      yield* writeTabularRowsLines(firstValue, fields, depth + 2, options)
 
       if (restEntries.length > 0) {
         const restObj: JsonObject = Object.fromEntries(restEntries)
@@ -259,11 +259,11 @@ function* encodeObjectAsListItemLines(
   // Keyed tabular object as first field: header on the hyphen line, entry
   // rows at depth +2, sibling fields at depth +1
   if (isJsonObject(firstValue)) {
-    const keyedFields = extractKeyedTabularHeader(firstValue)
+    const keyedFields = extractKeyedTabularFields(firstValue)
     if (keyedFields) {
       const keyedEntries = Object.entries(firstValue)
-      const formattedHeader = formatHeader(keyedEntries.length, { key: firstKey, fields: keyedFields, delimiter: options.delimiter, keyed: true })
-      yield indentedListItem(depth, formattedHeader, options.indentSize)
+      const header = formatHeader(keyedEntries.length, { key: firstKey, fields: keyedFields, delimiter: options.delimiter, keyed: true })
+      yield indentedListItem(depth, header, options.indentSize)
       yield* encodeKeyedEntryRowsLines(keyedEntries, keyedFields, depth + 2, options)
 
       if (restEntries.length > 0) {

@@ -180,7 +180,7 @@ describe('streaming decode', () => {
       { name: 'simple object', input: 'name: Alice\nage: 30' },
       { name: 'nested object', input: 'user:\n  name: Alice\n  age: 30' },
       { name: 'tabular array', input: 'users[2]{name,age}:\n  Alice, 30\n  Bob, 25' },
-      { name: 'list form', input: 'items[2]:\n  - Apple\n  - Banana' },
+      { name: 'list-form array', input: 'items[2]:\n  - Apple\n  - Banana' },
       { name: 'root primitive', input: 'Hello World' },
       { name: 'root array', input: '[2]:\n  - Apple\n  - Banana' },
       { name: 'empty input', input: '' },
