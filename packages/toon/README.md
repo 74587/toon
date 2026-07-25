@@ -10,7 +10,7 @@
 
 **Token-Oriented Object Notation** is a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow. It's intended for *LLM input* as a drop-in, lossless representation of your existing JSON.
 
-TOON combines YAML's indentation-based structure for nested objects with a CSV-style tabular layout for uniform arrays. TOON's sweet spot is uniform arrays of objects (multiple fields per row, same structure across items), achieving CSV-like compactness while adding explicit structure that helps LLMs parse and validate data reliably. For deeply nested or non-uniform data, JSON may be more efficient.
+TOON combines YAML's indentation-based structure for nested objects with a CSV-style tabular form for uniform arrays. Its sweet spot is uniform arrays of objects – multiple fields per row, same structure across items – reaching CSV-like compactness while adding explicit structure that helps LLMs parse and validate data reliably. For deeply nested or non-uniform data, JSON may be more efficient.
 
 Think of it as a translation layer: use JSON programmatically, and encode it as TOON for LLM input.
 
@@ -24,12 +24,11 @@ Think of it as a translation layer: use JSON programmatically, and encode it as 
 - [When Not to Use TOON](#when-not-to-use-toon)
 - [Benchmarks](#benchmarks)
 - [Installation & Quick Start](#installation--quick-start)
-- [Playgrounds](#playgrounds)
-- [Editor Support](#editor-support)
 - [CLI](#cli)
-- [Format Overview](#format-overview)
 - [Using TOON with LLMs](#using-toon-with-llms)
+- [Ecosystem](#ecosystem)
 - [Documentation](#documentation)
+- [Media Type & File Extension](#media-type--file-extension)
 - [Other Implementations](#other-implementations)
 - [📋 Full Specification](https://github.com/toon-format/spec/blob/main/SPEC.md)
 
@@ -128,38 +127,66 @@ forecast[3]{day,temp{min,max},condition,rainChance}:
   Wed,3,11,sunny,5
 ```
 
-Note `temp{min,max}` in the header: the uniform nested `temp` objects fold into a nested field group while rows stay flat – see [Format Overview](#format-overview) for this and the keyed tabular form.
+Three things are happening at once, and each is a **form** – one rendering of a value, chosen automatically:
+
+- `alerts[2]: frost,wind` is **inline form**: a primitive array on its header line.
+- `forecast[3]{day,…}:` is **tabular form**: the field list is declared once in the header, then one row per element.
+- `temp{min,max}` inside that header is a **nested field group**: the uniform nested `temp` objects fold into the header while rows stay flat.
+
+The fourth form is **keyed tabular**, for objects whose values are uniform objects – config maps, feature flags, records by ID. The colon after the length (`[2:]`) marks it, and each row carries its own key:
+
+<table>
+<tr><th>JSON</th><th>TOON</th></tr>
+<tr><td>
+
+```json
+{
+  "environments": {
+    "production": { "region": "eu-central-1", "replicas": 6, "debug": false },
+    "staging": { "region": "eu-central-1", "replicas": 2, "debug": true }
+  }
+}
+```
+
+</td><td>
+
+```toon
+environments[2:]{region,replicas,debug}:
+  production: eu-central-1,6,false
+  staging: eu-central-1,2,true
+```
+
+</td></tr>
+</table>
+
+Anything that fits none of these – mixed types, non-uniform objects – falls back to **list form**, one `- ` item per element. That's the whole format; the [Format Overview](https://toonformat.dev/guide/format-overview) covers the edges.
 
 ## Key Features
 
-- 📊 **Token-Efficient & Accurate:** Matches JSON's retrieval accuracy while using ~40% fewer tokens across the benchmark suite – see [Benchmarks](#benchmarks) for current figures.
+- 📊 **Token-Efficient & Accurate:** Matches JSON's retrieval accuracy while using 42.6% fewer tokens – see [Benchmarks](#benchmarks).
 - 🔁 **JSON Data Model:** Encodes the same objects, arrays, and primitives as JSON with deterministic, lossless round-trips.
-- 🛤️ **LLM-Friendly Guardrails:** Explicit [N] lengths and {fields} headers give models a clear schema to follow, improving parsing reliability.
+- 🛤️ **LLM-Friendly Guardrails:** Explicit `[N]` lengths and `{fields}` field lists give models a clear schema to follow, improving parsing reliability.
 - 📐 **Minimal Syntax:** Uses indentation instead of braces and minimizes quoting, giving YAML-like readability with CSV-style compactness.
-- 🧺 **Tabular Forms:** Uniform arrays of objects – and objects of uniform objects – collapse into tables that declare fields once and stream row values line by line.
+- 🧺 **Tabular Forms:** Uniform arrays of objects – and objects of uniform objects – collapse into tables that declare the field list once and stream row values line by line.
 - 🌐 **Multi-Language Ecosystem:** Spec-driven implementations in TypeScript, Python, Go, Rust, .NET, and other languages.
-
-## Media Type & File Extension
-
-By convention, TOON files use the `.toon` extension and the provisional media type `text/toon` for HTTP and content-type–aware contexts. TOON documents are always UTF-8 encoded; the `charset=utf-8` parameter may be specified but defaults to UTF-8 when omitted. See [SPEC.md §17](https://github.com/toon-format/spec/blob/main/SPEC.md#17-iana-considerations) for normative details.
 
 ## When Not to Use TOON
 
-TOON excels with uniform arrays of objects, but there are cases where other formats are better:
+TOON excels with uniform arrays of objects. Reach for something else when:
 
-- **Deeply nested or non-uniform structures** (tabular eligibility ≈ 0%): JSON-compact often uses fewer tokens. Example: complex configuration objects with many nested levels.
-- **Semi-uniform arrays** (~40–60% tabular eligibility): Token savings diminish. Prefer JSON if your pipelines already rely on it.
-- **Pure tabular data**: CSV is smaller than TOON for flat tables. TOON adds minimal overhead (~5–10%) to provide structure (array length declarations, field headers, delimiter scoping) that improves LLM reliability.
-- **Latency-critical applications**: If end-to-end response time is your top priority, benchmark on your exact setup. Some deployments (especially local/quantized models like Ollama) may process compact JSON faster despite TOON's lower token count. Measure TTFT, tokens/sec, and total time for both formats and use whichever is faster.
+- **Structures are deeply nested or non-uniform** (tabular eligibility ≈ 0%) – compact JSON often wins outright.
+- **Arrays are semi-uniform** (~40–60% eligibility) – savings shrink; stay on JSON if your pipeline already speaks it.
+- **Data is purely tabular** – CSV is smaller. TOON's ~5–10% overhead buys declared lengths, field lists, and delimiter scoping, which is a reliability trade, not a size one.
+- **Latency dominates** – some deployments (notably local or quantized models) process compact JSON faster despite the higher token count. Measure TTFT and total time on your own setup.
 
-See [benchmarks](#benchmarks) for concrete comparisons across different data structures.
+[Benchmarks](#benchmarks) below quantify each of these.
 
 ## Benchmarks
 
-Benchmarks are organized into two tracks to ensure fair comparisons:
+Two tracks, so every comparison is like-for-like:
 
-- **Mixed-Structure Track**: Datasets with nested or semi-uniform structures (TOON vs JSON, YAML, XML). CSV excluded as it cannot properly represent these structures.
-- **Flat-Only Track**: Datasets with flat tabular structures where CSV is applicable (CSV vs TOON vs JSON, YAML, XML).
+- **Mixed-Structure Track**: Nested and semi-uniform datasets (TOON vs JSON, YAML, XML). CSV is excluded – it cannot represent these structures without lossy flattening.
+- **Flat-Only Track**: Flat, fully tabular-eligible datasets, where CSV is a fair competitor.
 
 ### Retrieval Accuracy
 
@@ -619,22 +646,6 @@ metrics[5]{date,views,clicks,conversions,revenue,bounceRate}:
 
 ## Installation & Quick Start
 
-### CLI (No Installation Required)
-
-Try TOON instantly with npx:
-
-```bash
-# Convert JSON to TOON
-npx @toon-format/cli input.json -o output.toon
-
-# Pipe from stdin
-echo '{"name": "Ada", "role": "dev"}' | npx @toon-format/cli
-```
-
-See the [CLI section](#cli) for all options and examples.
-
-### TypeScript Library
-
 ```bash
 # npm
 npm install @toon-format/toon
@@ -645,6 +656,8 @@ pnpm add @toon-format/toon
 # yarn
 yarn add @toon-format/toon
 ```
+
+No install needed for one-off conversions – the [CLI](#cli) runs straight from `npx`.
 
 **Example usage:**
 
@@ -706,41 +719,6 @@ const transformed = encode(data, {
 > [!TIP]
 > The `replacer` function provides fine-grained control over encoding, similar to `JSON.stringify`'s replacer but with path tracking. See the [API Reference](https://toonformat.dev/reference/api#replacer-function) for more examples, including verbatim output with [`rawString`](https://toonformat.dev/reference/api#raw-string-output).
 
-## Playgrounds
-
-Experiment with TOON format interactively using these tools for token comparison, format conversion, and validation.
-
-### Official Playground
-
-The [TOON Playground](https://toonformat.dev/playground) lets you convert JSON or YAML to TOON in real time, compare token counts, and share your experiments via URL.
-
-### Community Playgrounds
-
-- [Format Tokenization Playground](https://www.curiouslychase.com/playground/format-tokenization-exploration)
-- [TOON Tools](https://toontools.vercel.app/)
-
-## Editor Support
-
-### VS Code
-
-[TOON Language Support](https://marketplace.visualstudio.com/items?itemName=vishalraut.vscode-toon) – Syntax highlighting, validation, conversion, and token analysis.
-
-```bash
-code --install-extension vishalraut.vscode-toon
-```
-
-### Tree-sitter Grammar
-
-[tree-sitter-toon](https://github.com/3swordman/tree-sitter-toon) – Grammar for Tree-sitter-compatible editors (Neovim, Helix, Emacs, Zed).
-
-### Neovim
-
-[toon.nvim](https://github.com/thalesgelinger/toon.nvim) – Lua-based plugin.
-
-### Other Editors
-
-Use YAML syntax highlighting as a close approximation.
-
 ## CLI
 
 Command-line tool for quick JSON↔TOON conversions, token analysis, and pipeline integration. Auto-detects format from file extension, supports stdin/stdout workflows, and offers delimiter options (comma, tab, pipe) that trade readability for fewer tokens.
@@ -766,73 +744,19 @@ npx @toon-format/cli data.json --stats
 > [!TIP]
 > See the full [CLI documentation](https://toonformat.dev/cli/) for all options, examples, and advanced usage.
 
-## Format Overview
-
-Uniform arrays of objects collapse into tables – and so do two more shapes that show up constantly in LLM payloads.
-
-**Nested field groups** ([SPEC §9.3](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form)): a uniform nested-object column folds into the header; rows stay flat.
-
-<table>
-<tr><th>JSON</th><th>TOON</th></tr>
-<tr><td>
-
-```json
-{
-  "orders": [
-    { "id": 1, "customer": { "name": "Ada", "country": "DK" }, "total": 99 },
-    { "id": 2, "customer": { "name": "Bob", "country": "UK" }, "total": 149 }
-  ]
-}
-```
-
-</td><td>
-
-```toon
-orders[2]{id,customer{name,country},total}:
-  1,Ada,DK,99
-  2,Bob,UK,149
-```
-
-</td></tr>
-</table>
-
-**Keyed tabular form** ([SPEC §9.5](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form)): maps of uniform objects – feature flags, users by ID, per-environment config – become tables whose rows carry their own keys. The colon after the length (`[2:]`) marks the keyed header.
-
-<table>
-<tr><th>JSON</th><th>TOON</th></tr>
-<tr><td>
-
-```json
-{
-  "environments": {
-    "production": { "region": "eu-central-1", "replicas": 6, "debug": false },
-    "staging": { "region": "eu-central-1", "replicas": 2, "debug": true }
-  }
-}
-```
-
-</td><td>
-
-```toon
-environments[2:]{region,replicas,debug}:
-  production: eu-central-1,6,false
-  staging: eu-central-1,2,true
-```
-
-</td></tr>
-</table>
-
-Detailed syntax references, implementation guides, and quick lookups for understanding and using the TOON format.
-
-- [Format Overview](https://toonformat.dev/guide/format-overview) – Complete syntax documentation
-- [Syntax Cheatsheet](https://toonformat.dev/reference/syntax-cheatsheet) – Quick reference
-- [API Reference](https://toonformat.dev/reference/api) – Encode/decode usage (TypeScript)
-
 ## Using TOON with LLMs
 
-TOON works best when you show the format instead of describing it. Once a model sees one tabular example, the header (`[N]` length + `{fields}`) tells it how to read the rest. Wrap data in ` ```toon` code blocks for input, and show the expected header template when asking models to generate TOON. Use tab delimiters for even better token efficiency. Full-line `#` comments are stripped on decode, so hand-annotated prompt data – and model output with explainer lines – still decodes cleanly.
+TOON works best when you show the format instead of describing it. Once a model sees one tabular example, the header – `[N]` length plus `{fields}` field list – tells it how to read the rest. Wrap data in ` ```toon` code blocks for input, and show the expected header template when asking models to generate TOON. Tab delimiters buy further token savings. Full-line `#` comments are stripped on decode, so hand-annotated prompt data – and model output with explainer lines – still decodes cleanly.
 
 Follow the detailed [LLM integration guide](https://toonformat.dev/guide/llm-prompts) for strategies, examples, and validation techniques.
+
+## Ecosystem
+
+**Playgrounds** – the [official playground](https://toonformat.dev/playground) converts JSON or YAML to TOON in real time, compares token counts, and shares experiments by URL. Community alternatives: [Format Tokenization Playground](https://www.curiouslychase.com/playground/format-tokenization-exploration), [TOON Tools](https://toontools.vercel.app/).
+
+**Editors** – [TOON Language Support](https://marketplace.visualstudio.com/items?itemName=vishalraut.vscode-toon) for VS Code (`code --install-extension vishalraut.vscode-toon`) adds highlighting, validation, and token analysis. [tree-sitter-toon](https://github.com/3swordman/tree-sitter-toon) covers Neovim, Helix, Emacs, and Zed; [toon.nvim](https://github.com/thalesgelinger/toon.nvim) is a Lua-native alternative. Elsewhere, YAML highlighting is a close approximation.
+
+**Tooling** – [Tooner](https://github.com/chaindead/tooner) is an MCP proxy that converts JSON tool responses to TOON.
 
 ## Documentation
 
@@ -848,7 +772,6 @@ Comprehensive guides, references, and resources to help you get the most out of 
 
 - [CLI](https://toonformat.dev/cli/) – Command-line tool for JSON↔TOON conversions
 - [Playgrounds](https://toonformat.dev/ecosystem/tools-and-playgrounds) – Interactive tools
-- [Tooner](https://github.com/chaindead/tooner) – MCP proxy that converts JSON tool responses to TOON
 - [Using TOON with LLMs](https://toonformat.dev/guide/llm-prompts) – Prompting strategies & validation
 
 ### References
@@ -856,6 +779,11 @@ Comprehensive guides, references, and resources to help you get the most out of 
 - [API Reference](https://toonformat.dev/reference/api) – TypeScript/JavaScript encode/decode API
 - [Syntax Cheatsheet](https://toonformat.dev/reference/syntax-cheatsheet) – Quick format lookup
 - [Specification](https://github.com/toon-format/spec/blob/main/SPEC.md) – Normative rules for implementers
+- [Glossary](https://github.com/toon-format/spec/blob/main/CONTEXT.md) – Canonical name for every concept
+
+## Media Type & File Extension
+
+TOON files use the `.toon` extension and the provisional media type `text/toon`. Documents are always UTF-8; the `charset=utf-8` parameter may be given but is assumed when absent. See [SPEC.md §17](https://github.com/toon-format/spec/blob/main/SPEC.md#17-iana-considerations) for normative details.
 
 ## Other Implementations
 
