@@ -53,7 +53,6 @@ function transformChildren(
     return transformArray(value, replacer, path)
   }
 
-  // Primitives have no children
   return value
 }
 
@@ -68,7 +67,6 @@ function transformObject(
     const childPath = [...path, key]
     const replacedValue = replacer(key, value, childPath)
 
-    // undefined means omit this property
     if (replacedValue === undefined) {
       continue
     }
@@ -92,7 +90,6 @@ function transformArray(
     const childPath = [...path, i]
     const replacedValue = replacer(String(i), value, childPath)
 
-    // undefined means omit this element
     if (replacedValue === undefined) {
       continue
     }

@@ -52,7 +52,6 @@ function applyEvent(state: BuildState, event: JsonStreamEvent): void {
       const obj: JsonObject = {}
 
       if (stack.length === 0) {
-        // Root object
         stack.push({ type: 'object', obj })
       }
       else {
@@ -96,7 +95,6 @@ function applyEvent(state: BuildState, event: JsonStreamEvent): void {
       const arr: JsonValue[] = []
 
       if (stack.length === 0) {
-        // Root array
         stack.push({ type: 'array', arr })
       }
       else {
@@ -152,7 +150,6 @@ function applyEvent(state: BuildState, event: JsonStreamEvent): void {
 
     case 'primitive': {
       if (stack.length === 0) {
-        // Root primitive
         state.root = event.value
       }
       else {

@@ -79,7 +79,6 @@ export function formatHeader(
     header += encodeKey(key)
   }
 
-  // Only include delimiter if it's not the default (comma)
   header += `[${length}${options?.keyed ? ':' : ''}${delimiter !== DEFAULT_DELIMITER ? delimiter : ''}]`
 
   if (fields) {

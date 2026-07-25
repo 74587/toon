@@ -25,7 +25,6 @@ function* emitValuePrefix(
   }
 }
 
-// Records that a value finished, so the parent expects a comma before the next entry
 function markValueComplete(parent: JsonContext | undefined): void {
   if (parent?.type === 'object') {
     parent.expectValue = false

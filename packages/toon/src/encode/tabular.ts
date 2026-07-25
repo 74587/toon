@@ -65,8 +65,7 @@ function classifyColumn(name: string, values: readonly JsonValue[]): FieldNode |
     return { name }
   }
 
-  // Nested-uniform column: every value a non-empty object sharing one key
-  // set whose sub-columns classify recursively
+  // Nested-uniform column: non-empty objects sharing one key set, classified recursively
   if (!values.every(value => isJsonObject(value) && !isEmptyObject(value))) {
     return
   }

@@ -20,10 +20,8 @@ export function parseArrayHeaderLine(
 ): ArrayHeaderParseResult {
   const trimmedToken = content.trimStart()
 
-  // Find the bracket segment, accounting for quoted keys that may contain brackets
   let bracketStart = -1
 
-  // For quoted keys, find bracket after closing quote (not inside the quoted string)
   if (trimmedToken.startsWith(DOUBLE_QUOTE)) {
     const closingQuoteIndex = findClosingQuote(trimmedToken, 0)
     if (closingQuoteIndex === -1) {
@@ -35,13 +33,11 @@ export function parseArrayHeaderLine(
       return { kind: 'notHeader' }
     }
 
-    // Calculate position in original content and find bracket after the quoted key
     const leadingWhitespace = content.length - trimmedToken.length
     const keyEndIndex = leadingWhitespace + closingQuoteIndex + 1
     bracketStart = content.indexOf(OPEN_BRACKET, keyEndIndex)
   }
   else {
-    // Unquoted key - find first bracket
     bracketStart = findUnquotedChar(content, OPEN_BRACKET)
   }
 
@@ -60,7 +56,6 @@ export function parseArrayHeaderLine(
     return { kind: 'notHeader' }
   }
 
-  // Find the colon that comes after all brackets and braces
   let colonIndex = bracketEnd + 1
   let braceEnd = colonIndex
 
@@ -100,7 +95,6 @@ export function parseArrayHeaderLine(
     }
   }
 
-  // Extract and parse the key (might be quoted)
   let key: string | undefined
   if (bracketStart > 0) {
     const rawKey = content.slice(0, bracketStart)
@@ -108,10 +102,8 @@ export function parseArrayHeaderLine(
     if (rawKey !== rawKey.trimEnd()) {
       return { kind: 'invalid', reason: 'Unexpected whitespace between key and bracket segment' }
     }
-    // The upstream quote and bracket guards make a malformed quoted key
-    // unreachable here, so this literal parse never actually throws; leaving
-    // it uncaught preserves today's both-modes throw instead of adding a
-    // non-strict swallow – do not "finish" the purity by catching it.
+    // Unreachable given the quote and bracket guards above. Leaving it uncaught
+    // preserves the both-modes throw instead of adding a non-strict swallow
     key = rawKey.startsWith(DOUBLE_QUOTE) ? parseStringLiteral(rawKey) : rawKey
   }
 
@@ -151,11 +143,8 @@ export function parseArrayHeaderLine(
     }
   }
 
-  // Duplicate field names produce duplicate sibling keys in every decoded
-  // element: non-strict LWW applies, strict mode errors. The dual nature is
-  // why the reason rides along on the otherwise-valid header as strictError,
-  // and why the trailing-content check below prefers it – strict reports the
-  // duplicate before the trailing-content violation.
+  // Duplicate field names are strict-only – non-strict resolves them via LWW – so the
+  // reason rides along on an otherwise-valid header, and the check below prefers it
   const duplicateFieldName = fields ? findDuplicateFieldName(fields) : undefined
   const duplicateReason = duplicateFieldName
     ? `Duplicate field name "${duplicateFieldName}" in field list`
@@ -203,9 +192,8 @@ export function parseBracketSegment(
     content = content.slice(0, -1)
   }
 
-  // A colon immediately after the length and before the optional delimiter
-  // symbol marks a keyed header: [N:], [N:<TAB>], [N:|]. Any other colon
-  // placement leaves a token that fails the length check below.
+  // Only a colon between the length and the optional delimiter symbol marks a keyed
+  // header; any other placement leaves a token that fails the length check below
   let keyed = false
   if (content.endsWith(COLON)) {
     keyed = true
@@ -456,7 +444,6 @@ export function parsePrimitiveToken(token: string): JsonPrimitive {
     return ''
   }
 
-  // A leading quote forces a properly quoted string
   if (trimmedToken.startsWith(DOUBLE_QUOTE)) {
     return parseStringLiteral(trimmedToken)
   }
@@ -472,7 +459,6 @@ export function parsePrimitiveToken(token: string): JsonPrimitive {
 
   if (isNumericLiteral(trimmedToken)) {
     const parsedNumber = Number.parseFloat(trimmedToken)
-    // Normalize negative zero to positive zero
     return Object.is(parsedNumber, -0) ? 0 : parsedNumber
   }
 

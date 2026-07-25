@@ -115,7 +115,6 @@ export function findClosingQuote(content: string, start: number): number {
   let i = start + 1
   while (i < content.length) {
     if (content[i] === BACKSLASH && i + 1 < content.length) {
-      // Skip escaped character
       i += 2
       continue
     }
@@ -136,7 +135,6 @@ export function findUnquotedChar(content: string, char: string, start = 0): numb
 
   while (i < content.length) {
     if (content[i] === BACKSLASH && i + 1 < content.length && inQuotes) {
-      // Skip escaped character
       i += 2
       continue
     }

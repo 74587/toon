@@ -85,12 +85,10 @@ export function isDataRow(content: string, delimiter: Delimiter): boolean {
     return true
   }
 
-  // Has delimiter and it comes before colon = data row
   if (delimiterPos !== -1 && delimiterPos < colonPos) {
     return true
   }
 
-  // Colon before delimiter or no delimiter = key-value pair
   return false
 }
 

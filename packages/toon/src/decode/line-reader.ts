@@ -4,17 +4,12 @@ import { createScanState, parseLineIncremental } from './scanner.ts'
 
 // #region Fetch-line effect
 
-// The single effect a decode rule performs beyond emitting events: a request
-// for the next raw line. Rules yield this instead of touching a source
-// directly, so one rule tree serves both sync and async sources – the driver
-// answers each request from whichever iterator it holds.
+// Rules yield this instead of touching a source directly, so one rule tree serves
+// both sync and async sources
 export const FETCH_LINE: unique symbol = Symbol('fetch-line')
 
-// A decode rule emits data-model events and yields lazy line-fetch requests,
-// receiving each fetched raw line (or `undefined` at end of input) back.
 export type LineRule = Generator<JsonStreamEvent | typeof FETCH_LINE, void, string | undefined>
 
-// A pure line effect only fetches lines; it emits no data-model events
 export type LineEffect<TReturn> = Generator<typeof FETCH_LINE, TReturn, string | undefined>
 
 // #endregion
@@ -41,12 +36,8 @@ export function createLineReader(context: { indentSize: number, strict: boolean 
   }
 }
 
-// Pull raw lines one at a time until the buffer holds a single parsed line or
-// the source is exhausted. Comments and blank lines parse to `undefined` and
-// are skipped here, with blanks still recorded into the scan state – exactly
-// as the line-parsing generators did. Fetching stays strictly lazy: at most
-// one line of lookahead, so scanner throws and blank accounting keep their
-// original ordering.
+// At most one line of lookahead, so scanner throws and blank accounting keep
+// their original ordering
 function* fillBuffer(reader: LineReader): LineEffect<void> {
   while (reader.buffer.length === 0 && !reader.done) {
     const raw = yield FETCH_LINE
@@ -82,8 +73,6 @@ export function* readLine(reader: LineReader): LineEffect<ParsedLine | undefined
 
 // #region Drivers
 
-// Pump a rule against a synchronous source: answer each fetch request with one
-// raw line, forward every event to the caller.
 export function* driveSync(rawSource: Iterable<string>, rule: LineRule): Generator<JsonStreamEvent> {
   const iterator = rawSource[Symbol.iterator]()
   let step = rule.next()
@@ -100,9 +89,8 @@ export function* driveSync(rawSource: Iterable<string>, rule: LineRule): Generat
   }
 }
 
-// Pump a rule against either an async or a sync source, preserving the "accepts
-// a sync iterable" behaviour. Each fetch request pulls exactly one raw line, so
-// bounded, incremental delivery from a chunk-by-chunk reader is preserved.
+// Accepts a sync source too, and pulls exactly one raw line per request so a
+// chunk-by-chunk reader still delivers incrementally
 export async function* driveAsync(
   rawSource: AsyncIterable<string> | Iterable<string>,
   rule: LineRule,

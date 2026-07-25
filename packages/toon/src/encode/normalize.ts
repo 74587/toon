@@ -12,13 +12,12 @@ export function normalizeValue(value: unknown): JsonValue {
     return null
   }
 
-  // RawString markers pass through untouched; encode-side guards treat
-  // them as primitives, never as objects
+  // RawString markers pass through untouched, treated as primitives and never as objects
   if (isRawString(value)) {
     return value as unknown as JsonValue
   }
 
-  // Objects with toJSON: delegate to its result before host-type normalization
+  // A host `toJSON` hook takes precedence over the default host-type mappings below
   if (
     typeof value === 'object'
     && value !== null
@@ -41,7 +40,6 @@ export function normalizeValue(value: unknown): JsonValue {
     return value
   }
 
-  // Numbers: canonicalize -0 to 0, handle NaN and Infinity
   if (typeof value === 'number') {
     if (Object.is(value, -0)) {
       return 0
@@ -52,12 +50,10 @@ export function normalizeValue(value: unknown): JsonValue {
     return value
   }
 
-  // BigInt → number (if safe) or string
   if (typeof value === 'bigint') {
     if (value >= Number.MIN_SAFE_INTEGER && value <= Number.MAX_SAFE_INTEGER) {
       return Number(value)
     }
-    // String form gets quoted in output
     return value.toString()
   }
 
@@ -92,7 +88,6 @@ export function normalizeValue(value: unknown): JsonValue {
     return encodedValues
   }
 
-  // Fallback: function, symbol, undefined, or other → null
   return null
 }
 

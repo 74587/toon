@@ -35,8 +35,7 @@ export function parseLineIncremental(
     raw = raw.slice(1)
   }
 
-  // A trailing carriage return belongs to a CRLF line terminator, not to
-  // the line's content.
+  // A trailing carriage return belongs to the CRLF terminator, not to the content
   if (raw[raw.length - 1] === CARRIAGE_RETURN) {
     raw = raw.slice(0, -1)
   }
@@ -52,9 +51,8 @@ export function parseLineIncremental(
   // Without this, `- ` would be an item carrying an empty token instead of the bare list-item marker
   const content = trimTrailingSpaces(raw.slice(indent))
 
-  // Comment lines vanish in a lexical pre-pass: they are removed before
-  // blank-line tracking and strict validation, and are never counted as
-  // rows, items, entries, or blank lines.
+  // Comment lines vanish before blank-line tracking and strict validation, so they
+  // never count as rows, items, entries, or blank lines
   if (content[0] === COMMENT_MARKER) {
     return undefined
   }

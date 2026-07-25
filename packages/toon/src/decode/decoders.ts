@@ -42,10 +42,8 @@ export function decodeStream(
 // #region Document dispatch
 
 function* decodeDocument(reader: LineReader, options: DecoderContext): LineRule {
-  // Get first line to determine root form
   const first = yield* peekLine(reader)
   if (!first) {
-    // Empty input decodes to empty object
     yield { type: 'startObject' }
     yield { type: 'endObject' }
     return
@@ -73,7 +71,6 @@ function* decodeDocument(reader: LineReader, options: DecoderContext): LineRule 
   const following = yield* peekLine(reader)
   const hasMore = following !== undefined
   if (!hasMore && !isKeyValueLine(first)) {
-    // Single non-key-value line is root primitive
     yield { type: 'primitive', value: withLine(first, () => parsePrimitiveToken(first.content)) }
     return
   }
@@ -85,12 +82,10 @@ function* decodeDocument(reader: LineReader, options: DecoderContext): LineRule 
     )
   }
 
-  // Root object
   const rootSeenKeys = options.strict ? new Set<string>() : undefined
   yield { type: 'startObject' }
   yield* decodeKeyValue(first, reader, 0, options, rootSeenKeys)
 
-  // Process remaining object fields
   while (true) {
     const line = yield* peekLine(reader)
     if (!line) {
@@ -133,8 +128,8 @@ function overIndentedLineError(line: ParsedLine, expectedDepth: Depth): ToonDeco
   )
 }
 
-// A bare token outside root primitive position is an error in both modes, so it must never
-// reach the non-strict paths that drop an over-indented line
+// Both modes reject a bare token outside root primitive position, so it must not reach
+// the non-strict paths that drop an over-indented line
 function assertNotScalarLine(line: ParsedLine): void {
   const isListItem = line.content.startsWith(LIST_ITEM_PREFIX) || line.content === LIST_ITEM_MARKER
   if (isListItem || findUnquotedChar(line.content, COLON) !== -1) {
@@ -168,8 +163,7 @@ function keylessFieldsHeaderError(line: ParsedLine): ToonDecodeError {
   )
 }
 
-// Strict decoding never silently discards input: once the root form is
-// complete, any remaining line is an error rather than dropped data.
+// Strict decoding never silently discards input, so a line after the root form is an error
 function* assertFullyConsumed(reader: LineReader, strict: boolean): LineRule {
   if (!strict) {
     return
@@ -216,8 +210,6 @@ function* decodeKeyValue(
     return
   }
 
-  // Keyless headers are only valid at the document root or as list items;
-  // non-strict decoders fall through to key-value parsing.
   if (arrayHeader && arrayHeader.header.key === undefined && options.strict) {
     throw arrayHeader.header.keyed ? keylessKeyedError(line) : keylessHeaderError(line)
   }
@@ -228,7 +220,6 @@ function* decodeKeyValue(
   assertNoDuplicateKey(key, line, seenKeys)
   yield { type: 'key', key }
 
-  // No value after colon – expect nested object or empty
   if (!rest) {
     const nextLine = yield* peekLine(reader)
     if (nextLine && nextLine.depth > baseDepth) {
@@ -358,9 +349,8 @@ function* decodeKeyedObject(
 
   yield { type: 'startObject' }
 
-  // A keyed scope ends only when the depth decreases to the header's
-  // depth or less, or at end of input; every line at entry depth with an
-  // unquoted colon is an entry row.
+  // A keyed scope ends only by dedent or end of input, so every line at entry depth
+  // carrying an unquoted colon is an entry row
   while (true) {
     const line = yield* peekLine(reader)
     if (!line || line.depth <= baseDepth) {
@@ -396,8 +386,6 @@ function* decodeKeyedObject(
     endLine = line.lineNumber
     lastEntryLine = line
 
-    // Split at the first unquoted colon: entry key first, then the
-    // remainder splits on the active delimiter into cells.
     const { key, end } = withLine(line, () => parseKeyToken(line.content, 0))
     assertNoDuplicateKey(key, line, seenEntryKeys)
     yield { type: 'key', key }
@@ -549,7 +537,6 @@ function* decodeListItem(
   let afterHyphen: string
 
   if (line.content === LIST_ITEM_MARKER) {
-    // Bare list item marker: always an empty object
     yield { type: 'startObject' }
     yield { type: 'endObject' }
     return
@@ -581,8 +568,7 @@ function* decodeListItem(
   if (isArrayHeaderContent(afterHyphen)) {
     const arrayHeader = withLine(itemLine, () => resolveArrayHeader(parseArrayHeaderLine(afterHyphen, DEFAULT_DELIMITER), options.strict))
     if (arrayHeader) {
-      // There is no keyless keyed (`- [N:]{fields}:`) or fields-bearing
-      // (`- [N]{fields}:`) list-item form.
+      // There is no keyless keyed or fields-bearing list-item form
       if (arrayHeader.header.keyed || arrayHeader.header.fields !== undefined) {
         if (options.strict) {
           throw arrayHeader.header.keyed ? keylessKeyedError(itemLine) : keylessFieldsHeaderError(itemLine)
@@ -595,7 +581,6 @@ function* decodeListItem(
     }
   }
 
-  // Tabular-first list-item object: `- key[N]{fields}:`
   const headerInfo = withLine(itemLine, () => resolveArrayHeader(parseArrayHeaderLine(afterHyphen, DEFAULT_DELIMITER), options.strict))
   if (headerInfo && headerInfo.header.key !== undefined && headerInfo.header.fields !== undefined) {
     const header = headerInfo.header
@@ -626,8 +611,6 @@ function* decodeListItem(
   yield { type: 'primitive', value: withLine(itemLine, () => parsePrimitiveToken(afterHyphen)) }
 }
 
-// Consume the sibling key-value fields that follow a list-item object at the
-// same depth, stopping at the next list item, a shallower line, or end of input.
 function* followSiblingFields(
   reader: LineReader,
   followDepth: Depth,
@@ -668,10 +651,9 @@ function isKeyValueLine(line: ParsedLine): boolean {
 
 // #region Shared decoder helpers
 
-// Applies strict-mode policy to a parsed array-header result, keeping the
-// detection/parse split in parser.ts free of error decisions. A bare
-// SyntaxError is thrown on purpose so the caller's `withLine` wrapper enriches
-// it into a `ToonDecodeError` with a `cause`, matching the direct-throw path.
+// Keeps the detection/parse split in `parser.ts` free of error decisions. The bare
+// SyntaxError is deliberate: the caller's `withLine` wrapper enriches it into a
+// `ToonDecodeError` with a `cause`, matching the direct-throw path
 function resolveArrayHeader(
   result: ArrayHeaderParseResult,
   strict: boolean,
@@ -687,8 +669,7 @@ function resolveArrayHeader(
     return undefined
   }
 
-  // A valid header may still carry a strict-only violation (duplicate field
-  // names) that non-strict mode resolves via last-write-wins.
+  // A valid header may still carry a strict-only violation that non-strict resolves via LWW
   if (strict && result.strictError !== undefined) {
     throw new SyntaxError(result.strictError)
   }

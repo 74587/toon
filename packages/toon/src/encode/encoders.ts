@@ -9,7 +9,6 @@ import { collectRowLeaves, extractKeyedTabularFields, extractTabularFields } fro
 
 export function* encodeJsonValue(value: JsonValue, options: ResolvedEncodeOptions, depth: Depth): Generator<string> {
   if (isEncodablePrimitive(value)) {
-    // Primitives at root level are returned as a single line
     const encodedPrimitive = encodePrimitive(value, options.delimiter)
 
     if (encodedPrimitive !== '')
@@ -145,7 +144,6 @@ function* encodeArrayLines(
     return
   }
 
-  // Mixed array: fall back to list form
   yield* encodeMixedArrayAsListItemsLines(key, value, depth, options)
 }
 
@@ -256,8 +254,7 @@ function* encodeObjectAsListItemLines(
     }
   }
 
-  // Keyed tabular object as first field: header on the hyphen line, entry
-  // rows at depth +2, sibling fields at depth +1
+  // Keyed first field: header on the hyphen line, entry rows at depth +2, siblings at +1
   if (isJsonObject(firstValue)) {
     const keyedFields = extractKeyedTabularFields(firstValue)
     if (keyedFields) {

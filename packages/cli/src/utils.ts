@@ -9,7 +9,6 @@ export function detectMode(
   encodeFlag?: boolean,
   decodeFlag?: boolean,
 ): 'encode' | 'decode' {
-  // Explicit flags take precedence
   if (encodeFlag)
     return 'encode'
   if (decodeFlag)
@@ -99,7 +98,6 @@ export async function* readLinesFromSource(source: InputSource, strict: boolean)
 
   buffer += decodeUtf8(decoder)
 
-  // Emit final line when the buffer has no trailing newline
   if (buffer.length > 0) {
     yield buffer
   }

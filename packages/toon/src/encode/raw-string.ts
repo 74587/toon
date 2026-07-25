@@ -1,8 +1,7 @@
 import type { JsonPrimitive } from '../types.ts'
 import { COMMENT_MARKER } from '../constants.ts'
 
-// A line whose first non-space character is the comment marker would be
-// silently stripped by decoders, so raw output must never form one
+// Decoders silently strip a line whose first non-space character is the comment marker
 const COMMENT_LINE_PATTERN = new RegExp(`(?:^|\\n) *${COMMENT_MARKER}`)
 
 /**
