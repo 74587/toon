@@ -3,6 +3,8 @@ import type { EncodablePrimitive } from './raw-string.ts'
 import { setOwnProperty } from '../shared/object-utils.ts'
 import { isRawString } from './raw-string.ts'
 
+const SURROGATE_PATTERN = /[\uD800-\uDFFF]/
+
 // #region Normalization (unknown → JsonValue)
 
 export function normalizeValue(value: unknown): JsonValue {
@@ -30,7 +32,12 @@ export function normalizeValue(value: unknown): JsonValue {
     }
   }
 
-  if (typeof value === 'string' || typeof value === 'boolean') {
+  if (typeof value === 'string') {
+    assertNoLoneSurrogate(value, 'string value')
+    return value
+  }
+
+  if (typeof value === 'boolean') {
     return value
   }
 
@@ -77,6 +84,7 @@ export function normalizeValue(value: unknown): JsonValue {
 
     for (const key in value) {
       if (Object.hasOwn(value, key)) {
+        assertNoLoneSurrogate(key, 'object key')
         setOwnProperty(encodedValues, key, normalizeValue(value[key]))
       }
     }
@@ -86,6 +94,31 @@ export function normalizeValue(value: unknown): JsonValue {
 
   // Fallback: function, symbol, undefined, or other → null
   return null
+}
+
+// A lone surrogate has no UTF-8 form, so emitting it would silently substitute U+FFFD and break round-tripping
+function assertNoLoneSurrogate(value: string, context: string): void {
+  if (!SURROGATE_PATTERN.test(value)) {
+    return
+  }
+
+  for (let index = 0; index < value.length; index++) {
+    const code = value.charCodeAt(index)
+    if (code < 0xD800 || code > 0xDFFF) {
+      continue
+    }
+
+    const isHighSurrogate = code <= 0xDBFF
+    const next = value.charCodeAt(index + 1)
+    if (isHighSurrogate && next >= 0xDC00 && next <= 0xDFFF) {
+      index++
+      continue
+    }
+
+    throw new TypeError(
+      `Cannot encode ${context} containing an unpaired surrogate U+${code.toString(16).toUpperCase()} at index ${index}`,
+    )
+  }
 }
 
 // #endregion

@@ -34,7 +34,8 @@ export function isSafeUnquoted(value: string, delimiter: string = DEFAULT_DELIMI
     return false
   }
 
-  if (value !== value.trim()) {
+  // Only space and tab force quoting, unlike host `trim()`, which also strips other Unicode whitespace
+  if (/^[ \t]|[ \t]$/.test(value)) {
     return false
   }
 
