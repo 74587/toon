@@ -161,6 +161,20 @@ environments[2:]{region,replicas,debug}:
 
 Anything that fits none of these – mixed types, non-uniform objects – falls back to **list form**, one `- ` item per element. That's the whole format; the [Format Overview](https://toonformat.dev/guide/format-overview) covers the edges.
 
+> [!TIP]
+> Try it on your own data – no install required:
+>
+> ```bash
+> cat data.json | npx @toon-format/cli --stats
+> ```
+>
+> It prints the TOON alongside what the conversion saved:
+>
+> ```
+> ℹ Token estimates: ~117 (JSON) → ~66 (TOON)
+> ✔ Saved ~51 tokens (-43.6%)
+> ```
+
 ## Key Features
 
 - 📊 **Token-Efficient & Accurate:** Matches JSON's retrieval accuracy while using 42.6% fewer tokens – see [Benchmarks](#benchmarks).
@@ -720,7 +734,11 @@ pnpm add @toon-format/toon
 yarn add @toon-format/toon
 ```
 
-No install needed for one-off conversions – the [CLI](#cli) runs straight from `npx`.
+To keep the [CLI](#cli) around instead of invoking it through `npx`, install it globally:
+
+```bash
+npm install -g @toon-format/cli
+```
 
 **Example usage:**
 
