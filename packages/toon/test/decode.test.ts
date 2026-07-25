@@ -44,7 +44,7 @@ for (const fixtures of fixtureFiles) {
 
 function resolveDecodeOptions(options?: TestCase['options']): DecodeOptions {
   return {
-    indent: options?.indentSize ?? 2,
+    indentSize: options?.indentSize ?? 2,
     strict: options?.strict ?? true,
   }
 }

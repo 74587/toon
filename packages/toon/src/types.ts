@@ -54,6 +54,10 @@ export interface EncodeOptions {
    * Number of spaces per indentation level.
    * @default 2
    */
+  indentSize?: number
+  /**
+   * @deprecated Use `indentSize` instead.
+   */
   indent?: number
   /**
    * Delimiter to use for tabular array rows and inline primitive arrays.
@@ -69,7 +73,7 @@ export interface EncodeOptions {
   replacer?: EncodeReplacer
 }
 
-export type ResolvedEncodeOptions = Readonly<Required<Omit<EncodeOptions, 'replacer'>>> & Pick<EncodeOptions, 'replacer'>
+export type ResolvedEncodeOptions = Readonly<Required<Omit<EncodeOptions, 'replacer' | 'indent'>>> & Pick<EncodeOptions, 'replacer'>
 
 // #endregion
 
@@ -80,6 +84,10 @@ export interface DecodeOptions {
    * Number of spaces per indentation level.
    * @default 2
    */
+  indentSize?: number
+  /**
+   * @deprecated Use `indentSize` instead.
+   */
   indent?: number
   /**
    * When true, enforce strict validation of array lengths and tabular row counts.
@@ -88,7 +96,7 @@ export interface DecodeOptions {
   strict?: boolean
 }
 
-export type ResolvedDecodeOptions = Readonly<Required<DecodeOptions>>
+export type ResolvedDecodeOptions = Readonly<Required<Omit<DecodeOptions, 'indent'>>>
 
 /**
  * Options for streaming decode operations.

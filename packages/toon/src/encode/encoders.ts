@@ -56,7 +56,7 @@ function* encodeKeyValuePairLines(
   const encodedKey = encodeKey(key)
 
   if (isEncodablePrimitive(value)) {
-    yield indentedLine(depth, `${encodedKey}: ${encodePrimitive(value, options.delimiter)}`, options.indent)
+    yield indentedLine(depth, `${encodedKey}: ${encodePrimitive(value, options.delimiter)}`, options.indentSize)
   }
   else if (isJsonArray(value)) {
     yield* encodeArrayLines(key, value, depth, options)
@@ -68,7 +68,7 @@ function* encodeKeyValuePairLines(
       return
     }
 
-    yield indentedLine(depth, `${encodedKey}:`, options.indent)
+    yield indentedLine(depth, `${encodedKey}:`, options.indentSize)
     if (!isEmptyObject(value)) {
       yield* encodeObjectLines(value, depth + 1, options)
     }
@@ -88,7 +88,7 @@ function* encodeKeyedObjectLines(
 ): Generator<string> {
   const entries = Object.entries(value)
   const header = formatHeader(entries.length, { key, fields, delimiter: options.delimiter, keyed: true })
-  yield indentedLine(depth, header, options.indent)
+  yield indentedLine(depth, header, options.indentSize)
   yield* encodeKeyedEntryRowsLines(entries, fields, depth + 1, options)
 }
 
@@ -100,7 +100,7 @@ function* encodeKeyedEntryRowsLines(
 ): Generator<string> {
   for (const [entryKey, entryValue] of entries) {
     const leaves = collectRowLeaves(entryValue as JsonObject, fields)
-    yield indentedLine(depth, `${encodeKey(entryKey)}: ${encodeAndJoinPrimitives(leaves, options.delimiter)}`, options.indent)
+    yield indentedLine(depth, `${encodeKey(entryKey)}: ${encodeAndJoinPrimitives(leaves, options.delimiter)}`, options.indentSize)
   }
 }
 
@@ -116,13 +116,13 @@ function* encodeArrayLines(
 ): Generator<string> {
   if (value.length === 0) {
     const line = key != null ? `${encodeKey(key)}: []` : '[]'
-    yield indentedLine(depth, line, options.indent)
+    yield indentedLine(depth, line, options.indentSize)
     return
   }
 
   if (isArrayOfPrimitives(value)) {
     const arrayLine = encodeInlineArrayLine(value, options.delimiter, key)
-    yield indentedLine(depth, arrayLine, options.indent)
+    yield indentedLine(depth, arrayLine, options.indentSize)
     return
   }
 
@@ -160,12 +160,12 @@ function* encodeArrayOfArraysAsListItemsLines(
   options: ResolvedEncodeOptions,
 ): Generator<string> {
   const header = formatHeader(values.length, { key: prefix, delimiter: options.delimiter })
-  yield indentedLine(depth, header, options.indent)
+  yield indentedLine(depth, header, options.indentSize)
 
   for (const arr of values) {
     if (isArrayOfPrimitives(arr)) {
       const arrayLine = encodeInlineArrayLine(arr, options.delimiter)
-      yield indentedListItem(depth + 1, arrayLine, options.indent)
+      yield indentedListItem(depth + 1, arrayLine, options.indentSize)
     }
   }
 }
@@ -192,7 +192,7 @@ function* encodeArrayOfObjectsAsTabularLines(
   options: ResolvedEncodeOptions,
 ): Generator<string> {
   const formattedHeader = formatHeader(rows.length, { key: prefix, fields: header, delimiter: options.delimiter })
-  yield indentedLine(depth, formattedHeader, options.indent)
+  yield indentedLine(depth, formattedHeader, options.indentSize)
 
   yield* writeTabularRowsLines(rows, header, depth + 1, options)
 }
@@ -205,7 +205,7 @@ function* writeTabularRowsLines(
 ): Generator<string> {
   for (const row of rows) {
     const leaves = collectRowLeaves(row, header)
-    yield indentedLine(depth, encodeAndJoinPrimitives(leaves, options.delimiter), options.indent)
+    yield indentedLine(depth, encodeAndJoinPrimitives(leaves, options.delimiter), options.indentSize)
   }
 }
 
@@ -220,7 +220,7 @@ function* encodeMixedArrayAsListItemsLines(
   options: ResolvedEncodeOptions,
 ): Generator<string> {
   const header = formatHeader(items.length, { key: prefix, delimiter: options.delimiter })
-  yield indentedLine(depth, header, options.indent)
+  yield indentedLine(depth, header, options.indentSize)
 
   for (const item of items) {
     yield* encodeListItemValueLines(item, depth + 1, options)
@@ -233,7 +233,7 @@ function* encodeObjectAsListItemLines(
   options: ResolvedEncodeOptions,
 ): Generator<string> {
   if (isEmptyObject(obj)) {
-    yield indentedLine(depth, LIST_ITEM_MARKER, options.indent)
+    yield indentedLine(depth, LIST_ITEM_MARKER, options.indentSize)
     return
   }
 
@@ -245,7 +245,7 @@ function* encodeObjectAsListItemLines(
     const header = extractTabularHeader(firstValue)
     if (header) {
       const formattedHeader = formatHeader(firstValue.length, { key: firstKey, fields: header, delimiter: options.delimiter })
-      yield indentedListItem(depth, formattedHeader, options.indent)
+      yield indentedListItem(depth, formattedHeader, options.indentSize)
       yield* writeTabularRowsLines(firstValue, header, depth + 2, options)
 
       if (restEntries.length > 0) {
@@ -263,7 +263,7 @@ function* encodeObjectAsListItemLines(
     if (keyedFields) {
       const keyedEntries = Object.entries(firstValue)
       const formattedHeader = formatHeader(keyedEntries.length, { key: firstKey, fields: keyedFields, delimiter: options.delimiter, keyed: true })
-      yield indentedListItem(depth, formattedHeader, options.indent)
+      yield indentedListItem(depth, formattedHeader, options.indentSize)
       yield* encodeKeyedEntryRowsLines(keyedEntries, keyedFields, depth + 2, options)
 
       if (restEntries.length > 0) {
@@ -278,20 +278,20 @@ function* encodeObjectAsListItemLines(
 
   if (isEncodablePrimitive(firstValue)) {
     const encodedValue = encodePrimitive(firstValue, options.delimiter)
-    yield indentedListItem(depth, `${encodedKey}: ${encodedValue}`, options.indent)
+    yield indentedListItem(depth, `${encodedKey}: ${encodedValue}`, options.indentSize)
   }
   else if (isJsonArray(firstValue)) {
     if (firstValue.length === 0) {
-      yield indentedListItem(depth, `${encodedKey}: []`, options.indent)
+      yield indentedListItem(depth, `${encodedKey}: []`, options.indentSize)
     }
     else if (isArrayOfPrimitives(firstValue)) {
       const arrayLine = encodeInlineArrayLine(firstValue, options.delimiter)
-      yield indentedListItem(depth, `${encodedKey}${arrayLine}`, options.indent)
+      yield indentedListItem(depth, `${encodedKey}${arrayLine}`, options.indentSize)
     }
     else {
       // Non-inline array items sit at depth + 2, below the hyphen line
       const header = formatHeader(firstValue.length, { delimiter: options.delimiter })
-      yield indentedListItem(depth, `${encodedKey}${header}`, options.indent)
+      yield indentedListItem(depth, `${encodedKey}${header}`, options.indentSize)
 
       for (const item of firstValue) {
         yield* encodeListItemValueLines(item, depth + 2, options)
@@ -299,7 +299,7 @@ function* encodeObjectAsListItemLines(
     }
   }
   else if (isJsonObject(firstValue)) {
-    yield indentedListItem(depth, `${encodedKey}:`, options.indent)
+    yield indentedListItem(depth, `${encodedKey}:`, options.indentSize)
     if (!isEmptyObject(firstValue)) {
       yield* encodeObjectLines(firstValue, depth + 2, options)
     }
@@ -321,16 +321,16 @@ function* encodeListItemValueLines(
   options: ResolvedEncodeOptions,
 ): Generator<string> {
   if (isEncodablePrimitive(value)) {
-    yield indentedListItem(depth, encodePrimitive(value, options.delimiter), options.indent)
+    yield indentedListItem(depth, encodePrimitive(value, options.delimiter), options.indentSize)
   }
   else if (isJsonArray(value)) {
     if (isArrayOfPrimitives(value)) {
       const arrayLine = encodeInlineArrayLine(value, options.delimiter)
-      yield indentedListItem(depth, arrayLine, options.indent)
+      yield indentedListItem(depth, arrayLine, options.indentSize)
     }
     else {
       const header = formatHeader(value.length, { delimiter: options.delimiter })
-      yield indentedListItem(depth, header, options.indent)
+      yield indentedListItem(depth, header, options.indentSize)
       for (const item of value) {
         yield* encodeListItemValueLines(item, depth + 1, options)
       }

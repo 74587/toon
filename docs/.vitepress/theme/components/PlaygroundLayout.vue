@@ -11,7 +11,8 @@ import VPInput from './VPInput.vue'
 type InputFormat = 'json' | 'yaml'
 type JsonFormat = 'pretty-2' | 'pretty-4' | 'pretty-tab' | 'compact'
 
-interface PlaygroundState extends Required<Pick<EncodeOptions, 'delimiter' | 'indent'>> {
+interface PlaygroundState extends Required<Pick<EncodeOptions, 'delimiter'>> {
+  indent: number
   input: string
   inputFormat: InputFormat
   jsonFormat: JsonFormat
@@ -124,7 +125,7 @@ const encodingResult = computed(() => {
     const parsedInput = parseInput(inputText.value, inputFormat.value)
     return {
       output: encode(parsedInput, {
-        indent: indent.value,
+        indentSize: indent.value,
         delimiter: delimiter.value,
       }),
       error: undefined,

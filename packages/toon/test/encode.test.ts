@@ -39,7 +39,7 @@ for (const fixtures of fixtureFiles) {
 
 function resolveEncodeOptions(options?: TestCase['options']): ResolvedEncodeOptions {
   return {
-    indent: options?.indentSize ?? 2,
+    indentSize: options?.indentSize ?? 2,
     delimiter: options?.delimiter ?? DEFAULT_DELIMITER,
   }
 }

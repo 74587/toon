@@ -26,17 +26,17 @@ export interface LineReader {
   done: boolean
   lastLine: ParsedLine | undefined
   scanState: StreamingScanState
-  indent: number
+  indentSize: number
   strict: boolean
 }
 
-export function createLineReader(context: { indent: number, strict: boolean }): LineReader {
+export function createLineReader(context: { indentSize: number, strict: boolean }): LineReader {
   return {
     buffer: [],
     done: false,
     lastLine: undefined,
     scanState: createScanState(),
-    indent: context.indent,
+    indentSize: context.indentSize,
     strict: context.strict,
   }
 }
@@ -55,7 +55,7 @@ function* fillBuffer(reader: LineReader): LineEffect<void> {
       return
     }
 
-    const parsedLine = parseLineIncremental(raw, reader.scanState, reader.indent, reader.strict)
+    const parsedLine = parseLineIncremental(raw, reader.scanState, reader.indentSize, reader.strict)
     if (parsedLine !== undefined) {
       reader.buffer.push(parsedLine)
     }

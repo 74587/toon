@@ -13,7 +13,7 @@ import { formatInputLabel, readInput, readLinesFromSource } from './utils.ts'
 export async function encodeToToon(config: {
   input: InputSource
   output?: string
-  indent: NonNullable<EncodeOptions['indent']>
+  indentSize: NonNullable<EncodeOptions['indentSize']>
   delimiter: NonNullable<EncodeOptions['delimiter']>
   printStats: boolean
 }): Promise<void> {
@@ -29,7 +29,7 @@ export async function encodeToToon(config: {
 
   const encodeOptions: EncodeOptions = {
     delimiter: config.delimiter,
-    indent: config.indent,
+    indentSize: config.indentSize,
   }
 
   // When printing stats, we need the full string for token counting
@@ -72,18 +72,18 @@ export async function encodeToToon(config: {
 export async function decodeToJson(config: {
   input: InputSource
   output?: string
-  indent: NonNullable<DecodeOptions['indent']>
+  indentSize: NonNullable<DecodeOptions['indentSize']>
   strict: NonNullable<DecodeOptions['strict']>
 }): Promise<void> {
   const lineSource = readLinesFromSource(config.input)
 
   const decodeStreamOptions: DecodeStreamOptions = {
-    indent: config.indent,
+    indentSize: config.indentSize,
     strict: config.strict,
   }
 
   const events = decodeStream(lineSource, decodeStreamOptions)
-  const jsonChunks = jsonStreamFromEvents(events, config.indent)
+  const jsonChunks = jsonStreamFromEvents(events, config.indentSize)
 
   await writeStream(jsonChunks, { outputPath: config.output, separator: '' })
 

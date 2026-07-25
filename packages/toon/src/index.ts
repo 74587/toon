@@ -48,7 +48,7 @@ export type {
  * encode({ tags: [] })
  * // tags: []
  *
- * encode(data, { indent: 4 })
+ * encode(data, { indentSize: 4 })
  * ```
  */
 export function encode(input: unknown, options?: EncodeOptions): string {
@@ -199,7 +199,7 @@ export function decodeStream(
 
 function resolveOptions(options?: EncodeOptions): ResolvedEncodeOptions {
   return {
-    indent: options?.indent ?? 2,
+    indentSize: options?.indentSize ?? options?.indent ?? 2,
     delimiter: options?.delimiter ?? DEFAULT_DELIMITER,
     replacer: options?.replacer,
   }
@@ -207,7 +207,7 @@ function resolveOptions(options?: EncodeOptions): ResolvedEncodeOptions {
 
 function resolveDecodeOptions(options?: DecodeOptions): ResolvedDecodeOptions {
   return {
-    indent: options?.indent ?? 2,
+    indentSize: options?.indentSize ?? options?.indent ?? 2,
     strict: options?.strict ?? true,
   }
 }

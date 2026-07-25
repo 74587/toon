@@ -8,11 +8,11 @@ import { createLineReader, driveAsync, driveSync, peekLine, readLine } from './l
 import { countLeafFields, isArrayHeaderContent, isKeyValueContent, mapRowValuesToPrimitives, parseArrayHeaderLine, parseDelimitedValues, parseKeyToken, parsePrimitiveToken } from './parser.ts'
 import { assertExpectedCount, isDataRow, validateNoBlankLinesInRange, validateNoExtraListItems, validateNoExtraTabularRows } from './validation.ts'
 
-interface DecoderContext { indent: number, strict: boolean }
+interface DecoderContext { indentSize: number, strict: boolean }
 
 function resolveContext(options?: DecodeStreamOptions): DecoderContext {
   return {
-    indent: options?.indent ?? 2,
+    indentSize: options?.indentSize ?? options?.indent ?? 2,
     strict: options?.strict ?? true,
   }
 }

@@ -76,8 +76,8 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
       : { type: 'file', path: path.resolve(input) }
     const outputPath = args.output ? path.resolve(args.output) : undefined
 
-    const indent = Number.parseInt(args.indent || '2', 10)
-    if (Number.isNaN(indent) || indent < 0) {
+    const indentSize = Number.parseInt(args.indent || '2', 10)
+    if (Number.isNaN(indentSize) || indentSize < 0) {
       throw new Error(`Invalid indent value: ${args.indent}`)
     }
 
@@ -94,7 +94,7 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
           input: inputSource,
           output: outputPath,
           delimiter: delimiter as Delimiter,
-          indent,
+          indentSize,
           printStats: args.stats === true,
         })
       }
@@ -102,7 +102,7 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
         await decodeToJson({
           input: inputSource,
           output: outputPath,
-          indent,
+          indentSize,
           strict: args.strict !== false,
         })
       }
