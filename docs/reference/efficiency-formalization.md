@@ -321,7 +321,7 @@ $$
 
 ### Tabular Arrays
 
-Uniform arrays of objects are TOON's sweet spot. JSON repeats every key for every row, while TOON declares the length and column names once (`key[N]{id,qty,...}:`) and streams rows as bare values.
+Uniform arrays of objects are TOON's sweet spot. JSON repeats every key for every row, while TOON declares the length and field list once (`key[N]{id,qty,...}:`) and streams rows as bare values.
 
 For arrays of objects with $n$ rows and $m$ fields, assuming numeric values and $|k| = 3$:
 

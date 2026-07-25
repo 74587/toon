@@ -108,7 +108,7 @@ forecast[3]{day,temp{min,max},condition,rainChance}:
 
 :::
 
-Notice how TOON combines YAML's indentation for the `location` object with inline format for the primitive `alerts` array and tabular format for the structured `forecast` array – where the uniform nested `temp` objects fold into the header as a [nested field group](/guide/format-overview#nested-field-groups) (`temp{min,max}`). Each format is chosen automatically based on the data structure.
+Notice how TOON combines YAML's indentation for the `location` object with inline form for the primitive `alerts` array and tabular form for the structured `forecast` array – where the uniform nested `temp` objects fold into the header as a [nested field group](/guide/format-overview#nested-field-groups) (`temp{min,max}`). Each form is chosen automatically based on the data structure.
 
 Maps of uniform objects collapse as well: the [keyed tabular form](/guide/format-overview#keyed-tabular-objects) turns them into tables whose rows carry their own keys.
 
@@ -123,7 +123,7 @@ TOON is optimized for specific use cases. It aims to:
 
 ## When to Use TOON
 
-TOON excels with uniform arrays of objects – data with the same structure across items. For LLM prompts, the format produces deterministic, minimally quoted text with built-in validation. Explicit array lengths (`[N]`) and field headers (`{fields}`) help detect truncation and malformed data, while the tabular structure declares fields once rather than repeating them in every row.
+TOON excels with uniform arrays of objects – data with the same structure across items. For LLM prompts, the format produces deterministic, minimally quoted text with built-in validation. Explicit array lengths (`[N]`) and field lists (`{fields}`) help detect truncation and malformed data, while tabular form declares the field list once rather than repeating it in every row.
 
 ::: tip
 The TOON format is stable, but also an idea in progress. Nothing's set in stone – help shape where it goes by contributing to the [spec](https://github.com/toon-format/spec) or sharing feedback.
@@ -135,7 +135,7 @@ TOON is not always the best choice. Consider alternatives when:
 
 - **Deeply nested or non-uniform structures** (tabular eligibility ≈ 0%): JSON-compact often uses fewer tokens. Example: complex configuration objects with many nested levels.
 - **Semi-uniform arrays** (~40–60% tabular eligibility): Token savings diminish. Prefer JSON if your pipelines already rely on it.
-- **Pure tabular data**: CSV is smaller than TOON for flat tables. TOON adds minimal overhead (~5–10%) to provide structure (array length declarations, field headers, delimiter scoping) that improves LLM reliability.
+- **Pure tabular data**: CSV is smaller than TOON for flat tables. TOON adds minimal overhead (~5–10%) to provide structure (array length declarations, field lists, delimiter scoping) that improves LLM reliability.
 - **Latency-critical applications**: Benchmark on your exact setup. Some deployments (especially local/quantized models) may process compact JSON faster despite TOON's lower token count.
 
 ::: info

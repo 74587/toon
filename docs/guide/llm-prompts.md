@@ -33,7 +33,7 @@ users[3]{id,name,role,lastLogin}:
 Task: Summarize the user roles and their last activity.
 ````
 
-The indentation and headers are usually enough – models treat TOON like familiar YAML or CSV. The explicit array lengths (`[N]`) and field headers (`{fields}`) help the model track structure, especially for large tables.
+The indentation and headers are usually enough – models treat TOON like familiar YAML or CSV. The explicit array lengths (`[N]`) and field lists (`{fields}`) help the model track structure, especially for large tables.
 
 > [!NOTE]
 > Most models don't have built-in TOON syntax highlighting, so ` ```toon` or ` ```yaml` both work fine. The structure is what matters.

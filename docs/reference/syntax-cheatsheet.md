@@ -308,7 +308,7 @@ key[N]{field1,field2,field3}:
 ```
 
 - `N` = array length
-- `{fields}` = column names
+- `{fields}` = the field list, one leaf field per row cell
 - Default delimiter: comma
 
 ### Nested Field Groups

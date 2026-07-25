@@ -26,7 +26,7 @@ hero:
 features:
   - title: Token-Efficient & Accurate
     icon: 📊
-    details: TOON reaches 76.4% accuracy (vs JSON's 75.0%) while using ~40% fewer tokens in mixed-structure benchmarks across 4 models.
+    details: TOON reaches 72.2% accuracy (vs JSON's 71.4%) while using 42.6% fewer tokens across 244 retrieval questions on 4 models.
     link: /guide/benchmarks
   - title: JSON Data Model
     icon: 🔁
@@ -34,16 +34,16 @@ features:
     link: /guide/format-overview
   - title: LLM-Friendly Guardrails
     icon: 🛤️
-    details: Explicit [N] lengths and {fields} headers give models a clear schema to follow, improving parsing reliability.
+    details: Explicit [N] lengths and {fields} field lists give models a clear schema to follow, improving parsing reliability.
     link: /guide/format-overview#arrays
   - title: Minimal Syntax
     icon: 📐
     details: Uses indentation instead of braces and minimizes quoting, giving YAML-like readability with CSV-style compactness.
     link: /guide/format-overview#arrays
-  - title: Tabular Arrays
+  - title: Tabular Forms
     icon: 🧺
-    details: Uniform arrays of objects collapse into tables that declare fields once and stream row values line by line.
-    link: /guide/format-overview#arrays
+    details: Uniform arrays of objects – and objects of uniform objects – collapse into tables that declare the field list once and stream row values line by line.
+    link: /guide/format-overview#the-four-forms
   - title: Multi-Language Ecosystem
     icon: 🌐
     details: Spec-driven implementations in TypeScript, Python, Go, Rust, .NET, and other languages.

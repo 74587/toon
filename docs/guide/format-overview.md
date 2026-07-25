@@ -6,6 +6,19 @@ description: TOON syntax with concrete examples – objects, arrays, tabular hea
 
 TOON syntax reference with concrete examples. See [Getting Started](/guide/getting-started) for an introduction.
 
+## The Four Forms
+
+A **form** is one rendering of a value. The encoder picks the most compact form a value qualifies for – you never choose by hand. Everything below is a variation on these four:
+
+| Form | Applies to | Looks like |
+| ---- | ---------- | ---------- |
+| [Inline](#primitive-arrays-inline-form) | Arrays of primitives | `tags[3]: admin,ops,dev` |
+| [List](#mixed-and-non-uniform-arrays-list-form) | Any array no tabular form fits | `items[2]:` then `- ` per element |
+| [Tabular](#arrays-of-objects-tabular-form) | Arrays of uniform objects | `items[2]{sku,qty}:` then one row per element |
+| [Keyed tabular](#keyed-tabular-objects) | Objects whose values are uniform objects | `users[2:]{age,city}:` then one entry row per entry |
+
+"Form" is deliberate: these are shapes *within* TOON, not sibling formats to JSON or YAML.
+
 ## Data Model
 
 TOON models data the same way as JSON:
@@ -80,7 +93,7 @@ Objects that don't qualify keep the nested form unchanged: single-entry objects,
 
 TOON detects array structure and chooses the most efficient representation. Arrays always declare their length in brackets: `[N]`.
 
-### Primitive Arrays (Inline)
+### Primitive Arrays (Inline Form)
 
 Arrays of primitives (strings, numbers, booleans, null) are rendered inline:
 
@@ -90,9 +103,9 @@ tags[3]: admin,ops,dev
 
 The delimiter (comma by default) separates values. Strings containing the active delimiter must be quoted.
 
-### Arrays of Objects (Tabular)
+### Arrays of Objects (Tabular Form)
 
-When all objects in an array share the same set of primitive-valued keys, TOON uses tabular format:
+When all objects in an array share the same set of primitive-valued keys, TOON uses tabular form:
 
 ::: code-group
 
@@ -118,7 +131,7 @@ The header `items[2]{sku,qty,price}:` declares:
 Each row contains values in the same order as the field list. Values are encoded as primitives (strings, numbers, booleans, null) and separated by the delimiter.
 
 > [!NOTE]
-> Tabular format requires identical field sets across all objects (same keys, order per object may vary), at least one key per object, and every column either primitive-valued or a uniform nested object (see below) – arrays that contain an empty `{}` element or mix value shapes within a column fall back to the expanded list form.
+> Tabular form requires identical field sets across all objects (same keys, order per object may vary), at least one key per object, and every column either primitive-valued or a uniform nested object (see below) – arrays that contain an empty `{}` element or mix value shapes within a column fall back to list form.
 
 ### Nested Field Groups
 
@@ -132,9 +145,9 @@ orders[2]{id,customer{name,country},total}:
 
 The header `customer{name,country}` declares a nested-object column; each row's cells follow a depth-first walk of the field list, so `Ada,DK` fills `customer.name` and `customer.country` of the first order. Nesting depth is unbounded ([spec §9.3](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form)).
 
-### Mixed and Non-Uniform Arrays
+### Mixed and Non-Uniform Arrays (List Form)
 
-Arrays that don't meet the tabular requirements use list format with hyphen markers:
+Arrays that don't meet the tabular requirements use list form with hyphen markers:
 
 ```yaml
 items[3]:
