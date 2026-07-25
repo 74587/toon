@@ -689,6 +689,11 @@ function* yieldObjectFromFields(
   function* walkFieldGroup(nodes: readonly FieldNode[]): Generator<JsonStreamEvent> {
     yield { type: 'startObject' }
     for (const node of nodes) {
+      // A non-strict width mismatch leaves trailing leaf fields with no cell; they are absent, not undefined
+      if (!node.children && cellIndex >= primitives.length) {
+        continue
+      }
+
       yield { type: 'key', key: node.name }
       if (node.children) {
         yield* walkFieldGroup(node.children)
