@@ -79,7 +79,8 @@ async function writeFiles(baseDir: string, files: FileRecord): Promise<void> {
 }
 
 export function mockStdin(input: string): () => void {
-  const mockStream = Readable.from([input])
+  // Real stdin hands over bytes, and the strict UTF-8 check depends on getting them
+  const mockStream = Readable.from([new TextEncoder().encode(input)])
 
   const originalStdin = process.stdin
   Object.defineProperty(process, 'stdin', {

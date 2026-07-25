@@ -86,7 +86,7 @@ export async function* readLinesFromSource(source: InputSource, strict: boolean)
   let buffer = ''
 
   for await (const chunk of stream) {
-    buffer += decodeUtf8(decoder, chunk as Uint8Array | string)
+    buffer += decodeUtf8(decoder, chunk as Uint8Array)
     let index: number
 
     while ((index = buffer.indexOf('\n')) !== -1) {
@@ -103,12 +103,7 @@ export async function* readLinesFromSource(source: InputSource, strict: boolean)
   }
 }
 
-function decodeUtf8(decoder: TextDecoder, chunk?: Uint8Array | string): string {
-  // A stream that was already given an encoding hands over strings, with the byte errors long gone
-  if (typeof chunk === 'string') {
-    return chunk
-  }
-
+function decodeUtf8(decoder: TextDecoder, chunk?: Uint8Array): string {
   try {
     return chunk === undefined ? decoder.decode() : decoder.decode(chunk, { stream: true })
   }
