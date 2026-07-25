@@ -420,7 +420,8 @@ function* decodeTabularArray(
   let endLine: number | undefined
   let lastRowLine: ParsedLine = headerLine
 
-  while (rowCount < header.length) {
+  // Only strict stops at N, leaving the surplus to `validateNoExtraTabularRows`; non-strict reads on so [N] never truncates
+  while (!options.strict || rowCount < header.length) {
     const line = yield* peekLine(reader)
     if (!line || line.depth < rowDepth) {
       break
@@ -476,7 +477,8 @@ function* decodeListArray(
   let endLine: number | undefined
   let lastItemLine: ParsedLine = headerLine
 
-  while (itemCount < header.length) {
+  // Only strict stops at N, leaving the surplus to `validateNoExtraListItems`; non-strict reads on so [N] never truncates
+  while (!options.strict || itemCount < header.length) {
     const line = yield* peekLine(reader)
     if (!line || line.depth < itemDepth) {
       break
@@ -509,7 +511,7 @@ function* decodeListArray(
   assertExpectedCount(itemCount, header.length, 'list-form items', options, lastItemLine)
 
   if (options.strict && startLine !== undefined && endLine !== undefined) {
-    validateNoBlankLinesInRange(startLine, endLine, reader.scanState.blankLines, options.strict, 'list form')
+    validateNoBlankLinesInRange(startLine, endLine, reader.scanState.blankLines, options.strict, 'list-form array')
   }
 
   if (options.strict) {

@@ -64,7 +64,6 @@ export function parseArrayHeaderLine(
   let colonIndex = bracketEnd + 1
   let braceEnd = colonIndex
 
-  // Check for field list (braces come after bracket)
   const braceStart = findUnquotedChar(content, OPEN_BRACE, bracketEnd)
   if (braceStart !== -1 && braceStart < findUnquotedChar(content, COLON, bracketEnd)) {
     const gapBeforeBrace = content.slice(bracketEnd + 1, braceStart)
@@ -104,7 +103,11 @@ export function parseArrayHeaderLine(
   // Extract and parse the key (might be quoted)
   let key: string | undefined
   if (bracketStart > 0) {
-    const rawKey = content.slice(0, bracketStart).trim()
+    const rawKey = content.slice(0, bracketStart)
+    // Trimming here would silently turn `foo [2]:` into a header with key `foo`
+    if (rawKey !== rawKey.trimEnd()) {
+      return { kind: 'invalid', reason: 'Unexpected whitespace between key and bracket segment' }
+    }
     // The upstream quote and bracket guards make a malformed quoted key
     // unreachable here, so this literal parse never actually throws; leaving
     // it uncaught preserves today's both-modes throw instead of adding a
