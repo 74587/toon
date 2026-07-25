@@ -127,13 +127,13 @@ forecast[3]{day,temp{min,max},condition,rainChance}:
   Wed,3,11,sunny,5
 ```
 
-Three things are happening at once, and each is a **form** – one rendering of a value, chosen automatically:
+Three things are happening at once. Two are **forms** – one rendering of a value, picked automatically from the data's shape – and the third is a header feature:
 
 - `alerts[2]: frost,wind` is **inline form**: a primitive array on its header line.
 - `forecast[3]{day,…}:` is **tabular form**: the field list is declared once in the header, then one row per element.
 - `temp{min,max}` inside that header is a **nested field group**: the uniform nested `temp` objects fold into the header while rows stay flat.
 
-The fourth form is **keyed tabular**, for objects whose values are uniform objects – config maps, feature flags, records by ID. The colon after the length (`[2:]`) marks it, and each row carries its own key:
+The third form is **keyed tabular**, for objects whose values are uniform objects – config maps, feature flags, records by ID. The colon after the length (`[2:]`) marks it, and each row carries its own key:
 
 <table>
 <tr><th>JSON</th><th>TOON</th></tr>
@@ -159,7 +159,7 @@ environments[2:]{region,replicas,debug}:
 </td></tr>
 </table>
 
-Anything that fits none of these – mixed types, non-uniform objects – falls back to **list form**, one `- ` item per element. That's the whole format; the [Format Overview](https://toonformat.dev/guide/format-overview) covers the edges.
+Anything that fits none of these – mixed types, non-uniform objects – falls back to the fourth form, **list form**: one `- ` item per element, or a bare `-` for an empty object. Those four cover the shapes; the [Format Overview](https://toonformat.dev/guide/format-overview) covers the rest.
 
 > [!TIP]
 > Try it on your own data – no install required:
@@ -193,7 +193,7 @@ TOON excels with uniform arrays of objects. Reach for something else when:
 - **Data is purely tabular** – CSV is smaller. TOON's ~5–10% overhead buys declared lengths, field lists, and delimiter scoping, which is a reliability trade, not a size one.
 - **Latency dominates** – some deployments (notably local or quantized models) process compact JSON faster despite the higher token count. Measure TTFT and total time on your own setup.
 
-[Benchmarks](#benchmarks) below quantify each of these.
+[Benchmarks](#benchmarks) below quantify the token and accuracy trade-offs; latency is the one you have to measure yourself.
 
 ## Benchmarks
 
@@ -860,7 +860,7 @@ Comprehensive guides, references, and resources to help you get the most out of 
 - [API Reference](https://toonformat.dev/reference/api) – TypeScript/JavaScript encode/decode API
 - [Syntax Cheatsheet](https://toonformat.dev/reference/syntax-cheatsheet) – Quick format lookup
 - [Specification](https://github.com/toon-format/spec/blob/main/SPEC.md) – Normative rules for implementers
-- [Glossary](https://github.com/toon-format/spec/blob/main/CONTEXT.md) – Canonical name for every concept
+- [Glossary](https://github.com/toon-format/spec/blob/main/CONTEXT.md) – One name per concept, for contributors and tooling
 
 ## Media Type & File Extension
 

@@ -34,7 +34,7 @@ features:
     link: /guide/format-overview
   - title: LLM-Friendly Guardrails
     icon: 🛤️
-    details: Explicit [N] lengths and {fields} field lists give models a clear schema to follow, improving parsing reliability.
+    details: Explicit [N] lengths and {fields} field lists in every header give models a clear schema to follow, improving parsing reliability.
     link: /guide/format-overview#arrays
   - title: Minimal Syntax
     icon: 📐

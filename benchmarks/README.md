@@ -56,7 +56,7 @@ Live row counts and per-dataset scores are in the generated [dataset catalog](./
 | GitHub repositories | Real-world data, long string values |
 | Event logs | Semi-uniform data, roughly half flat and half with nested error objects |
 | Nested config | Deep nesting with almost no tabular eligibility – TOON's worst case |
-| Feature flags | A map of uniform objects – exercises [keyed tabular form](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form) (`key[N:]{fields}:`) |
+| Feature flags | A map of uniform objects – exercises [keyed tabular form](https://github.com/toon-format/spec/blob/main/SPEC.md#95-objects-of-uniform-objects--keyed-tabular-form) (`key[N:]{fields}:`) |
 | Contacts | Uniform records with nested address and plan objects – exercises [nested field groups](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form) |
 
 **Structural validation datasets** – five variants of one valid 20-row dataset. The corruption is applied to the *encoded text* after it is emitted, so TOON's `[N]` length and field-list width still declare the original shape while the other formats render the lossy-pipeline outcome:

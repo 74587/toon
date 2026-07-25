@@ -123,7 +123,7 @@ items[1]:
 
 :::
 
-## Arrays of Arrays
+## Arrays of Arrays (List Form)
 
 ::: code-group
 

@@ -8,12 +8,12 @@ TOON syntax reference with concrete examples. See [Getting Started](/guide/getti
 
 ## The Four Forms
 
-A **form** is one rendering of a value. The encoder picks the most compact form a value qualifies for – you never choose by hand. Everything below is a variation on these four:
+A **form** is one rendering of a value. Which form you get follows from the data's shape and where it sits – you never choose by hand. Everything below is a variation on these four:
 
 | Form | Applies to | Looks like |
 | ---- | ---------- | ---------- |
 | [Inline](#primitive-arrays-inline-form) | Arrays of primitives | `tags[3]: admin,ops,dev` |
-| [List](#mixed-and-non-uniform-arrays-list-form) | Any array no tabular form fits | `items[2]:` then `- ` per element |
+| [List](#mixed-and-non-uniform-arrays-list-form) | Arrays that fit neither inline nor tabular form | `items[2]:` then `- ` per element |
 | [Tabular](#arrays-of-objects-tabular-form) | Arrays of uniform objects | `items[2]{sku,qty}:` then one row per element |
 | [Keyed tabular](#keyed-tabular-objects) | Objects whose values are uniform objects | `users[2:]{age,city}:` then one entry row per entry |
 
@@ -87,7 +87,7 @@ When the root object itself is eligible, the key is omitted:
   bob: 25,Oslo
 ```
 
-Objects that don't qualify keep the nested form unchanged: single-entry objects, objects whose values mix shapes or include primitives, arrays, or empty objects. In practice this leaves most configuration-style maps as they are ([spec §9.5](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form)).
+Objects that don't qualify keep the nested form unchanged: single-entry objects, objects whose values mix shapes or include primitives, arrays, or empty objects. In practice this leaves most configuration-style maps as they are ([spec §9.5](https://github.com/toon-format/spec/blob/main/SPEC.md#95-objects-of-uniform-objects--keyed-tabular-form)).
 
 ## Arrays
 
@@ -192,7 +192,7 @@ items[1]:
 
 This is the canonical encoding for list-item objects whose first field is a tabular array.
 
-### Arrays of Arrays
+### Arrays of Arrays (List Form)
 
 When you have arrays containing primitive inner arrays:
 

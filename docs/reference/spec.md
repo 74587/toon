@@ -13,7 +13,7 @@ You don't need this page to *use* TOON. It's mainly for implementers and contrib
 
 ## Current Version
 
-**Spec v{{ $spec.version }}** (2026-07-22) is the current published Working Draft. It is stable for implementation but not yet finalized; see "Status of This Document" in the spec for details.
+**Spec v{{ $spec.version }}** ({{ $spec.date }}) is the current published Working Draft. It is stable for implementation but not yet finalized; see "Status of This Document" in the spec for details.
 
 ## Media Type & File Extension
 
