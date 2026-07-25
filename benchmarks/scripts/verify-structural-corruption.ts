@@ -49,7 +49,7 @@ const toonWidthNarrowRows = toonRowLines(toonWidth).filter(line => cellCount(lin
 assert(toonHeaderFieldCount === 7, 'TOON control: header declares 7 fields')
 assert(
   toonWidthNarrowRows.length === 1,
-  `TOON width-mismatch: exactly one row has ${toonHeaderFieldCount - 1} cells under the ${toonHeaderFieldCount}-field header`,
+  `TOON width-mismatch: exactly one row has ${toonHeaderFieldCount - 1} cells under the ${toonHeaderFieldCount}-field list`,
 )
 assert(
   toonRowLines(toonWidth).filter(line => cellCount(line) === toonHeaderFieldCount).length === 19,

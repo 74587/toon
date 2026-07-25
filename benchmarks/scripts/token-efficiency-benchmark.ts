@@ -37,7 +37,8 @@ const TOKEN_PADDING = 7
 
 const DEFAULT_DATASET_ICON = '📊'
 
-const DETAILED_EXAMPLE_DATASETS = ['github', 'analytics'] as const
+// One worked example carries the point; the GitHub one repeated it at 3x the length
+const DETAILED_EXAMPLE_DATASETS = ['analytics'] as const
 const GITHUB_REPO_LIMIT = 3
 const GITHUB_DESC_LIMIT = 80
 const ANALYTICS_METRICS_LIMIT = 5
@@ -274,7 +275,7 @@ ${mixedTotalLines}
 
 #### Flat-Only Track
 
-Datasets with flat tabular structures where CSV is applicable.
+Datasets with flat, fully tabular-eligible data where CSV is applicable.
 
 \`\`\`
 ${flatCharts}

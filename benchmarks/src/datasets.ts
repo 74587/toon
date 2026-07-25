@@ -230,7 +230,7 @@ export function generateAnalyticsData(days: number, startDate = '2025-01-01'): {
 }
 
 /**
- * Generate employee data (uniform tabular structure)
+ * Generate employee data (uniform, fully tabular-eligible)
  */
 const departments = ['Engineering', 'Sales', 'Marketing', 'HR', 'Operations', 'Finance'] as const
 
@@ -356,7 +356,7 @@ const analyticsDataset: Dataset = {
  * Real-world dataset: Top 100 starred GitHub repositories
  *
  * @remarks
- * Tests TOON's tabular format with real data.
+ * Tests TOON's tabular form with real data.
  */
 const githubDataset: Dataset = {
   name: 'github',
@@ -671,7 +671,7 @@ function generateStructuralValidationFixtures(): StructuralValidationFixture[] {
       data: { employees: baseData.employees },
       corruption: { kind: 'extra-rows', appendRecords },
     },
-    // Drop one cell from row 10 so the row is narrower than the {fields} header
+    // Drop one cell from row 10 so the row is narrower than the header's field list
     {
       type: 'width-mismatch' as const,
       description: 'Inconsistent field count (missing salary in row 10)',

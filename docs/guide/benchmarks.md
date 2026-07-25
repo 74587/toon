@@ -49,7 +49,7 @@ Benchmarks test LLM comprehension across different input formats using 244 data 
 
 **CSV Support:** ✓ (supported), ✗ (not supported – would require lossy flattening)
 
-**Eligibility:** Percentage of arrays that qualify for TOON's tabular format (uniform objects with primitive values)
+**Eligibility:** Percentage of arrays that qualify for TOON's tabular form (uniform objects with primitive values)
 
 </details>
 
@@ -58,11 +58,11 @@ Benchmarks test LLM comprehension across different input formats using 244 data 
 Each format ranked by efficiency (accuracy percentage per 1,000 tokens):
 
 ```
-TOON           ████████████████████   29.2 acc%/1K tok  │  72.2% acc  │  2,474 tokens
-JSON compact   ████████████████░░░░   23.8 acc%/1K tok  │  69.0% acc  │  2,892 tokens
-YAML           ██████████████░░░░░░   20.1 acc%/1K tok  │  70.1% acc  │  3,487 tokens
-JSON           ███████████░░░░░░░░░   16.6 acc%/1K tok  │  71.4% acc  │  4,308 tokens
-XML            ██████████░░░░░░░░░░   14.4 acc%/1K tok  │  70.7% acc  │  4,909 tokens
+TOON           ████████████████████   29.2 acc%/1K tok  │  72.2%  ±2.8 acc  │  2,474 tokens
+JSON compact   ████████████████░░░░   23.8 acc%/1K tok  │  69.0%  ±2.9 acc  │  2,892 tokens
+YAML           ██████████████░░░░░░   20.1 acc%/1K tok  │  70.1%  ±2.9 acc  │  3,487 tokens
+JSON           ███████████░░░░░░░░░   16.6 acc%/1K tok  │  71.4%  ±2.8 acc  │  4,308 tokens
+XML            ██████████░░░░░░░░░░   14.4 acc%/1K tok  │  70.7%  ±2.9 acc  │  4,909 tokens
 ```
 
 *Efficiency score = (Accuracy % ÷ Tokens) × 1,000. Higher is better.*
@@ -73,23 +73,9 @@ XML            ██████████░░░░░░░░░░   14
 > [!NOTE]
 > CSV is excluded from the ranking as it only supports 109 of 244 questions (flat tabular data only). While CSV is highly token-efficient for simple tabular data, it cannot represent nested structures that other formats handle.
 
-#### Accuracy by Format
+#### Accuracy on Flat Datasets
 
-##### All Datasets
-
-CSV is excluded here – it cannot represent the nested datasets.
-
-| Format | Accuracy | Correct/Total | Avg Tokens |
-| ------ | -------- | ------------- | ---------- |
-| `toon` | 72.2% ±2.8 | 705/976 | 2,474 |
-| `json-pretty` | 71.4% ±2.8 | 697/976 | 4,308 |
-| `xml` | 70.7% ±2.9 | 690/976 | 4,909 |
-| `yaml` | 70.1% ±2.9 | 684/976 | 3,487 |
-| `json-compact` | 69.0% ±2.9 | 673/976 | 2,892 |
-
-##### Flat Datasets Only
-
-Every format answers the same 109 flat-dataset questions per model.
+Every format answers the same 109 flat-dataset questions per model, so CSV can be compared on equal footing here.
 
 | Format | Accuracy | Correct/Total | Avg Tokens |
 | ------ | -------- | ------------- | ---------- |
@@ -142,7 +128,7 @@ grok-4.5
 > Accuracy figures include Wilson 95% confidence intervals (±); when two formats' intervals overlap, the difference between them is not statistically meaningful. CSV answers only the 109 flat-dataset questions, so its per-model cells cover a smaller, easier population than the other formats.
 
 <details>
-<summary><strong>Performance by dataset, model, and question type</strong></summary>
+<summary><strong>Performance by dataset and question type</strong></summary>
 
 #### Performance by Question Type
 
@@ -294,125 +280,18 @@ grok-4.5
 | `json-pretty` | 97.2% | 4,014 | 70/72 |
 | `xml` | 98.6% | 4,534 | 71/72 |
 
-#### Performance by Model
-
-##### claude-haiku-4-5-20251001
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-| `toon` | 65.6% | 160/244 |
-| `json-pretty` | 63.5% | 155/244 |
-| `xml` | 62.3% | 152/244 |
-| `yaml` | 62.3% | 152/244 |
-| `json-compact` | 61.9% | 151/244 |
-| `csv` | 49.5% | 54/109 |
-
-##### gemini-3.6-flash
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-| `toon` | 69.3% | 169/244 |
-| `json-pretty` | 68.4% | 167/244 |
-| `yaml` | 67.6% | 165/244 |
-| `xml` | 65.2% | 159/244 |
-| `json-compact` | 63.5% | 155/244 |
-| `csv` | 57.8% | 63/109 |
-
-##### gpt-5.4-nano
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-| `xml` | 59.4% | 145/244 |
-| `json-pretty` | 57.4% | 140/244 |
-| `toon` | 57.0% | 139/244 |
-| `json-compact` | 54.9% | 134/244 |
-| `yaml` | 54.5% | 133/244 |
-| `csv` | 46.8% | 51/109 |
-
-##### grok-4.5
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-| `toon` | 97.1% | 237/244 |
-| `json-pretty` | 96.3% | 235/244 |
-| `xml` | 95.9% | 234/244 |
-| `yaml` | 95.9% | 234/244 |
-| `json-compact` | 95.5% | 233/244 |
-| `csv` | 94.5% | 103/109 |
-
 </details>
 
-#### What's Being Measured
-
-This benchmark tests **LLM comprehension and data retrieval accuracy** across different input formats. Each LLM receives formatted data and must answer questions about it. This does **not** test the model's ability to generate TOON output – only to read and understand it.
-
-#### Datasets Tested
-
-Thirteen datasets designed to test different structural patterns and validation capabilities:
-
-**Primary datasets:**
-
-1. **Tabular** (100 employee records): Uniform objects with identical fields – optimal for TOON's tabular format.
-2. **Nested** (50 e-commerce orders): Complex structures with nested customer objects and item arrays.
-3. **Analytics** (60 days of metrics): Time-series data with dates and numeric values.
-4. **GitHub** (100 repositories): Real-world data from top GitHub repos by stars.
-5. **Event Logs** (75 logs): Semi-uniform data with ~50% flat logs and ~50% with nested error objects.
-6. **Nested Config** (1 configuration): Deeply nested configuration with minimal tabular eligibility.
-7. **Keyed** (40 feature flags): Map of uniform flat objects – exercises TOON's [keyed tabular form](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form) (`key[N:]{fields}:`).
-8. **Nested Group** (50 contacts): Uniform records with nested address and plan objects – exercises TOON's [nested field groups](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form).
-
-**Structural validation datasets:**
-
-Each carries the same valid 20-row dataset; the corruption is applied to the encoded text after it is emitted, so TOON's `[N]` length and `{fields}` width still declare the original shape while JSON, YAML, XML, and CSV render the lossy-pipeline outcome.
-
-9. **Control**: Valid complete dataset, text passed through untouched (baseline for validation)
-10. **Truncated**: Last 3 row lines removed – TOON still declares `[20]`, so the shortfall is detectable; formats without length metadata stay valid and undetectable in principle
-11. **Extra rows**: 3 rows appended past the declared `[20]` – detectable in TOON, valid and undetectable elsewhere
-12. **Width mismatch**: One cell dropped from row 10 – TOON's row is narrower than its `{fields}` header (CSV narrower than its column row); JSON/YAML/XML only drop the property, a schema-level signal
-13. **Missing fields**: The email value removed from every 5th record, surfacing the same way as width mismatch
-
-#### Question Types
-
-244 questions are generated dynamically across five categories:
-
-- **Field retrieval (38%)**: Direct value lookups or values that can be read straight off a record (including booleans and simple counts such as array lengths)
-  - Example: "What is Alice's salary?" → `75000`
-  - Example: "How many items are in order ORD-0042?" → `3`
-  - Example: "What is the customer name for order ORD-0042?" → `John Doe`
-
-- **Aggregation (26%)**: Dataset-level totals and averages plus single-condition filters (counts, sums, min/max comparisons)
-  - Example: "How many employees work in Engineering?" → `17`
-  - Example: "What is the total revenue across all orders?" → `45123.50`
-  - Example: "How many employees have salary > 80000?" → `23`
-
-- **Filtering (20%)**: Multi-condition queries requiring compound logic (AND constraints across fields)
-  - Example: "How many employees in Sales have salary > 80000?" → `5`
-  - Example: "How many active employees have more than 10 years of experience?" → `8`
-  - Note: With reasoning disabled, multi-row arithmetic is hard in every format – aggregation and filtering scores mostly measure computation under format friction and sit near the floor for all formats.
-
-- **Structure awareness (15%)**: Tests format-native structural affordances (TOON's `[N]` count and `{fields}`, CSV's header row)
-  - Example: "How many employees are in the dataset?" → `100`
-  - Example: "List the field names for employees" → `id, name, email, department, salary, yearsExperience, active`
-  - Example: "What is the department of the last employee?" → `Sales`
-
-- **Structural validation (2%)**: Tests ability to detect incomplete, truncated, or corrupted data from the encoded text alone
-  - Example: "Is this data complete and valid?" → `YES` (control dataset) or `NO` (corrupted datasets)
-  - The text is corrupted post-encode: TOON's `[N]` length and `{fields}` width still declare the original shape, so truncation, extra rows, and width drops are detectable
-  - JSON, YAML, XML, and CSV carry no length metadata, so their truncated and extra-row variants stay syntactically valid and cannot be flagged in principle – that contrast is the demonstration
-
-#### Evaluation Process
-
-1. **Format conversion**: Each dataset is converted to all 6 formats (TOON, JSON, XML, YAML, JSON compact, CSV).
-2. **Query LLM**: Each model receives formatted data + question in a prompt and extracts the answer.
-3. **Validate deterministically**: Answers are validated using type-aware comparison (e.g., `50000` = `$50,000`, `Engineering` = `engineering`, `2025-01-01` = `January 1, 2025`) without requiring an LLM judge.
-
-#### Models & Configuration
+#### Run Configuration
 
 - **Models tested**: `claude-haiku-4-5-20251001`, `gemini-3.6-flash`, `gpt-5.4-nano`, `grok-4.5`
+- **Formats compared**: TOON, JSON, XML, YAML, JSON compact, CSV
 - **Token counting**: Using `gpt-tokenizer` with `o200k_base` encoding (GPT-5 tokenizer). Other providers tokenize differently, so absolute counts are tokenizer-specific; relative differences between formats hold directionally.
 - **Reasoning**: Disabled via the AI SDK's universal `reasoning: 'none'` (Gemini 3 floors at minimal thinking, `grok-4.5` at `low`)
 - **Temperature**: Not set (models use their defaults)
 - **Total evaluations**: 244 questions × 6 formats × 4 models = 5,856 LLM calls
+
+What the datasets contain, how the questions are generated, and how answers are validated is documented in [the benchmark README](https://github.com/toon-format/toon/tree/main/benchmarks#retrieval-accuracy-benchmark).
 
 <!-- /automd -->
 
@@ -479,7 +358,7 @@ Datasets with nested or semi-uniform structures. CSV excluded as it cannot prope
 
 #### Flat-Only Track
 
-Datasets with flat tabular structures where CSV is applicable.
+Datasets with flat, fully tabular-eligible data where CSV is applicable.
 
 ```
 👥 Uniform employee records  ┊  Tabular: 100%
@@ -585,69 +464,6 @@ metrics[5]{date,views,clicks,conversions,revenue,bounceRate}:
   2025-01-03,4460,143,8,1317.98,0.59
   2025-01-04,4740,125,13,2934.77,0.37
   2025-01-05,6428,369,19,1317.24,0.3
-```
-
----
-
-#### ⭐ Top 100 GitHub repositories
-
-**Savings:** 6,400 tokens (41.7% reduction vs JSON)
-
-**JSON** (15,337 tokens):
-
-```json
-{
-  "repositories": [
-    {
-      "id": 132750724,
-      "name": "build-your-own-x",
-      "repo": "codecrafters-io/build-your-own-x",
-      "description": "Master programming by recreating your favorite technologies from scratch.",
-      "createdAt": "2018-05-09T12:03:18Z",
-      "updatedAt": "2026-07-23T18:57:15Z",
-      "pushedAt": "2026-07-14T19:25:58Z",
-      "stars": 530712,
-      "watchers": 6778,
-      "forks": 50205,
-      "defaultBranch": "master"
-    },
-    {
-      "id": 21737465,
-      "name": "awesome",
-      "repo": "sindresorhus/awesome",
-      "description": "😎 Awesome lists about all kinds of interesting topics",
-      "createdAt": "2014-07-11T13:42:37Z",
-      "updatedAt": "2026-07-23T18:57:24Z",
-      "pushedAt": "2026-06-30T18:21:16Z",
-      "stars": 488074,
-      "watchers": 8292,
-      "forks": 36010,
-      "defaultBranch": "main"
-    },
-    {
-      "id": 28457823,
-      "name": "freeCodeCamp",
-      "repo": "freeCodeCamp/freeCodeCamp",
-      "description": "freeCodeCamp.org's open-source codebase and curriculum. Learn math, programming,…",
-      "createdAt": "2014-12-24T17:49:19Z",
-      "updatedAt": "2026-07-22T07:01:33Z",
-      "pushedAt": "2026-07-21T18:00:51Z",
-      "stars": 452380,
-      "watchers": 8590,
-      "forks": 45624,
-      "defaultBranch": "main"
-    }
-  ]
-}
-```
-
-**TOON** (8,937 tokens):
-
-```
-repositories[3]{id,name,repo,description,createdAt,updatedAt,pushedAt,stars,watchers,forks,defaultBranch}:
-  132750724,build-your-own-x,codecrafters-io/build-your-own-x,Master programming by recreating your favorite technologies from scratch.,"2018-05-09T12:03:18Z","2026-07-23T18:57:15Z","2026-07-14T19:25:58Z",530712,6778,50205,master
-  21737465,awesome,sindresorhus/awesome,😎 Awesome lists about all kinds of interesting topics,"2014-07-11T13:42:37Z","2026-07-23T18:57:24Z","2026-06-30T18:21:16Z",488074,8292,36010,main
-  28457823,freeCodeCamp,freeCodeCamp/freeCodeCamp,"freeCodeCamp.org's open-source codebase and curriculum. Learn math, programming,…","2014-12-24T17:49:19Z","2026-07-22T07:01:33Z","2026-07-21T18:00:51Z",452380,8590,45624,main
 ```
 
 </details>

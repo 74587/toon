@@ -143,9 +143,9 @@ ${generateDatasetCatalog(ACCURACY_DATASETS)}
 
 ${generateEfficiencyRankingReport(allDatasetsFormatResults, flatOnlyCsvResult, totalQuestions, modelNames.length)}
 
-#### Accuracy by Format
+#### Accuracy on Flat Datasets
 
-${generateAccuracyComparisonTables(allDatasetsFormatResults, flatOnlyFormatResults, modelNames.length)}
+${generateFlatOnlyAccuracyTable(flatOnlyFormatResults, modelNames.length)}
 
 #### Per-Model Accuracy
 
@@ -154,41 +154,33 @@ ${generateDetailedAccuracyReport(fullFormatResults, results, questions, tokenCou
 }
 
 /**
- * Render the overall (CSV-excluded) and flat-only (all formats) accuracy tables
+ * Render the flat-only accuracy table, the one population CSV can also answer
+ *
+ * @remarks
+ * The all-datasets figures are not repeated here – the efficiency ranking above
+ * already carries each format's accuracy, interval, and token count.
  */
-function generateAccuracyComparisonTables(
-  allDatasetsFormatResults: FormatResult[],
+function generateFlatOnlyAccuracyTable(
   flatOnlyFormatResults: FormatResult[],
   modelCount: number,
 ): string {
-  const renderRows = (formatResults: FormatResult[]): string =>
-    formatResults.map((fr) => {
-      const confidenceInterval = wilsonInterval(fr.correctCount, fr.totalCount)
-      const marginString = `±${(confidenceInterval.halfWidth * 100).toFixed(1)}`
+  const rows = flatOnlyFormatResults.map((fr) => {
+    const confidenceInterval = wilsonInterval(fr.correctCount, fr.totalCount)
+    const marginString = `±${(confidenceInterval.halfWidth * 100).toFixed(1)}`
 
-      return `| \`${fr.format}\` | ${(fr.accuracy * 100).toFixed(1)}% ${marginString} | ${fr.correctCount}/${fr.totalCount} | ${fr.totalTokens.toLocaleString('en-US')} |`
-    }).join('\n')
+    return `| \`${fr.format}\` | ${(fr.accuracy * 100).toFixed(1)}% ${marginString} | ${fr.correctCount}/${fr.totalCount} | ${fr.totalTokens.toLocaleString('en-US')} |`
+  }).join('\n')
 
   const flatQuestionCount = flatOnlyFormatResults.length > 0
     ? flatOnlyFormatResults[0]!.totalCount / modelCount
     : 0
 
   return `
-##### All Datasets
-
-CSV is excluded here – it cannot represent the nested datasets.
+Every format answers the same ${flatQuestionCount} flat-dataset questions per model, so CSV can be compared on equal footing here.
 
 | Format | Accuracy | Correct/Total | Avg Tokens |
 | ------ | -------- | ------------- | ---------- |
-${renderRows(allDatasetsFormatResults)}
-
-##### Flat Datasets Only
-
-Every format answers the same ${flatQuestionCount} flat-dataset questions per model.
-
-| Format | Accuracy | Correct/Total | Avg Tokens |
-| ------ | -------- | ------------- | ---------- |
-${renderRows(flatOnlyFormatResults)}
+${rows}
 `.trim()
 }
 
@@ -225,7 +217,7 @@ ${rows}
 
 **CSV Support:** ✓ (supported), ✗ (not supported – would require lossy flattening)
 
-**Eligibility:** Percentage of arrays that qualify for TOON's tabular format (uniform objects with primitive values)
+**Eligibility:** Percentage of arrays that qualify for TOON's tabular form (uniform objects with primitive values)
 `.trim()
 }
 
@@ -250,6 +242,8 @@ function generateEfficiencyRankingReport(
         efficiency,
         accuracy: fr.accuracy,
         tokens: fr.totalTokens,
+        correctCount: fr.correctCount,
+        totalCount: fr.totalCount,
       }
     })
     .sort((a, b) => b.efficiency - a.efficiency)
@@ -307,33 +301,8 @@ function generateDetailedAccuracyReport(
 
   const datasetBreakdown = generateDatasetBreakdown(formatResults, results, questions, tokenCounts)
 
-  const modelPerformance = generateModelPerformanceTable(formatResults, results, modelNames)
-
   const questionTypeBreakdown = generateQuestionTypeBreakdown(formatResults, results, questions)
   const totalQuestions = [...new Set(results.map(r => r.questionId))].length
-
-  // Calculate question type distribution
-  const fieldRetrievalCount = questions.filter(q => q.type === 'field-retrieval').length
-  const aggregationCount = questions.filter(q => q.type === 'aggregation').length
-  const filteringCount = questions.filter(q => q.type === 'filtering').length
-  const structureAwarenessCount = questions.filter(q => q.type === 'structure-awareness').length
-  const structuralValidationCount = questions.filter(q => q.type === 'structural-validation').length
-
-  const fieldRetrievalPercent = ((fieldRetrievalCount / totalQuestions) * 100).toFixed(0)
-  const aggregationPercent = ((aggregationCount / totalQuestions) * 100).toFixed(0)
-  const filteringPercent = ((filteringCount / totalQuestions) * 100).toFixed(0)
-  const structureAwarenessPercent = ((structureAwarenessCount / totalQuestions) * 100).toFixed(0)
-  const structuralValidationPercent = ((structuralValidationCount / totalQuestions) * 100).toFixed(0)
-
-  // Calculate dataset sizes
-  const tabularSize = ACCURACY_DATASETS.find(d => d.name === 'tabular')?.data.employees?.length || 0
-  const nestedSize = ACCURACY_DATASETS.find(d => d.name === 'nested')?.data.orders?.length || 0
-  const analyticsSize = ACCURACY_DATASETS.find(d => d.name === 'analytics')?.data.metrics?.length || 0
-  const githubSize = ACCURACY_DATASETS.find(d => d.name === 'github')?.data.repositories?.length || 0
-  const eventLogsSize = ACCURACY_DATASETS.find(d => d.name === 'event-logs')?.data.logs?.length || 0
-  const nestedConfigSize = 1 // Single config object
-  const keyedSize = Object.keys(ACCURACY_DATASETS.find(d => d.name === 'keyed')?.data.flags ?? {}).length
-  const nestedGroupSize = ACCURACY_DATASETS.find(d => d.name === 'nested-group')?.data.contacts?.length || 0
 
   // Calculate number of formats and evaluations
   const formatCount = formatResults.length
@@ -350,7 +319,7 @@ ${modelBreakdown}
 > Accuracy figures include Wilson 95% confidence intervals (±); when two formats' intervals overlap, the difference between them is not statistically meaningful. CSV answers only the ${flatQuestionCount} flat-dataset questions, so its per-model cells cover a smaller, easier population than the other formats.
 
 <details>
-<summary><strong>Performance by dataset, model, and question type</strong></summary>
+<summary><strong>Performance by dataset and question type</strong></summary>
 
 #### Performance by Question Type
 
@@ -360,83 +329,18 @@ ${questionTypeBreakdown}
 
 ${datasetBreakdown}
 
-#### Performance by Model
-
-${modelPerformance}
-
 </details>
 
-#### What's Being Measured
-
-This benchmark tests **LLM comprehension and data retrieval accuracy** across different input formats. Each LLM receives formatted data and must answer questions about it. This does **not** test the model's ability to generate TOON output – only to read and understand it.
-
-#### Datasets Tested
-
-Thirteen datasets designed to test different structural patterns and validation capabilities:
-
-**Primary datasets:**
-
-1. **Tabular** (${tabularSize} employee records): Uniform objects with identical fields – optimal for TOON's tabular format.
-2. **Nested** (${nestedSize} e-commerce orders): Complex structures with nested customer objects and item arrays.
-3. **Analytics** (${analyticsSize} days of metrics): Time-series data with dates and numeric values.
-4. **GitHub** (${githubSize} repositories): Real-world data from top GitHub repos by stars.
-5. **Event Logs** (${eventLogsSize} logs): Semi-uniform data with ~50% flat logs and ~50% with nested error objects.
-6. **Nested Config** (${nestedConfigSize} configuration): Deeply nested configuration with minimal tabular eligibility.
-7. **Keyed** (${keyedSize} feature flags): Map of uniform flat objects – exercises TOON's [keyed tabular form](https://github.com/toon-format/spec/blob/main/SPEC.md#95-keyed-objects--tabular-form) (\`key[N:]{fields}:\`).
-8. **Nested Group** (${nestedGroupSize} contacts): Uniform records with nested address and plan objects – exercises TOON's [nested field groups](https://github.com/toon-format/spec/blob/main/SPEC.md#93-arrays-of-objects--tabular-form).
-
-**Structural validation datasets:**
-
-Each carries the same valid 20-row dataset; the corruption is applied to the encoded text after it is emitted, so TOON's \`[N]\` length and \`{fields}\` width still declare the original shape while JSON, YAML, XML, and CSV render the lossy-pipeline outcome.
-
-9. **Control**: Valid complete dataset, text passed through untouched (baseline for validation)
-10. **Truncated**: Last 3 row lines removed – TOON still declares \`[20]\`, so the shortfall is detectable; formats without length metadata stay valid and undetectable in principle
-11. **Extra rows**: 3 rows appended past the declared \`[20]\` – detectable in TOON, valid and undetectable elsewhere
-12. **Width mismatch**: One cell dropped from row 10 – TOON's row is narrower than its \`{fields}\` header (CSV narrower than its column row); JSON/YAML/XML only drop the property, a schema-level signal
-13. **Missing fields**: The email value removed from every 5th record, surfacing the same way as width mismatch
-
-#### Question Types
-
-${totalQuestions} questions are generated dynamically across five categories:
-
-- **Field retrieval (${fieldRetrievalPercent}%)**: Direct value lookups or values that can be read straight off a record (including booleans and simple counts such as array lengths)
-  - Example: "What is Alice's salary?" → \`75000\`
-  - Example: "How many items are in order ORD-0042?" → \`3\`
-  - Example: "What is the customer name for order ORD-0042?" → \`John Doe\`
-
-- **Aggregation (${aggregationPercent}%)**: Dataset-level totals and averages plus single-condition filters (counts, sums, min/max comparisons)
-  - Example: "How many employees work in Engineering?" → \`17\`
-  - Example: "What is the total revenue across all orders?" → \`45123.50\`
-  - Example: "How many employees have salary > 80000?" → \`23\`
-
-- **Filtering (${filteringPercent}%)**: Multi-condition queries requiring compound logic (AND constraints across fields)
-  - Example: "How many employees in Sales have salary > 80000?" → \`5\`
-  - Example: "How many active employees have more than 10 years of experience?" → \`8\`
-  - Note: With reasoning disabled, multi-row arithmetic is hard in every format – aggregation and filtering scores mostly measure computation under format friction and sit near the floor for all formats.
-
-- **Structure awareness (${structureAwarenessPercent}%)**: Tests format-native structural affordances (TOON's \`[N]\` count and \`{fields}\`, CSV's header row)
-  - Example: "How many employees are in the dataset?" → \`100\`
-  - Example: "List the field names for employees" → \`id, name, email, department, salary, yearsExperience, active\`
-  - Example: "What is the department of the last employee?" → \`Sales\`
-
-- **Structural validation (${structuralValidationPercent}%)**: Tests ability to detect incomplete, truncated, or corrupted data from the encoded text alone
-  - Example: "Is this data complete and valid?" → \`YES\` (control dataset) or \`NO\` (corrupted datasets)
-  - The text is corrupted post-encode: TOON's \`[N]\` length and \`{fields}\` width still declare the original shape, so truncation, extra rows, and width drops are detectable
-  - JSON, YAML, XML, and CSV carry no length metadata, so their truncated and extra-row variants stay syntactically valid and cannot be flagged in principle – that contrast is the demonstration
-
-#### Evaluation Process
-
-1. **Format conversion**: Each dataset is converted to all ${formatCount} formats (${formatResults.map(f => getFormat(f.format).displayName).join(', ')}).
-2. **Query LLM**: Each model receives formatted data + question in a prompt and extracts the answer.
-3. **Validate deterministically**: Answers are validated using type-aware comparison (e.g., \`50000\` = \`$50,000\`, \`Engineering\` = \`engineering\`, \`2025-01-01\` = \`January 1, 2025\`) without requiring an LLM judge.
-
-#### Models & Configuration
+#### Run Configuration
 
 - **Models tested**: ${modelNames.map(m => `\`${m}\``).join(', ')}
+- **Formats compared**: ${formatResults.map(f => getFormat(f.format).displayName).join(', ')}
 - **Token counting**: Using \`gpt-tokenizer\` with \`o200k_base\` encoding (GPT-5 tokenizer). Other providers tokenize differently, so absolute counts are tokenizer-specific; relative differences between formats hold directionally.
 - **Reasoning**: Disabled via the AI SDK's universal \`reasoning: 'none'\` (Gemini 3 floors at minimal thinking, \`grok-4.5\` at \`low\`)
 - **Temperature**: Not set (models use their defaults)
 - **Total evaluations**: ${totalQuestions} questions × ${formatCount} formats × ${modelNames.length} models = ${totalEvaluations.toLocaleString('en-US')} LLM calls
+
+What the datasets contain, how the questions are generated, and how answers are validated is documented in [the benchmark README](https://github.com/toon-format/toon/tree/main/benchmarks#retrieval-accuracy-benchmark).
 `.trim()
 }
 
@@ -594,43 +498,6 @@ ${rows.join('\n')}
 }
 
 /**
- * Generate per-model performance comparison tables
- */
-function generateModelPerformanceTable(
-  formatResults: FormatResult[],
-  results: EvaluationResult[],
-  modelNames: string[],
-): string {
-  return modelNames.map((modelName) => {
-    const modelResults = formatResults.map((fr) => {
-      const modelFormatResults = results.filter(r => r.model === modelName && r.format === fr.format)
-      const correctCount = modelFormatResults.filter(r => r.isCorrect).length
-      const totalCount = modelFormatResults.length
-      const accuracy = correctCount / totalCount
-
-      return {
-        format: fr.format,
-        accuracy,
-        correctCount,
-        totalCount,
-      }
-    }).sort((a, b) => b.accuracy - a.accuracy)
-
-    const tableRows = modelResults.map(result =>
-      `| \`${result.format}\` | ${(result.accuracy * 100).toFixed(1)}% | ${result.correctCount}/${result.totalCount} |`,
-    ).join('\n')
-
-    return `
-##### ${modelName}
-
-| Format | Accuracy | Correct/Total |
-| ------ | -------- | ------------- |
-${tableRows}
-`.trimStart()
-  }).join('\n').trim()
-}
-
-/**
  * Generate horizontal bar chart for efficiency ranking
  */
 function generateHorizontalEfficiencyChart(
@@ -651,9 +518,10 @@ function generateHorizontalEfficiencyChart(
       const formatName = displayName.padEnd(maxFormatWidth)
       const efficiency = r.efficiency.toFixed(1).padStart(4)
       const accuracy = `${(r.accuracy * 100).toFixed(1)}%`.padStart(5)
+      const margin = `±${(wilsonInterval(r.correctCount, r.totalCount).halfWidth * 100).toFixed(1)}`.padStart(5)
       const tokens = r.tokens.toLocaleString('en-US').padStart(5)
 
-      return `${formatName}   ${bar}   ${efficiency} acc%/1K tok  │  ${accuracy} acc  │  ${tokens} tokens`
+      return `${formatName}   ${bar}   ${efficiency} acc%/1K tok  │  ${accuracy} ${margin} acc  │  ${tokens} tokens`
     })
     .join('\n')
 }
