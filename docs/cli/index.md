@@ -168,8 +168,6 @@ Show token savings when encoding:
 toon data.json --stats -o output.toon
 ```
 
-This helps you estimate token cost savings before sending data to LLMs.
-
 Example output:
 
 ```
@@ -261,7 +259,7 @@ Decode errors are thrown as `ToonDecodeError` instances by the library. The CLI'
 
 ### Stdin Workflows
 
-The CLI integrates seamlessly with Unix pipes and other command-line tools:
+The CLI integrates with Unix pipes and other command-line tools:
 
 ```bash
 # Convert API response to TOON
@@ -272,13 +270,4 @@ cat large-dataset.json | toon --delimiter $'\t' > output.toon
 
 # Chain with jq
 jq '.results' data.json | toon > filtered.toon
-```
-
-### Combined Options
-
-Combine multiple options for maximum efficiency:
-
-```bash
-# Tab delimiter + stats
-toon data.json --delimiter $'\t' --stats -o output.toon
 ```

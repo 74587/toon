@@ -46,6 +46,6 @@ features:
     link: /guide/format-overview#the-four-forms
   - title: Multi-Language Ecosystem
     icon: 🌐
-    details: Spec-driven implementations in TypeScript, Python, Go, Rust, .NET, and other languages.
+    details: Spec-driven implementations in many languages.
     link: /ecosystem/implementations
 ---

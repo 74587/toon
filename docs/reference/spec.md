@@ -97,58 +97,13 @@ Non-normative guidance for Go, JavaScript, Python, Rust, and Java implementation
 [Appendix C: Test Suite and Compliance](https://github.com/toon-format/spec/blob/main/SPEC.md#appendix-c-test-suite-and-compliance-informative):
 Reference test suite at [github.com/toon-format/spec/tree/main/tests](https://github.com/toon-format/spec/tree/main/tests) for validating implementations.
 
-## Spec Sections at a Glance
-
-| Section | Topic | When to Read |
-|---------|-------|--------------|
-| §1–4 | Data model, normalization, decoding | Implementing encoders/decoders |
-| §5–6 | Syntax, headers, root form | Implementing parsers |
-| §7 | Strings, keys, quoting, escaping | Implementing string handling |
-| §8–10 | Objects, arrays, list items | Implementing structure encoding |
-| §11–12 | Delimiters, indentation, whitespace | Implementing formatting and validation |
-| §13 | Conformance and options | Implementing options and features |
-| §14 | Strict-mode errors | Implementing validators |
-| §15–16 | Security, internationalization | Operational considerations |
-| §17–19 | IANA, versioning, IP | Ecosystem and licensing |
-
 ## Conformance Checklists
 
-The spec includes three conformance checklists:
+The spec carries one checklist per conformance class – work through the one matching what you're building. The checklists in SPEC.md are authoritative; summaries elsewhere can drift.
 
-### Encoder Checklist (§13.1) <sup>[↗ SPEC.md](https://github.com/toon-format/spec/blob/main/SPEC.md#131-encoder-conformance-checklist)</sup>
-
-Key requirements:
-- Produce UTF-8 with LF line endings
-- Use consistent indentation (default 2 spaces, no tabs)
-- Escape `\\`, `\"`, `\n`, `\r`, `\t` in quoted strings, and use `\uXXXX` for any other U+0000–U+001F control character; lone surrogates are rejected
-- Quote strings with active delimiter, colon, or structural characters, and strings starting with `-` or `#`
-- Emit array lengths `[N]` matching the actual item or entry count
-- Preserve object key order
-- Emit numbers per §2 (canonical decimal in `[1e-6, 1e21)` or zero; exponent form permitted outside)
-- Convert `-0` to `0`, `NaN`/±Infinity to `null`
-- Emit booleans and null as lowercase literals (`true`, `false`, `null`)
-- No trailing spaces or trailing newline
-- Never emit comment lines
-
-### Decoder Checklist (§13.2) <sup>[↗ SPEC.md](https://github.com/toon-format/spec/blob/main/SPEC.md#132-decoder-conformance-checklist)</sup>
-
-Key requirements:
-- Strip full-line comment lines in a lexical pre-pass (§5.1)
-- Parse array and keyed headers per §6 (length, keyed marker, delimiter, fields including nested field groups)
-- Split inline arrays, tabular rows, and keyed entry rows using active delimiter only
-- Unescape quoted strings with only valid escapes
-- Type unquoted primitives: true/false/null → booleans/null, numeric → number, else → string
-- Enforce strict-mode rules when `strict=true`
-- Preserve array order and object key order
-
-### Validator Checklist (§13.3) <sup>[↗ SPEC.md](https://github.com/toon-format/spec/blob/main/SPEC.md#133-validator-conformance-checklist)</sup>
-
-Validators should verify:
-- Structural conformance (headers, indentation, list markers)
-- Whitespace invariants (no trailing spaces/newlines)
-- Delimiter consistency between headers and rows
-- Row, item, and entry counts match declared `[N]`
-- All strict-mode requirements
+- **[Encoder checklist (§13.1)](https://github.com/toon-format/spec/blob/main/SPEC.md#131-encoder-conformance-checklist)** – output invariants: UTF-8 with LF, consistent indentation, quoting and escaping, `[N]` lengths, canonical numbers, key order, no comment lines, no trailing whitespace.
+- **[Decoder checklist (§13.2)](https://github.com/toon-format/spec/blob/main/SPEC.md#132-decoder-conformance-checklist)** – parsing duties: comment pre-pass, header parsing, active-delimiter splitting, token typing, strict-mode enforcement, order preservation.
+- **[Validator checklist (§13.3)](https://github.com/toon-format/spec/blob/main/SPEC.md#133-validator-conformance-checklist)** – structural and whitespace invariants, delimiter consistency, declared counts, all strict-mode rules.
 
 ## Versioning
 
@@ -160,4 +115,4 @@ See [CHANGELOG.md](https://github.com/toon-format/spec/blob/main/CHANGELOG.md) f
 
 ## Contributing to the Spec
 
-The spec is community-maintained at [github.com/toon-format/spec](https://github.com/toon-format/spec). We welcome contributions of all kinds: reporting ambiguities or errors, proposing clarifications and examples, adding test cases to the reference suite, or discussing edge cases and normative behavior. Your feedback helps shape the format.
+The spec is community-maintained at [github.com/toon-format/spec](https://github.com/toon-format/spec) – report ambiguities, propose clarifications, or add test cases to the reference suite.

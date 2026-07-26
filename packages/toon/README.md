@@ -8,11 +8,11 @@
 [![npm downloads (total)](https://img.shields.io/npm/dt/@toon-format/toon.svg?labelColor=1b1b1f&color=fef3c0)](https://www.npmjs.com/package/@toon-format/toon)
 [![License: MIT](https://img.shields.io/badge/license-MIT-fef3c0?labelColor=1b1b1f)](./LICENSE)
 
-**Token-Oriented Object Notation** is a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow. It's intended for *LLM input* as a drop-in, lossless representation of your existing JSON.
+**Token-Oriented Object Notation** is a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow.
 
 TOON combines YAML's indentation-based structure for nested objects with a CSV-style tabular form for uniform arrays. Its sweet spot is uniform arrays of objects – multiple fields per row, same structure across items – reaching CSV-like compactness while adding explicit structure that helps LLMs parse and validate data reliably. For deeply nested or non-uniform data, JSON may be more efficient.
 
-Think of it as a translation layer: use JSON programmatically, and encode it as TOON for LLM input.
+Think of it as a translation layer: use JSON programmatically, and encode it as TOON for LLM input – a drop-in, lossless representation of the JSON you already have.
 
 > [!TIP]
 > The TOON format is stable, but also an idea in progress. Nothing's set in stone – help shape where it goes by contributing to the [spec](https://github.com/toon-format/spec) or sharing feedback.
@@ -93,7 +93,7 @@ The same data as JSON – ~117 tokens against TOON's ~66:
 }
 ```
 
-Three things are happening at once. Two are **forms** – one rendering of a value, picked automatically from the data's shape – and the third is a header feature:
+Three things are happening at once in the TOON above. Two are **forms** – one rendering of a value, picked automatically from the data's shape – and the third is a header feature:
 
 - `alerts[2]: frost,wind` is **inline form**: a primitive array on its header line.
 - `forecast[3]{day,…}:` is **tabular form**: the field list is declared once in the header, then one row per element.
@@ -148,7 +148,7 @@ Anything that fits none of these – mixed types, non-uniform objects – falls 
 - 🛤️ **LLM-Friendly Guardrails:** Explicit `[N]` lengths and `{fields}` field lists give models a clear schema to follow, improving parsing reliability.
 - 📐 **Minimal Syntax:** Uses indentation instead of braces and minimizes quoting, giving YAML-like readability with CSV-style compactness.
 - 🧺 **Tabular Forms:** Uniform arrays of objects – and objects of uniform objects – collapse into tables that declare the field list once and stream row values line by line.
-- 🌐 **Multi-Language Ecosystem:** Spec-driven implementations in TypeScript, Python, Go, Rust, .NET, and other languages.
+- 🌐 **Multi-Language Ecosystem:** Spec-driven implementations in many languages.
 
 ## When Not to Use TOON
 
@@ -752,15 +752,6 @@ const safe = encode(user, {
 })
 // name: Ada
 // email: ada@example.com
-
-// Transform values
-const data = { status: 'active', count: 5 }
-const transformed = encode(data, {
-  replacer: (key, value) =>
-    typeof value === 'string' ? value.toUpperCase() : value
-})
-// status: ACTIVE
-// count: 5
 ```
 
 > [!TIP]
@@ -806,8 +797,6 @@ Follow the detailed [LLM integration guide](https://toonformat.dev/guide/llm-pro
 **Tooling** – [Tooner](https://github.com/chaindead/tooner) is an MCP proxy that converts JSON tool responses to TOON.
 
 ## Documentation
-
-Comprehensive guides, references, and resources to help you get the most out of the TOON format and tools.
 
 ### Getting Started
 

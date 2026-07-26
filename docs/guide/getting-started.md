@@ -6,15 +6,23 @@ description: What TOON is, when to use it, and a first encode/decode example wit
 
 ## What Is TOON?
 
-**Token-Oriented Object Notation** is a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow. It is intended for *LLM input* as a drop-in, lossless representation of your existing JSON.
+**Token-Oriented Object Notation** is a compact, human-readable encoding of the JSON data model that minimizes tokens and makes structure easy for models to follow.
 
 TOON combines YAML's indentation-based structure for nested objects with a CSV-style tabular form for uniform arrays. Its sweet spot is uniform arrays of objects (multiple fields per row, same structure across items), reaching CSV-like compactness while adding explicit structure that helps LLMs parse and validate data reliably.
 
-Think of it as a translation layer: use JSON programmatically, and encode it as TOON for LLM input.
+Think of it as a translation layer: use JSON programmatically, and encode it as TOON for LLM input – a drop-in, lossless representation of the JSON you already have.
 
 ### Why TOON?
 
-Standard JSON is verbose and token-expensive. For uniform arrays of objects, JSON repeats every field name for every record:
+LLM tokens cost money – and standard JSON is verbose. A uniform array of users in TOON:
+
+```yaml
+users[2]{id,name,role}:
+  1,Ada,admin
+  2,Bob,user
+```
+
+The same data as JSON, repeating every field name for every record:
 
 ```json
 {
@@ -23,26 +31,6 @@ Standard JSON is verbose and token-expensive. For uniform arrays of objects, JSO
     { "id": 2, "name": "Bob", "role": "user" }
   ]
 }
-```
-
-YAML already reduces some redundancy with indentation instead of braces:
-
-```yaml
-users:
-  - id: 1
-    name: Ada
-    role: admin
-  - id: 2
-    name: Bob
-    role: user
-```
-
-TOON goes further by declaring fields once and streaming data as rows:
-
-```yaml
-users[2]{id,name,role}:
-  1,Ada,admin
-  2,Bob,user
 ```
 
 The `[2]` declares the array length, letting LLMs answer dataset-size questions and detect truncation. The `{id,name,role}` declares the field names. Each row is a compact, comma-separated list of values. The pattern is the same throughout TOON: declare structure once, stream data compactly. The result lands close to CSV density with explicit structure preserved.

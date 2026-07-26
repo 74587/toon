@@ -6,13 +6,9 @@ description: Prompting strategies for sending TOON to LLMs and validating TOON t
 
 TOON is designed for passing structured data to Large Language Models with reduced token costs and improved reliability. This guide shows how to use TOON effectively in prompts, both for input (sending data to models) and output (getting models to generate TOON).
 
-This guide is about the TOON format itself. Code examples use the TypeScript library for demonstration, but the same patterns and techniques apply regardless of which programming language you're using.
-
 ## Why TOON for LLMs
 
-LLM tokens cost money, and JSON is verbose – repeating every field name for every record in an array. TOON minimizes tokens especially for uniform arrays by declaring fields once and streaming data as rows, typically saving 30–60% compared to formatted JSON.
-
-TOON adds structure guardrails: explicit `[N]` lengths and `{fields}` headers make it easier for models to track rows and for you to validate output. Strict mode helps detect truncation and malformed TOON when decoding model responses.
+Beyond token savings (see [Benchmarks](/guide/benchmarks)), TOON adds structure guardrails: explicit `[N]` lengths and `{fields}` headers make it easier for models to track rows and for you to validate output. Strict mode helps detect truncation and malformed TOON when decoding model responses.
 
 ## Sending TOON as Input
 

@@ -61,20 +61,6 @@ Use YAML syntax highlighting as a close approximation. Most editors allow associ
 
 [TORM](https://github.com/Kalama-Tech/torm) – ORM that works with the ToonStore database, with SDKs for Node.js, Python, Go, and PHP.
 
-## Web APIs
-
-If you're building web applications that work with TOON, you can use the TypeScript library in the browser:
-
-```ts
-import { decode, encode } from '@toon-format/toon'
-
-// Works in browsers, Node.js, Deno, and Bun
-const toon = encode(data)
-const data = decode(toon)
-```
-
-See the [API Reference](/reference/api) for details.
-
 ## MCP
 
 ### Tooner
