@@ -14,32 +14,23 @@ Think of it as a translation layer: use JSON programmatically, and encode it as 
 
 ### Why TOON?
 
-LLM tokens cost money – and standard JSON is verbose. A uniform array of users in TOON:
+LLM tokens cost money – and standard JSON is verbose. A weather forecast in TOON:
 
 ```yaml
-users[2]{id,name,role}:
-  1,Ada,admin
-  2,Bob,user
+location:
+  city: Berlin
+  country: DE
+  units: metric
+alerts[2]: frost,wind
+forecast[3]{day,temp{min,max},condition,rainChance}:
+  Mon,-2,4,snow,80
+  Tue,1,7,cloudy,20
+  Wed,3,11,sunny,5
 ```
 
-The same data as JSON, repeating every field name for every record:
+The same data as JSON – ~117 tokens against TOON's ~66:
 
 ```json
-{
-  "users": [
-    { "id": 1, "name": "Ada", "role": "admin" },
-    { "id": 2, "name": "Bob", "role": "user" }
-  ]
-}
-```
-
-The `[2]` declares the array length, letting LLMs answer dataset-size questions and detect truncation. The `{id,name,role}` declares the field names. Each row is a compact, comma-separated list of values. The pattern is the same throughout TOON: declare structure once, stream data compactly. The result lands close to CSV density with explicit structure preserved.
-
-For a more realistic example, here's how TOON handles a dataset with both nested objects and tabular arrays:
-
-::: code-group
-
-```json [JSON (196 tokens)]
 {
   "location": {
     "city": "Berlin",
@@ -82,21 +73,9 @@ For a more realistic example, here's how TOON handles a dataset with both nested
 }
 ```
 
-```yaml [TOON (74 tokens)]
-location:
-  city: Berlin
-  country: DE
-  units: metric
-alerts[2]: frost,wind
-forecast[3]{day,temp{min,max},condition,rainChance}:
-  Mon,-2,4,snow,80
-  Tue,1,7,cloudy,20
-  Wed,3,11,sunny,5
-```
+TOON combines YAML's indentation for the `location` object, inline form for the primitive `alerts` array, and tabular form for the `forecast` array: `[3]` declares the array length (letting LLMs answer dataset-size questions and detect truncation), `{day,…}` declares the field names once, and each row streams comma-separated values. The uniform nested `temp` objects fold into the header as a [nested field group](/guide/format-overview#nested-field-groups) (`temp{min,max}`) while rows stay flat. Each form is chosen automatically from the data's shape.
 
-:::
-
-Notice how TOON combines YAML's indentation for the `location` object with inline form for the primitive `alerts` array and tabular form for the structured `forecast` array – where the uniform nested `temp` objects fold into the header as a [nested field group](/guide/format-overview#nested-field-groups) (`temp{min,max}`). Each form is chosen automatically based on the data structure.
+The pattern is the same throughout TOON: declare structure once, stream data compactly – landing close to CSV density with explicit structure preserved.
 
 Maps of uniform objects collapse as well: the [keyed tabular form](/guide/format-overview#keyed-tabular-objects) turns them into tables whose rows carry their own keys.
 
