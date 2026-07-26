@@ -1,4 +1,4 @@
-![Summary card: JSON encodes to TOON for LLM prompts, with token and accuracy benchmarks](./.github/og.png)
+![Summary card: JSON encodes to TOON for LLM prompts, with token and accuracy benchmarks](./.github/og_v4.png)
 
 # Token-Oriented Object Notation (TOON)
 
