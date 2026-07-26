@@ -34,7 +34,21 @@ Think of it as a translation layer: use JSON programmatically, and encode it as 
 
 ## Why TOON?
 
-AI is becoming cheaper and more accessible, but larger context windows allow for larger data inputs as well. **LLM tokens still cost money** – and standard JSON is verbose and token-expensive:
+**LLM tokens cost money** – and JSON spends a lot of them on structure. A weather forecast in TOON:
+
+```yaml
+location:
+  city: Berlin
+  country: DE
+  units: metric
+alerts[2]: frost,wind
+forecast[3]{day,temp{min,max},condition,rainChance}:
+  Mon,-2,4,snow,80
+  Tue,1,7,cloudy,20
+  Wed,3,11,sunny,5
+```
+
+The same data as JSON – ~117 tokens against TOON's ~66:
 
 ```json
 {
@@ -79,54 +93,6 @@ AI is becoming cheaper and more accessible, but larger context windows allow for
 }
 ```
 
-<details>
-<summary>YAML already conveys the same information with <strong>fewer tokens</strong>.</summary>
-
-```yaml
-location:
-  city: Berlin
-  country: DE
-  units: metric
-alerts:
-  - frost
-  - wind
-forecast:
-  - day: Mon
-    temp:
-      min: -2
-      max: 4
-    condition: snow
-    rainChance: 80
-  - day: Tue
-    temp:
-      min: 1
-      max: 7
-    condition: cloudy
-    rainChance: 20
-  - day: Wed
-    temp:
-      min: 3
-      max: 11
-    condition: sunny
-    rainChance: 5
-```
-
-</details>
-
-TOON conveys the same information with **even fewer tokens** – combining YAML-like indentation with CSV-style tabular arrays:
-
-```yaml
-location:
-  city: Berlin
-  country: DE
-  units: metric
-alerts[2]: frost,wind
-forecast[3]{day,temp{min,max},condition,rainChance}:
-  Mon,-2,4,snow,80
-  Tue,1,7,cloudy,20
-  Wed,3,11,sunny,5
-```
-
 Three things are happening at once. Two are **forms** – one rendering of a value, picked automatically from the data's shape – and the third is a header feature:
 
 - `alerts[2]: frost,wind` is **inline form**: a primitive array on its header line.
@@ -168,7 +134,7 @@ Anything that fits none of these – mixed types, non-uniform objects – falls 
 > cat data.json | npx @toon-format/cli --stats
 > ```
 >
-> It prints the TOON alongside what the conversion saved:
+> It prints the TOON alongside what the conversion saved – on the weather forecast above, that's:
 >
 > ```
 > ℹ Token estimates: ~117 (JSON) → ~66 (TOON)
