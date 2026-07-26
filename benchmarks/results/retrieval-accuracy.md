@@ -29,7 +29,7 @@ Benchmarks test LLM comprehension across different input formats using 244 data 
 
 **CSV Support:** ✓ (supported), ✗ (not supported – would require lossy flattening)
 
-**Eligibility:** Percentage of arrays that qualify for TOON's tabular form (uniform objects with primitive values)
+**Eligibility:** Percentage of arrays and keyed maps that qualify for TOON's tabular forms (uniform records whose fields are primitives or uniform nested objects folded into nested field groups)
 
 </details>
 
