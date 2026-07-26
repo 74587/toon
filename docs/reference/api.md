@@ -340,6 +340,8 @@ const data = decode(toon, {
 
 Returns a JavaScript value (object, array, or primitive) representing the parsed TOON data.
 
+Numeric tokens decode to `number` and follow IEEE 754 double precision: values beyond it round silently (including integers outside the safe integer range), and tokens that overflow the finite range decode as strings – this is the decoder's documented out-of-range policy per [spec §4](https://github.com/toon-format/spec/blob/main/SPEC.md#4-decoding-interpretation-reference-decoder). Values that must stay exact belong in quoted strings; `encode()` writes out-of-range `BigInt` values that way automatically.
+
 #### Example
 
 ```ts
