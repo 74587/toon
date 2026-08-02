@@ -107,7 +107,9 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
     }
     catch (error) {
       consola.error(formatError(error, { isVerbose: args.verbose === true }))
-      process.exit(1)
+      // `process.exit` would discard whatever stdout has still buffered, which
+      // truncates a piped conversion partway through
+      process.exitCode = 1
     }
   },
 })

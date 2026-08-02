@@ -1,11 +1,9 @@
 import type { JsonStreamEvent } from '../../toon/src/types.ts'
 
-/** Context for tracking JSON structure state during event streaming. */
 type JsonContext
   = | { type: 'object', needsComma: boolean, expectValue: boolean }
     | { type: 'array', needsComma: boolean }
 
-// Array elements own their separator because no key event precedes them, unlike object values positioned by the preceding key
 function* emitValuePrefix(
   parent: JsonContext | undefined,
   depth: number,
@@ -33,10 +31,6 @@ function markValueComplete(parent: JsonContext | undefined): void {
   }
 }
 
-/**
- * Converts a stream of `JsonStreamEvent` into formatted JSON string chunks,
- * streaming decode output without building the full value in memory.
- */
 export async function* jsonStreamFromEvents(
   events: AsyncIterable<JsonStreamEvent>,
   indent: number = 2,

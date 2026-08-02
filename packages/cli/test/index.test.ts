@@ -6,13 +6,22 @@ import { version } from '../package.json' with { type: 'json' }
 import { createCliTestContext, mockStdin, runCli } from './utils'
 
 describe('toon CLI', () => {
+  let stdout: string[]
+
   beforeEach(() => {
+    stdout = []
+    process.exitCode = undefined
+    // citty exits the process itself for usage errors it resolves
     vi.spyOn(process, 'exit').mockImplementation(() => 0 as never)
     vi.spyOn(console, 'log').mockImplementation(() => undefined)
-    vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
+      stdout.push(String(chunk))
+      return true
+    })
   })
 
   afterEach(() => {
+    process.exitCode = undefined
     vi.restoreAllMocks()
   })
 
@@ -35,15 +44,9 @@ describe('toon CLI', () => {
       }
       const cleanup = mockStdin(JSON.stringify(data))
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli()
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         expect(fullOutput).toBe(`${encode(data)}\n`)
       }
       finally {
@@ -86,16 +89,10 @@ describe('toon CLI', () => {
         'input.json': JSON.stringify(data),
       })
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await context.run(['input.json'])
 
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         expect(fullOutput).toBe(`${encode(data)}\n`)
       }
       finally {
@@ -155,15 +152,9 @@ describe('toon CLI', () => {
 
       const cleanup = mockStdin(toonInput)
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli({ rawArgs: ['--decode'] })
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         const jsonOutput = fullOutput.endsWith('\n') ? fullOutput.slice(0, -1) : fullOutput
         const result = JSON.parse(jsonOutput)
         expect(result).toEqual(data)
@@ -200,12 +191,11 @@ describe('toon CLI', () => {
       const cleanup = mockStdin('{ invalid json }')
 
       const consolaError = vi.spyOn(consola, 'error').mockImplementation(() => undefined)
-      const exitSpy = vi.mocked(process.exit)
 
       try {
         await runCli({ rawArgs: [] })
 
-        expect(exitSpy).toHaveBeenCalledWith(1)
+        expect(process.exitCode).toBe(1)
         expect(consolaError).toHaveBeenCalled()
       }
       finally {
@@ -217,12 +207,11 @@ describe('toon CLI', () => {
       const cleanup = mockStdin('key: "unterminated string')
 
       const consolaError = vi.spyOn(consola, 'error').mockImplementation(() => undefined)
-      const exitSpy = vi.mocked(process.exit)
 
       try {
         await runCli({ rawArgs: ['--decode'] })
 
-        expect(exitSpy).toHaveBeenCalledWith(1)
+        expect(process.exitCode).toBe(1)
         expect(consolaError).toHaveBeenCalled()
       }
       finally {
@@ -234,12 +223,11 @@ describe('toon CLI', () => {
       const cleanup = mockStdin('a:\n\tb: 1\n')
 
       const consolaError = vi.spyOn(consola, 'error').mockImplementation(() => undefined)
-      const exitSpy = vi.mocked(process.exit)
 
       try {
         await runCli({ rawArgs: ['--decode'] })
 
-        expect(exitSpy).toHaveBeenCalledWith(1)
+        expect(process.exitCode).toBe(1)
         const errorCall = consolaError.mock.calls.at(0)
         expect(errorCall).toBeDefined()
         const [rendered] = errorCall!
@@ -278,16 +266,10 @@ describe('toon CLI', () => {
       const data = { items: [1, 2, 3] }
       const cleanup = mockStdin(JSON.stringify(data))
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli({ rawArgs: ['--delimiter', '|'] })
 
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         expect(fullOutput).toBe(`${encode(data, { delimiter: '|' })}\n`)
       }
       finally {
@@ -303,16 +285,10 @@ describe('toon CLI', () => {
       }
       const cleanup = mockStdin(JSON.stringify(data))
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli({ rawArgs: ['--indent', '4'] })
 
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         expect(fullOutput).toBe(`${encode(data, { indent: 4 })}\n`)
       }
       finally {
@@ -325,16 +301,10 @@ describe('toon CLI', () => {
       const toonInput = encode(data)
       const cleanup = mockStdin(toonInput)
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli({ rawArgs: ['--decode', '--no-strict'] })
 
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         const jsonOutput = fullOutput.endsWith('\n') ? fullOutput.slice(0, -1) : fullOutput
         const result = JSON.parse(jsonOutput)
         expect(result).toEqual(data)
@@ -377,16 +347,10 @@ describe('toon CLI', () => {
 
       const cleanup = mockStdin(toonInput)
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli({ rawArgs: ['--decode'] })
 
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         expect(fullOutput).toBe('42\n')
       }
       finally {
@@ -399,16 +363,10 @@ describe('toon CLI', () => {
 
       const cleanup = mockStdin(toonInput)
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli({ rawArgs: ['--decode'] })
 
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         const jsonOutput = fullOutput.endsWith('\n') ? fullOutput.slice(0, -1) : fullOutput
         expect(JSON.parse(jsonOutput)).toBe('Hello World')
       }
@@ -422,16 +380,10 @@ describe('toon CLI', () => {
 
       const cleanup = mockStdin(toonInput)
 
-      const writeChunks: string[] = []
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await runCli({ rawArgs: ['--decode'] })
 
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         expect(fullOutput).toBe('true\n')
       }
       finally {
@@ -520,19 +472,11 @@ describe('toon CLI', () => {
         'input.json': JSON.stringify(data),
       })
 
-      const writeChunks: string[] = []
-      const writeSpy = vi.spyOn(process.stdout, 'write').mockImplementation((chunk) => {
-        writeChunks.push(String(chunk))
-        return true
-      })
-
       try {
         await context.run(['input.json'])
 
-        expect(writeSpy).toHaveBeenCalled()
-
         // Verify complete output matches `encode()`
-        const fullOutput = writeChunks.join('')
+        const fullOutput = stdout.join('')
         const expected = `${encode(data)}\n`
         expect(fullOutput).toBe(expected)
       }
@@ -659,12 +603,11 @@ describe('toon CLI', () => {
       const context = await createCliTestContext({})
 
       const consolaError = vi.spyOn(consola, 'error').mockImplementation(() => undefined)
-      const exitSpy = vi.mocked(process.exit)
 
       try {
         await context.run(['nonexistent.json'])
 
-        expect(exitSpy).toHaveBeenCalledWith(1)
+        expect(process.exitCode).toBe(1)
         expect(consolaError).toHaveBeenCalled()
       }
       finally {

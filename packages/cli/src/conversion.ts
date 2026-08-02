@@ -94,7 +94,6 @@ export async function decodeToJson(config: {
   }
 }
 
-/** Streams pieces to a file or stdout, one at a time without buffering the full string. */
 async function writeStream(
   pieces: AsyncIterable<string> | Iterable<string>,
   options: { outputPath?: string, separator: string },
@@ -120,7 +119,7 @@ async function writeStream(
       isFirst = false
     }
 
-    // Stdout gets a trailing newline so the shell prompt resumes on a fresh line; files end exactly at content
+    // Stdout gets a trailing newline so the shell prompt resumes on a fresh line
     if (!outputPath)
       process.stdout.write('\n')
   }
