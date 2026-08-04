@@ -3,12 +3,12 @@ import type { InputSource } from './types.ts'
 import * as path from 'node:path'
 import process from 'node:process'
 import { defineCommand } from 'citty'
-import { consola } from 'consola'
 import { DEFAULT_DELIMITER } from '../../toon/src/index.ts'
 import { assertValidDelimiter } from '../../toon/src/shared/validation.ts'
 import pkg from '../package.json' with { type: 'json' }
 import { decodeToJson, encodeToToon } from './conversion.ts'
 import { formatError } from './format-error.ts'
+import * as log from './log.ts'
 import { detectMode } from './utils.ts'
 
 const { name, version } = pkg
@@ -76,17 +76,17 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
       : { type: 'file', path: path.resolve(input) }
     const outputPath = args.output ? path.resolve(args.output) : undefined
 
-    const indentSize = Number.parseInt(args.indent || '2', 10)
-    if (Number.isNaN(indentSize) || indentSize < 0) {
-      throw new Error(`Invalid indent value: ${args.indent}`)
-    }
-
-    const delimiter = args.delimiter || DEFAULT_DELIMITER
-    assertValidDelimiter(delimiter)
-
-    const mode = detectMode(inputSource, args.encode, args.decode)
-
     try {
+      const indentSize = Number.parseInt(args.indent || '2', 10)
+      if (Number.isNaN(indentSize) || indentSize < 0) {
+        throw new Error(`Invalid indent value: ${args.indent}`)
+      }
+
+      const delimiter = args.delimiter || DEFAULT_DELIMITER
+      assertValidDelimiter(delimiter)
+
+      const mode = detectMode(inputSource, args.encode, args.decode)
+
       if (mode === 'encode') {
         await encodeToToon({
           input: inputSource,
@@ -106,7 +106,7 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
       }
     }
     catch (error) {
-      consola.error(formatError(error, { isVerbose: args.verbose === true }))
+      log.error(formatError(error, { isVerbose: args.verbose === true }))
       // `process.exit` would discard whatever stdout has still buffered, which
       // truncates a piped conversion partway through
       process.exitCode = 1

@@ -4,10 +4,10 @@ import type { InputSource } from './types.ts'
 import * as fsp from 'node:fs/promises'
 import * as path from 'node:path'
 import process from 'node:process'
-import { consola } from 'consola'
 import { estimateTokenCount } from 'tokenx'
 import { decodeStream, encode, encodeLines } from '../../toon/src/index.ts'
 import { jsonStreamFromEvents } from './json-from-events.ts'
+import * as log from './log.ts'
 import { formatInputLabel, readInput, readLinesFromSource } from './utils.ts'
 
 export async function encodeToToon(config: {
@@ -51,12 +51,11 @@ export async function encodeToToon(config: {
     if (config.output) {
       const relativeInputPath = formatInputLabel(config.input)
       const relativeOutputPath = path.relative(process.cwd(), config.output)
-      consola.success(`Encoded \`${relativeInputPath}\` → \`${relativeOutputPath}\``)
+      log.success(`Encoded \`${relativeInputPath}\` → \`${relativeOutputPath}\``)
     }
 
-    console.log()
-    consola.info(`Token estimates: ~${jsonTokens} (JSON) → ~${toonTokens} (TOON)`)
-    consola.success(`Saved ~${diff} tokens (-${percent}%)`)
+    log.info(`Token estimates: ~${jsonTokens} (JSON) → ~${toonTokens} (TOON)`)
+    log.success(`Saved ~${diff} tokens (-${percent}%)`)
   }
   else {
     await writeStream(encodeLines(data, encodeOptions), { outputPath: config.output, separator: '\n' })
@@ -64,7 +63,7 @@ export async function encodeToToon(config: {
     if (config.output) {
       const relativeInputPath = formatInputLabel(config.input)
       const relativeOutputPath = path.relative(process.cwd(), config.output)
-      consola.success(`Encoded \`${relativeInputPath}\` → \`${relativeOutputPath}\``)
+      log.success(`Encoded \`${relativeInputPath}\` → \`${relativeOutputPath}\``)
     }
   }
 }
@@ -90,7 +89,7 @@ export async function decodeToJson(config: {
   if (config.output) {
     const relativeInputPath = formatInputLabel(config.input)
     const relativeOutputPath = path.relative(process.cwd(), config.output)
-    consola.success(`Decoded \`${relativeInputPath}\` → \`${relativeOutputPath}\``)
+    log.success(`Decoded \`${relativeInputPath}\` → \`${relativeOutputPath}\``)
   }
 }
 
