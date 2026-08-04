@@ -344,7 +344,7 @@ describe('jsonStreamFromEvents', () => {
     it('throws on mismatched endObject event', async () => {
       const events = [
         { type: 'startArray' as const, length: 0 },
-        { type: 'endObject' as const }, // Wrong closing event
+        { type: 'endObject' as const }, // Wrong closing event.
       ]
 
       await expect(async () => {
@@ -355,7 +355,7 @@ describe('jsonStreamFromEvents', () => {
     it('throws on mismatched endArray event', async () => {
       const events = [
         { type: 'startObject' as const },
-        { type: 'endArray' as const }, // Wrong closing event
+        { type: 'endArray' as const }, // Wrong closing event.
       ]
 
       await expect(async () => {
@@ -377,7 +377,7 @@ describe('jsonStreamFromEvents', () => {
     it('throws on primitive in object without preceding key', async () => {
       const events = [
         { type: 'startObject' as const },
-        { type: 'primitive' as const, value: 'invalid' }, // No key before primitive
+        { type: 'primitive' as const, value: 'invalid' }, // No key before primitive.
         { type: 'endObject' as const },
       ]
 
@@ -401,7 +401,6 @@ describe('jsonStreamFromEvents', () => {
   })
 })
 
-/** Converts array of events to async iterable. */
 async function* asyncEvents(events: JsonStreamEvent[]): AsyncIterable<JsonStreamEvent> {
   for (const event of events) {
     await Promise.resolve()

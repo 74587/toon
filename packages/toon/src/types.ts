@@ -23,8 +23,8 @@ export type { Delimiter, DelimiterKey }
  * @param value The normalized `JsonValue` at this location
  * @param path Array representing the path from root to this value
  *
- * @returns The replacement value (will be normalized again), or `undefined` to omit.
- *          For root value, returning `undefined` means "no change" (don't omit root).
+ * @returns The replacement value (will be normalized again), or `undefined` to omit –
+ *          at the root, `undefined` means "no change" rather than an omission
  *
  * @example
  * ```ts

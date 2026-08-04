@@ -199,7 +199,7 @@ describe('replacer function', () => {
 
       encode(input, { replacer })
 
-      expect(paths).toContain('') // root
+      expect(paths).toContain('') // The root value's path is the empty string.
       expect(paths).toContain('user')
       expect(paths).toContain('user.profile')
       expect(paths).toContain('user.profile.name')

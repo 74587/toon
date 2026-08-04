@@ -651,7 +651,7 @@ function isKeyValueLine(line: ParsedLine): boolean {
 
 // #region Shared decoder helpers
 
-// Keeps the detection/parse split in `parser.ts` free of error decisions. The bare
+// Keeps the detection/parse split free of error decisions. The bare
 // SyntaxError is deliberate: the caller's `withLine` wrapper enriches it into a
 // `ToonDecodeError` with a `cause`, matching the direct-throw path.
 function resolveArrayHeader(
