@@ -5,7 +5,7 @@ import { createScanState, parseLineIncremental } from './scanner.ts'
 // #region Fetch-line effect
 
 // Rules yield this instead of touching a source directly, so one rule tree serves
-// both sync and async sources
+// both sync and async sources.
 export const FETCH_LINE: unique symbol = Symbol('fetch-line')
 
 export type LineRule = Generator<JsonStreamEvent | typeof FETCH_LINE, void, string | undefined>
@@ -37,7 +37,7 @@ export function createLineReader(context: { indentSize: number, strict: boolean 
 }
 
 // At most one line of lookahead, so scanner throws and blank accounting keep
-// their original ordering
+// their original ordering.
 function* fillBuffer(reader: LineReader): LineEffect<void> {
   while (reader.buffer.length === 0 && !reader.done) {
     const raw = yield FETCH_LINE
@@ -90,7 +90,7 @@ export function* driveSync(rawSource: Iterable<string>, rule: LineRule): Generat
 }
 
 // Accepts a sync source too, and pulls exactly one raw line per request so a
-// chunk-by-chunk reader still delivers incrementally
+// chunk-by-chunk reader still delivers incrementally.
 export async function* driveAsync(
   rawSource: AsyncIterable<string> | Iterable<string>,
   rule: LineRule,

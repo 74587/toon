@@ -42,7 +42,7 @@ export function isSafeUnquoted(value: string, delimiter: string = DEFAULT_DELIMI
     return false
   }
 
-  // Only space and tab force quoting, unlike host `trim()`, which also strips other Unicode whitespace
+  // Only space and tab force quoting, unlike host `trim()`, which also strips other Unicode whitespace.
   if (/^[ \t]|[ \t]$/.test(value)) {
     return false
   }

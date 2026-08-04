@@ -1,7 +1,7 @@
 import type { JsonPrimitive } from '../types.ts'
 import { COMMENT_MARKER } from '../constants.ts'
 
-// Decoders silently strip a line whose first non-space character is the comment marker
+// Decoders silently strip a line whose first non-space character is the comment marker.
 const COMMENT_LINE_PATTERN = new RegExp(`(?:^|\\n) *${COMMENT_MARKER}`)
 
 /**
@@ -29,7 +29,7 @@ export type EncodablePrimitive = JsonPrimitive | RawString
  * Wraps a pre-formatted string for verbatim emission, typically returned from
  * an encode `replacer`. Compose with `escapeString` to control quoting yourself.
  *
- * @param value - The exact text to emit at the value position
+ * @param value The exact text to emit at the value position
  * @returns A `RawString` marker honored at primitive value positions
  *
  * @example

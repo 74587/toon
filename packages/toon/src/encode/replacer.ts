@@ -12,7 +12,7 @@ import { isRawString } from './raw-string.ts'
 export function applyReplacer(root: JsonValue, replacer: EncodeReplacer): JsonValue {
   const replacedRoot = replacer('', root, [])
 
-  // At the root, undefined means "no change", never omission
+  // At the root, undefined means "no change", never omission.
   if (replacedRoot === undefined) {
     return transformChildren(root, replacer, [])
   }
@@ -36,7 +36,7 @@ function transformReplaced(
     return transformChildren(original, replacer, path)
   }
 
-  // Normalize in case the replacer returned a non-JsonValue
+  // Normalize in case the replacer returned a non-JsonValue.
   return transformChildren(normalizeValue(replaced), replacer, path)
 }
 
@@ -86,7 +86,7 @@ function transformArray(
 
   for (let i = 0; i < arr.length; i++) {
     const value = arr[i]!
-    // String index (`'0'`, `'1'`, etc.) matches `JSON.stringify` behavior
+    // String index (`'0'`, `'1'`, etc.) matches `JSON.stringify` behavior.
     const childPath = [...path, i]
     const replacedValue = replacer(String(i), value, childPath)
 

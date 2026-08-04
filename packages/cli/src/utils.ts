@@ -81,7 +81,7 @@ export async function* readLinesFromSource(source: InputSource, strict: boolean)
     ? process.stdin
     : createReadStream(source.path)
 
-  // Node's own string decoding substitutes U+FFFD, which a strict decoder MUST NOT do
+  // Node's own string decoding substitutes U+FFFD, which a strict decoder MUST NOT do.
   const decoder = new TextDecoder('utf-8', { fatal: strict })
   let buffer = ''
 

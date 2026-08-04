@@ -1,5 +1,5 @@
 /**
- * Type definitions for TOON test fixtures
+ * Type definitions for TOON test fixtures.
  *
  * @remarks
  * Matches the JSON schema at https://github.com/toon-format/spec/blob/main/tests/fixtures.schema.json.

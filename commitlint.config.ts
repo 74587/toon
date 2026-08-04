@@ -6,7 +6,7 @@ import { RuleConfigSeverity } from '@commitlint/types'
 /**
  * Rule to ensure the first letter of the commit subject is lowercase.
  *
- * @param parsed - Parsed commit object containing commit message parts.
+ * @param parsed Parsed commit object containing commit message parts
  * @returns A tuple where the first element is a boolean indicating
  * if the rule passed, and the second is an optional error message.
  */

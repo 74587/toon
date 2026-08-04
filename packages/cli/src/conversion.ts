@@ -32,7 +32,7 @@ export async function encodeToToon(config: {
     indentSize: config.indentSize,
   }
 
-  // When printing stats, we need the full string for token counting
+  // When printing stats, we need the full string for token counting.
   if (config.printStats) {
     const toonOutput = encode(data, encodeOptions)
 
@@ -118,7 +118,7 @@ async function writeStream(
       isFirst = false
     }
 
-    // Stdout gets a trailing newline so the shell prompt resumes on a fresh line
+    // Stdout gets a trailing newline so the shell prompt resumes on a fresh line.
     if (!outputPath)
       process.stdout.write('\n')
   }

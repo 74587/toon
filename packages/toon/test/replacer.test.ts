@@ -280,7 +280,7 @@ describe('replacer function', () => {
     it('re-normalizes non-JsonValue returns', () => {
       const input = { date: '2025-01-01' }
       const replacer: EncodeReplacer = (key, value) => {
-        // Return a Date object (will be normalized to ISO string)
+        // Return a Date object (will be normalized to ISO string).
         if (key === 'date')
           return new Date(value as string)
         return value

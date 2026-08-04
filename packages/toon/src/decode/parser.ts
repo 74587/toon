@@ -45,7 +45,7 @@ export function parseArrayHeaderLine(
     return { kind: 'notHeader' }
   }
 
-  // A header key can't contain an unquoted colon, so this is a key-value line
+  // A header key can't contain an unquoted colon, so this is a key-value line.
   const firstColonIndex = findUnquotedChar(content, COLON)
   if (firstColonIndex !== -1 && firstColonIndex < bracketStart) {
     return { kind: 'notHeader' }
@@ -98,12 +98,12 @@ export function parseArrayHeaderLine(
   let key: string | undefined
   if (bracketStart > 0) {
     const rawKey = content.slice(0, bracketStart)
-    // Trimming here would silently turn `foo [2]:` into a header with key `foo`
+    // Trimming here would silently turn `foo [2]:` into a header with key `foo`.
     if (rawKey !== rawKey.trimEnd()) {
       return { kind: 'invalid', reason: 'Unexpected whitespace between key and bracket segment' }
     }
     // Unreachable given the quote and bracket guards above. Leaving it uncaught
-    // preserves the both-modes throw instead of adding a non-strict swallow
+    // preserves the both-modes throw instead of adding a non-strict swallow.
     key = rawKey.startsWith(DOUBLE_QUOTE) ? parseStringLiteral(rawKey) : rawKey
   }
 
@@ -144,7 +144,7 @@ export function parseArrayHeaderLine(
   }
 
   // Duplicate field names are strict-only – non-strict resolves them via LWW – so the
-  // reason rides along on an otherwise-valid header, and the check below prefers it
+  // reason rides along on an otherwise-valid header, and the check below prefers it.
   const duplicateFieldName = fields ? findDuplicateFieldName(fields) : undefined
   const duplicateReason = duplicateFieldName
     ? `Duplicate field name "${duplicateFieldName}" in field list`
@@ -193,7 +193,7 @@ export function parseBracketSegment(
   }
 
   // Only a colon between the length and the optional delimiter symbol marks a keyed
-  // header; any other placement leaves a token that fails the length check below
+  // header; any other placement leaves a token that fails the length check below.
   let keyed = false
   if (content.endsWith(COLON)) {
     keyed = true
@@ -487,7 +487,7 @@ export function parseStringLiteral(token: string): string {
 }
 
 export function parseUnquotedKey(content: string, start: number): { key: string, end: number } {
-  // A raw scan would cut `a "b:c" d: 1` at the quoted colon and split the key in two
+  // A raw scan would cut `a "b:c" d: 1` at the quoted colon and split the key in two.
   const colonIndex = findUnquotedChar(content, COLON, start)
 
   if (colonIndex === -1) {

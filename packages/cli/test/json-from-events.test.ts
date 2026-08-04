@@ -391,7 +391,7 @@ describe('jsonStreamFromEvents', () => {
         { type: 'startObject' as const },
         { type: 'key' as const, key: 'name' },
         { type: 'primitive' as const, value: 'Alice' },
-        // Missing `endObject`
+        // Missing `endObject`.
       ]
 
       await expect(async () => {

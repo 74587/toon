@@ -35,7 +35,7 @@ export function parseLineIncremental(
     raw = raw.slice(1)
   }
 
-  // A trailing carriage return belongs to the CRLF terminator, not to the content
+  // A trailing carriage return belongs to the CRLF terminator, not to the content.
   if (raw[raw.length - 1] === CARRIAGE_RETURN) {
     raw = raw.slice(0, -1)
   }
@@ -43,16 +43,16 @@ export function parseLineIncremental(
   const leadingWhitespace = LEADING_WHITESPACE_PATTERN.exec(raw)![0]
   const firstTabIndex = leadingWhitespace.indexOf(TAB)
 
-  // Strict rejects tab indentation below, so only the spaces before the first tab are indentation there
+  // Strict rejects tab indentation below, so only the spaces before the first tab are indentation there.
   const indent = strict && firstTabIndex !== -1 ? firstTabIndex : leadingWhitespace.length
-  // Non-strict input may indent with tabs, and each tab counts as one depth level
+  // Non-strict input may indent with tabs, and each tab counts as one depth level.
   const tabIndent = strict || firstTabIndex === -1 ? 0 : leadingWhitespace.split(TAB).length - 1
 
-  // Without this, `- ` would be an item carrying an empty token instead of the bare list-item marker
+  // Without this, `- ` would be an item carrying an empty token instead of the bare list-item marker.
   const content = trimTrailingSpaces(raw.slice(indent))
 
   // Comment lines vanish before blank-line tracking and strict validation, so they
-  // never count as rows, items, entries, or blank lines
+  // never count as rows, items, entries, or blank lines.
   if (content[0] === COMMENT_MARKER) {
     return undefined
   }

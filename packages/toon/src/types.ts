@@ -19,9 +19,9 @@ export type { Delimiter, DelimiterKey }
  * Called for every value (root, object properties, array elements) during the encoding process.
  * Similar to `JSON.stringify`'s replacer, but with path tracking.
  *
- * @param key - The property key or array index (as string). Empty string (`''`) for root value.
- * @param value - The normalized `JsonValue` at this location.
- * @param path - Array representing the path from root to this value.
+ * @param key The property key or array index as a string, empty at the root
+ * @param value The normalized `JsonValue` at this location
+ * @param path Array representing the path from root to this value
  *
  * @returns The replacement value (will be normalized again), or `undefined` to omit.
  *          For root value, returning `undefined` means "no change" (don't omit root).

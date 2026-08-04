@@ -129,7 +129,7 @@ function overIndentedLineError(line: ParsedLine, expectedDepth: Depth): ToonDeco
 }
 
 // Both modes reject a bare token outside root primitive position, so it must not reach
-// the non-strict paths that drop an over-indented line
+// the non-strict paths that drop an over-indented line.
 function assertNotScalarLine(line: ParsedLine): void {
   const isListItem = line.content.startsWith(LIST_ITEM_PREFIX) || line.content === LIST_ITEM_MARKER
   if (isListItem || findUnquotedChar(line.content, COLON) !== -1) {
@@ -163,7 +163,7 @@ function keylessFieldsHeaderError(line: ParsedLine): ToonDecodeError {
   )
 }
 
-// Strict decoding never silently discards input, so a line after the root form is an error
+// Strict decoding never silently discards input, so a line after the root form is an error.
 function* assertFullyConsumed(reader: LineReader, strict: boolean): LineRule {
   if (!strict) {
     return
@@ -287,7 +287,7 @@ function* decodeArrayFromHeader(
   options: DecoderContext,
   headerLine: ParsedLine,
 ): LineRule {
-  // Keyed tabular header: decodes to an object, not an array
+  // Keyed tabular header: decodes to an object, not an array.
   if (header.keyed) {
     yield* decodeKeyedObject(header, reader, baseDepth, options, headerLine)
     return
@@ -350,7 +350,7 @@ function* decodeKeyedObject(
   yield { type: 'startObject' }
 
   // A keyed scope ends only by dedent or end of input, so every line at entry depth
-  // carrying an unquoted colon is an entry row
+  // carrying an unquoted colon is an entry row.
   while (true) {
     const line = yield* peekLine(reader)
     if (!line || line.depth <= baseDepth) {
@@ -424,7 +424,7 @@ function* decodeTabularArray(
   let endLine: number | undefined
   let lastRowLine: ParsedLine = headerLine
 
-  // Only strict stops at N, leaving the surplus to `validateNoExtraTabularRows`; non-strict reads on so [N] never truncates
+  // Only strict stops at N, leaving the surplus to `validateNoExtraTabularRows`; non-strict reads on so [N] never truncates.
   while (!options.strict || rowCount < header.length) {
     const line = yield* peekLine(reader)
     if (!line || line.depth < rowDepth) {
@@ -481,7 +481,7 @@ function* decodeListArray(
   let endLine: number | undefined
   let lastItemLine: ParsedLine = headerLine
 
-  // Only strict stops at N, leaving the surplus to `validateNoExtraListItems`; non-strict reads on so [N] never truncates
+  // Only strict stops at N, leaving the surplus to `validateNoExtraListItems`; non-strict reads on so [N] never truncates.
   while (!options.strict || itemCount < header.length) {
     const line = yield* peekLine(reader)
     if (!line || line.depth < itemDepth) {
@@ -568,7 +568,7 @@ function* decodeListItem(
   if (isArrayHeaderContent(afterHyphen)) {
     const arrayHeader = withLine(itemLine, () => resolveArrayHeader(parseArrayHeaderLine(afterHyphen, DEFAULT_DELIMITER), options.strict))
     if (arrayHeader) {
-      // There is no keyless keyed or fields-bearing list-item form
+      // There is no keyless keyed or fields-bearing list-item form.
       if (arrayHeader.header.keyed || arrayHeader.header.fields !== undefined) {
         if (options.strict) {
           throw arrayHeader.header.keyed ? keylessKeyedError(itemLine) : keylessFieldsHeaderError(itemLine)
@@ -588,7 +588,7 @@ function* decodeListItem(
     yield { type: 'startObject' }
     yield { type: 'key', key: header.key! }
 
-    // Use baseDepth + 1 for the array so rows are at baseDepth + 2
+    // Use baseDepth + 1 for the array so rows are at baseDepth + 2.
     yield* decodeArrayFromHeader(header, headerInfo.inlineValues, reader, baseDepth + 1, options, itemLine)
 
     yield* followSiblingFields(reader, baseDepth + 1, options, seenKeys)
@@ -653,7 +653,7 @@ function isKeyValueLine(line: ParsedLine): boolean {
 
 // Keeps the detection/parse split in `parser.ts` free of error decisions. The bare
 // SyntaxError is deliberate: the caller's `withLine` wrapper enriches it into a
-// `ToonDecodeError` with a `cause`, matching the direct-throw path
+// `ToonDecodeError` with a `cause`, matching the direct-throw path.
 function resolveArrayHeader(
   result: ArrayHeaderParseResult,
   strict: boolean,
@@ -669,7 +669,7 @@ function resolveArrayHeader(
     return undefined
   }
 
-  // A valid header may still carry a strict-only violation that non-strict resolves via LWW
+  // A valid header may still carry a strict-only violation that non-strict resolves via LWW.
   if (strict && result.strictError !== undefined) {
     throw new SyntaxError(result.strictError)
   }
@@ -686,7 +686,7 @@ function* yieldObjectFromFields(
   function* walkFieldGroup(nodes: readonly FieldNode[]): Generator<JsonStreamEvent> {
     yield { type: 'startObject' }
     for (const node of nodes) {
-      // A non-strict width mismatch leaves trailing leaf fields with no cell; they are absent, not undefined
+      // A non-strict width mismatch leaves trailing leaf fields with no cell; they are absent, not undefined.
       if (!node.children && cellIndex >= primitives.length) {
         continue
       }

@@ -296,7 +296,7 @@ describe('toon CLI', () => {
 
       const { stderr } = await runCli(['large-input.json', '--output', 'output.toon'], { cwd: directory })
 
-      // Streaming has to produce byte-identical output to the one-shot `encode()`
+      // Streaming has to produce byte-identical output to the one-shot `encode()`.
       const expected = encode(data, {
         delimiter: DEFAULT_DELIMITER,
         indent: 2,
@@ -362,7 +362,7 @@ describe('toon CLI', () => {
 
       const { stdout, stderr } = await runCli(['input.json', '--stats'], { cwd: directory })
 
-      // Diagnostics stay off stdout so `toon input.json --stats | …` pipes clean data
+      // Diagnostics stay off stdout so `toon input.json --stats | …` pipes clean data.
       expect(stdout).toBe('items[2]{id,value}:\n  1,test\n  2,data\n')
       expect(stderr).toMatch(/Token estimates:/)
       expect(stderr).toMatch(/Saved.*tokens/)
