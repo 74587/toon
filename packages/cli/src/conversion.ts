@@ -6,6 +6,7 @@ import * as path from 'node:path'
 import process from 'node:process'
 import { estimateTokenCount } from 'tokenx'
 import { decodeStream, encode, encodeLines } from '../../toon/src/index.ts'
+import { CliError } from './errors.ts'
 import { jsonStreamFromEvents } from './json-from-events.ts'
 import * as log from './log.ts'
 import { formatInputLabel, readInput, readLinesFromSource } from './utils.ts'
@@ -15,7 +16,7 @@ export async function encodeToToon(config: {
   output?: string
   indentSize: NonNullable<EncodeOptions['indentSize']>
   delimiter: NonNullable<EncodeOptions['delimiter']>
-  printStats: boolean
+  shouldPrintStats: boolean
 }): Promise<void> {
   const jsonContent = await readInput(config.input)
 
@@ -24,7 +25,7 @@ export async function encodeToToon(config: {
     data = JSON.parse(jsonContent)
   }
   catch (error) {
-    throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : String(error)}`)
+    throw new CliError(`Failed to parse JSON: ${Error.isError(error) ? error.message : String(error)}`, { cause: error })
   }
 
   const encodeOptions: EncodeOptions = {
@@ -33,7 +34,7 @@ export async function encodeToToon(config: {
   }
 
   // When printing stats, we need the full string for token counting.
-  if (config.printStats) {
+  if (config.shouldPrintStats) {
     const toonOutput = encode(data, encodeOptions)
 
     if (config.output) {

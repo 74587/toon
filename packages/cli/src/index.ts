@@ -1,19 +1,19 @@
 import type { ArgsDef, CommandDef } from 'citty'
+import type { Delimiter } from '../../toon/src/index.ts'
 import type { InputSource } from './types.ts'
 import * as path from 'node:path'
-import process from 'node:process'
 import { defineCommand } from 'citty'
 import { DEFAULT_DELIMITER } from '../../toon/src/index.ts'
 import { assertValidDelimiter } from '../../toon/src/shared/validation.ts'
 import pkg from '../package.json' with { type: 'json' }
 import { decodeToJson, encodeToToon } from './conversion.ts'
-import { formatError } from './format-error.ts'
-import * as log from './log.ts'
+import { CliError, commonArgs, withCleanErrors } from './errors.ts'
 import { detectMode } from './utils.ts'
 
 const { name, version } = pkg
 
 const args: ArgsDef = {
+  ...commonArgs,
   input: {
     type: 'positional',
     description: 'Input file path (omit or use "-" to read from stdin)',
@@ -54,14 +54,9 @@ const args: ArgsDef = {
     description: 'Show token statistics',
     default: false,
   },
-  verbose: {
-    type: 'boolean',
-    description: 'Show full stack traces and cause chains for errors',
-    default: false,
-  },
 } as const
 
-export const mainCommand: CommandDef<ArgsDef> = defineCommand({
+export const mainCommand: CommandDef<ArgsDef> = withCleanErrors(defineCommand({
   meta: {
     name,
     description: 'TOON CLI – Convert between JSON and TOON',
@@ -76,40 +71,45 @@ export const mainCommand: CommandDef<ArgsDef> = defineCommand({
       : { type: 'file', path: path.resolve(input) }
     const outputPath = args.output ? path.resolve(args.output) : undefined
 
-    try {
-      const indentSize = Number.parseInt(args.indent || '2', 10)
-      if (Number.isNaN(indentSize) || indentSize < 0) {
-        throw new Error(`Invalid indent value: ${args.indent}`)
-      }
-
-      const delimiter = args.delimiter || DEFAULT_DELIMITER
-      assertValidDelimiter(delimiter)
-
-      const mode = detectMode(inputSource, args.encode, args.decode)
-
-      if (mode === 'encode') {
-        await encodeToToon({
-          input: inputSource,
-          output: outputPath,
-          delimiter,
-          indentSize,
-          printStats: args.stats === true,
-        })
-      }
-      else {
-        await decodeToJson({
-          input: inputSource,
-          output: outputPath,
-          indentSize,
-          strict: args.strict !== false,
-        })
-      }
+    const indentSize = Number.parseInt(args.indent || '2', 10)
+    if (Number.isNaN(indentSize) || indentSize < 0) {
+      throw new CliError(`Invalid indent value: ${args.indent}`)
     }
-    catch (error) {
-      log.error(formatError(error, { isVerbose: args.verbose === true }))
-      // `process.exit` would discard whatever stdout has still buffered, which
-      // truncates a piped conversion partway through.
-      process.exitCode = 1
+
+    const delimiter = args.delimiter || DEFAULT_DELIMITER
+    assertDelimiter(delimiter)
+
+    const mode = detectMode(inputSource, args.encode, args.decode)
+
+    if (mode === 'encode') {
+      await encodeToToon({
+        input: inputSource,
+        output: outputPath,
+        delimiter,
+        indentSize,
+        shouldPrintStats: args.stats === true,
+      })
+    }
+    else {
+      await decodeToJson({
+        input: inputSource,
+        output: outputPath,
+        indentSize,
+        strict: args.strict !== false,
+      })
     }
   },
-})
+}))
+
+/**
+ * The library reports a bad delimiter as a `TypeError`, which the boundary would
+ * read as a defect rather than as the flag value the user chose.
+ */
+function assertDelimiter(delimiter: string): asserts delimiter is Delimiter {
+  try {
+    assertValidDelimiter(delimiter)
+  }
+  catch (error) {
+    throw new CliError(Error.isError(error) ? error.message : String(error), { cause: error })
+  }
+}

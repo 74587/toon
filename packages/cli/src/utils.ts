@@ -3,6 +3,7 @@ import { createReadStream } from 'node:fs'
 import * as fsp from 'node:fs/promises'
 import * as path from 'node:path'
 import process from 'node:process'
+import { CliError } from './errors.ts'
 
 export function detectMode(
   input: InputSource,
@@ -108,6 +109,6 @@ function decodeUtf8(decoder: TextDecoder, chunk?: Uint8Array): string {
     return chunk === undefined ? decoder.decode() : decoder.decode(chunk, { stream: true })
   }
   catch {
-    throw new Error('Input is not valid UTF-8. Pass --no-strict to replace ill-formed bytes')
+    throw new CliError('Input is not valid UTF-8. Pass --no-strict to replace ill-formed bytes')
   }
 }
