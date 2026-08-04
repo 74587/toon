@@ -48,7 +48,7 @@ describe('toon CLI', () => {
         indent: 2,
       })
 
-      expect(output).toBe(expected)
+      expect(output).toBe(`${expected}\n`)
       expect(stderr).toMatch(/Encoded .* → .*/)
     })
 
@@ -71,7 +71,7 @@ describe('toon CLI', () => {
       try {
         const { stderr } = await runCli(['--output', 'output.toon'], { cwd: directory })
 
-        expect(await readOutput(directory, 'output.toon')).toBe(encode(data))
+        expect(await readOutput(directory, 'output.toon')).toBe(`${encode(data)}\n`)
         expect(stderr).toMatch(/Encoded.*stdin[^\n\r\u2028\u2029\u2192]*\u2192.*output\.toon/)
       }
       finally {
@@ -87,7 +87,7 @@ describe('toon CLI', () => {
 
       await runCli(['empty.json', '--output', 'output.toon'], { cwd: directory })
 
-      expect(await readOutput(directory, 'output.toon')).toBe(encode(data))
+      expect(await readOutput(directory, 'output.toon')).toBe(`${encode(data)}\n`)
     })
 
     it('writes a large JSON input identically to one-shot encoding', async () => {
@@ -104,13 +104,12 @@ describe('toon CLI', () => {
 
       const { stderr } = await runCli(['large-input.json', '--output', 'output.toon'], { cwd: directory })
 
-      // Streaming has to produce byte-identical output to the one-shot `encode()`.
       const expected = encode(data, {
         delimiter: DEFAULT_DELIMITER,
         indent: 2,
       })
 
-      expect(await readOutput(directory, 'output.toon')).toBe(expected)
+      expect(await readOutput(directory, 'output.toon')).toBe(`${expected}\n`)
       expect(stderr).toMatch(/Encoded .* → .*/)
     })
   })

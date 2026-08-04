@@ -38,7 +38,7 @@ export async function encodeToToon(config: {
     const toonOutput = encode(data, encodeOptions)
 
     if (config.output) {
-      await fsp.writeFile(config.output, toonOutput, 'utf-8')
+      await fsp.writeFile(config.output, `${toonOutput}\n`, 'utf-8')
     }
     else {
       console.log(toonOutput)
@@ -119,9 +119,7 @@ async function writeStream(
       isFirst = false
     }
 
-    // Stdout gets a trailing newline so the shell prompt resumes on a fresh line.
-    if (!outputPath)
-      process.stdout.write('\n')
+    await write('\n')
   }
   finally {
     await fileHandle?.close()
