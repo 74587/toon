@@ -11,7 +11,7 @@ function readOutput(directory: string, relativePath: string): Promise<string> {
 }
 
 describe('toon CLI', () => {
-  describe('encode (JSON → TOON)', () => {
+  describe('encode', () => {
     it('encodes JSON from stdin', async () => {
       const data = {
         title: 'TOON test',
@@ -63,7 +63,7 @@ describe('toon CLI', () => {
       expect(stdout).toBe(`${encode(data)}\n`)
     })
 
-    it('encodes JSON from stdin to output file', async () => {
+    it('encodes JSON from stdin into a file', async () => {
       const data = { key: 'value' }
       const directory = createDirectory()
       const restoreStdin = mockStdin(JSON.stringify(data))
@@ -78,9 +78,44 @@ describe('toon CLI', () => {
         restoreStdin()
       }
     })
+
+    it('encodes an empty object', async () => {
+      const data = {}
+      const directory = createDirectory({
+        'empty.json': JSON.stringify(data),
+      })
+
+      await runCli(['empty.json', '--output', 'output.toon'], { cwd: directory })
+
+      expect(await readOutput(directory, 'output.toon')).toBe(encode(data))
+    })
+
+    it('writes a large JSON input identically to one-shot encoding', async () => {
+      const data = {
+        items: Array.from({ length: 1000 }, (_, index) => ({
+          id: index,
+          name: `Item ${index}`,
+          value: index / 7,
+        })),
+      }
+      const directory = createDirectory({
+        'large-input.json': JSON.stringify(data, undefined, 2),
+      })
+
+      const { stderr } = await runCli(['large-input.json', '--output', 'output.toon'], { cwd: directory })
+
+      // Streaming has to produce byte-identical output to the one-shot `encode()`.
+      const expected = encode(data, {
+        delimiter: DEFAULT_DELIMITER,
+        indent: 2,
+      })
+
+      expect(await readOutput(directory, 'output.toon')).toBe(expected)
+      expect(stderr).toMatch(/Encoded .* → .*/)
+    })
   })
 
-  describe('decode (TOON → JSON)', () => {
+  describe('decode', () => {
     it('decodes a TOON file into a JSON file', async () => {
       const data = {
         items: ['alpha', 'beta'],
@@ -110,7 +145,7 @@ describe('toon CLI', () => {
       }
     })
 
-    it('decodes TOON from stdin to output file', async () => {
+    it('decodes TOON from stdin into a file', async () => {
       const data = { name: 'test', values: [1, 2, 3] }
       const directory = createDirectory()
       const restoreStdin = mockStdin(encode(data))
@@ -125,9 +160,137 @@ describe('toon CLI', () => {
         restoreStdin()
       }
     })
+
+    it('decodes a root number, string and boolean', async () => {
+      const cases = [
+        ['42', 42],
+        ['"Hello World"', 'Hello World'],
+        ['true', true],
+      ] as const
+
+      for (const [input, expected] of cases) {
+        const restoreStdin = mockStdin(input)
+
+        try {
+          const { stdout } = await runCli(['--decode'])
+
+          expect(JSON.parse(stdout)).toBe(expected)
+        }
+        finally {
+          restoreStdin()
+        }
+      }
+    })
+
+    it('writes a large TOON input back to the original JSON', async () => {
+      const data = {
+        records: Array.from({ length: 1000 }, (_, index) => ({
+          id: index,
+          title: `Record ${index}`,
+          score: index / 3,
+        })),
+      }
+      const directory = createDirectory({
+        'large-input.toon': encode(data, {
+          delimiter: DEFAULT_DELIMITER,
+          indent: 2,
+        }),
+      })
+
+      const { stderr } = await runCli(['large-input.toon', '--decode', '--output', 'output.json'], { cwd: directory })
+
+      expect(JSON.parse(await readOutput(directory, 'output.json'))).toEqual(data)
+      expect(stderr).toMatch(/Decoded .* → .*/)
+    })
   })
 
-  describe('stdin edge cases', () => {
+  describe('options', () => {
+    it('encodes with a custom --delimiter', async () => {
+      const data = { items: [1, 2, 3] }
+      const restoreStdin = mockStdin(JSON.stringify(data))
+
+      try {
+        const { stdout } = await runCli(['--delimiter', '|'])
+
+        expect(stdout).toBe(`${encode(data, { delimiter: '|' })}\n`)
+      }
+      finally {
+        restoreStdin()
+      }
+    })
+
+    it('encodes with a custom --indent', async () => {
+      const data = {
+        nested: {
+          deep: { value: 1 },
+        },
+      }
+      const restoreStdin = mockStdin(JSON.stringify(data))
+
+      try {
+        const { stdout } = await runCli(['--indent', '4'])
+
+        expect(stdout).toBe(`${encode(data, { indent: 4 })}\n`)
+      }
+      finally {
+        restoreStdin()
+      }
+    })
+
+    it('indents decoded JSON by --indent', async () => {
+      const data = {
+        a: 1,
+        b: [2, 3],
+        c: { nested: true },
+      }
+      const directory = createDirectory({
+        'input.toon': encode(data, { indent: 4 }),
+      })
+
+      await runCli(['input.toon', '--decode', '--indent', '4', '--output', 'output.json'], { cwd: directory })
+
+      const output = await readOutput(directory, 'output.json')
+
+      expect(JSON.parse(output)).toEqual(data)
+      expect(output).toContain('    ')
+    })
+
+    it('accepts tab indentation with --no-strict', async () => {
+      // Strict decoding rejects this input, so the flag has to be what admits it.
+      const restoreStdin = mockStdin('a:\n\tb: 1\n')
+
+      try {
+        const { stdout, exitCode } = await runCli(['--decode', '--no-strict'])
+
+        expect(exitCode).toBeUndefined()
+        expect(JSON.parse(stdout)).toEqual({ a: { b: 1 } })
+      }
+      finally {
+        restoreStdin()
+      }
+    })
+
+    it('keeps --stats diagnostics off stdout', async () => {
+      const data = {
+        items: [
+          { id: 1, value: 'test' },
+          { id: 2, value: 'data' },
+        ],
+      }
+      const directory = createDirectory({
+        'input.json': JSON.stringify(data),
+      })
+
+      const { stdout, stderr } = await runCli(['input.json', '--stats'], { cwd: directory })
+
+      // Diagnostics stay off stdout so `toon input.json --stats | …` pipes clean data.
+      expect(stdout).toBe('items[2]{id,value}:\n  1,test\n  2,data\n')
+      expect(stderr).toMatch(/Token estimates:/)
+      expect(stderr).toMatch(/Saved.*tokens/)
+    })
+  })
+
+  describe('error reporting', () => {
     it('rejects invalid JSON from stdin', async () => {
       const restoreStdin = mockStdin('{ invalid json }')
 
@@ -159,7 +322,7 @@ describe('toon CLI', () => {
       }
     })
 
-    it('includes the stack trace when --verbose is passed', async () => {
+    it('prints the stack trace with --verbose', async () => {
       const restoreStdin = mockStdin('a:\n\tb: 1\n')
 
       try {
@@ -172,205 +335,8 @@ describe('toon CLI', () => {
         restoreStdin()
       }
     })
-  })
 
-  describe('stdin with options', () => {
-    it('encodes JSON from stdin with custom delimiter', async () => {
-      const data = { items: [1, 2, 3] }
-      const restoreStdin = mockStdin(JSON.stringify(data))
-
-      try {
-        const { stdout } = await runCli(['--delimiter', '|'])
-
-        expect(stdout).toBe(`${encode(data, { delimiter: '|' })}\n`)
-      }
-      finally {
-        restoreStdin()
-      }
-    })
-
-    it('encodes JSON from stdin with custom indent', async () => {
-      const data = {
-        nested: {
-          deep: { value: 1 },
-        },
-      }
-      const restoreStdin = mockStdin(JSON.stringify(data))
-
-      try {
-        const { stdout } = await runCli(['--indent', '4'])
-
-        expect(stdout).toBe(`${encode(data, { indent: 4 })}\n`)
-      }
-      finally {
-        restoreStdin()
-      }
-    })
-
-    it('decodes TOON from stdin with --no-strict', async () => {
-      const data = { test: true }
-      const restoreStdin = mockStdin(encode(data))
-
-      try {
-        const { stdout } = await runCli(['--decode', '--no-strict'])
-
-        expect(JSON.parse(stdout)).toEqual(data)
-      }
-      finally {
-        restoreStdin()
-      }
-    })
-  })
-
-  describe('decode options', () => {
-    it('decodes with --indent for JSON formatting', async () => {
-      const data = {
-        a: 1,
-        b: [2, 3],
-        c: { nested: true },
-      }
-      const directory = createDirectory({
-        'input.toon': encode(data, { indent: 4 }),
-      })
-
-      await runCli(['input.toon', '--decode', '--indent', '4', '--output', 'output.json'], { cwd: directory })
-
-      const output = await readOutput(directory, 'output.json')
-
-      expect(JSON.parse(output)).toEqual(data)
-      expect(output).toContain('    ')
-    })
-
-    it('decodes root primitive number', async () => {
-      const restoreStdin = mockStdin('42')
-
-      try {
-        const { stdout } = await runCli(['--decode'])
-
-        expect(stdout).toBe('42\n')
-      }
-      finally {
-        restoreStdin()
-      }
-    })
-
-    it('decodes root primitive string', async () => {
-      const restoreStdin = mockStdin('"Hello World"')
-
-      try {
-        const { stdout } = await runCli(['--decode'])
-
-        expect(JSON.parse(stdout)).toBe('Hello World')
-      }
-      finally {
-        restoreStdin()
-      }
-    })
-
-    it('decodes root primitive boolean', async () => {
-      const restoreStdin = mockStdin('true')
-
-      try {
-        const { stdout } = await runCli(['--decode'])
-
-        expect(stdout).toBe('true\n')
-      }
-      finally {
-        restoreStdin()
-      }
-    })
-  })
-
-  describe('streaming output', () => {
-    it('writes a large JSON input identically to one-shot encoding', async () => {
-      const data = {
-        items: Array.from({ length: 1000 }, (_, index) => ({
-          id: index,
-          name: `Item ${index}`,
-          value: index / 7,
-        })),
-      }
-      const directory = createDirectory({
-        'large-input.json': JSON.stringify(data, undefined, 2),
-      })
-
-      const { stderr } = await runCli(['large-input.json', '--output', 'output.toon'], { cwd: directory })
-
-      // Streaming has to produce byte-identical output to the one-shot `encode()`.
-      const expected = encode(data, {
-        delimiter: DEFAULT_DELIMITER,
-        indent: 2,
-      })
-
-      expect(await readOutput(directory, 'output.toon')).toBe(expected)
-      expect(stderr).toMatch(/Encoded .* → .*/)
-    })
-
-    it('writes a large TOON input back to the original JSON', async () => {
-      const data = {
-        records: Array.from({ length: 1000 }, (_, index) => ({
-          id: index,
-          title: `Record ${index}`,
-          score: index / 3,
-        })),
-      }
-      const directory = createDirectory({
-        'large-input.toon': encode(data, {
-          delimiter: DEFAULT_DELIMITER,
-          indent: 2,
-        }),
-      })
-
-      const { stderr } = await runCli(['large-input.toon', '--decode', '--output', 'output.json'], { cwd: directory })
-
-      expect(JSON.parse(await readOutput(directory, 'output.json'))).toEqual(data)
-      expect(stderr).toMatch(/Decoded .* → .*/)
-    })
-
-    it('encodes an empty object', async () => {
-      const data = {}
-      const directory = createDirectory({
-        'empty.json': JSON.stringify(data),
-      })
-
-      await runCli(['empty.json', '--output', 'output.toon'], { cwd: directory })
-
-      expect(await readOutput(directory, 'output.toon')).toBe(encode(data))
-    })
-
-    it('encodes a single-key object', async () => {
-      const data = { key: 'value' }
-      const directory = createDirectory({
-        'single.json': JSON.stringify(data),
-      })
-
-      await runCli(['single.json', '--output', 'output.toon'], { cwd: directory })
-
-      expect(await readOutput(directory, 'output.toon')).toBe(encode(data))
-    })
-
-    it('keeps stats diagnostics off stdout', async () => {
-      const data = {
-        items: [
-          { id: 1, value: 'test' },
-          { id: 2, value: 'data' },
-        ],
-      }
-      const directory = createDirectory({
-        'input.json': JSON.stringify(data),
-      })
-
-      const { stdout, stderr } = await runCli(['input.json', '--stats'], { cwd: directory })
-
-      // Diagnostics stay off stdout so `toon input.json --stats | …` pipes clean data.
-      expect(stdout).toBe('items[2]{id,value}:\n  1,test\n  2,data\n')
-      expect(stderr).toMatch(/Token estimates:/)
-      expect(stderr).toMatch(/Saved.*tokens/)
-    })
-  })
-
-  describe('error handling', () => {
-    it('rejects invalid delimiter', async () => {
+    it('rejects an invalid --delimiter', async () => {
       const directory = createDirectory({
         'input.json': JSON.stringify({ value: 1 }),
       })
@@ -381,7 +347,7 @@ describe('toon CLI', () => {
       expect(stderr).toContain('Invalid delimiter')
     })
 
-    it('rejects invalid indent value', async () => {
+    it('rejects a non-numeric --indent', async () => {
       const directory = createDirectory({
         'input.json': JSON.stringify({ value: 1 }),
       })
