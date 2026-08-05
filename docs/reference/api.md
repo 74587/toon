@@ -626,7 +626,7 @@ All decode errors are thrown as [`ToonDecodeError`](#error-handling) instances w
 
 Set `strict: false` to skip these checks. Duplicate sibling keys then resolve with last-write-wins in document order. A declared `[N]` never truncates a scope: every list item, tabular row, and entry row the scope actually contains is decoded, whether that is fewer or more than `N` (§14.1).
 
-Four conditions are errors in both modes, because no recovery preserves the document's meaning (§14): a missing colon in key context, an invalid escape or unterminated quoted string, characters after a quoted token's closing quote, and a document whose depth-0 lines are neither headers nor key-value lines.
+Five conditions are errors in both modes, because no recovery preserves the document's meaning (§14): a missing colon in key context, an invalid escape or unterminated quoted string, characters after a quoted token's closing quote, a bare token line inside an array or object scope, and a document whose depth-0 lines are neither headers nor key-value lines.
 
 **Documented decoder policies.** The specification requires each implementation to state the choices it leaves open (§4, §12, §15):
 
