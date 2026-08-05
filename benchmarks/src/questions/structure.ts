@@ -3,10 +3,10 @@ import type { Question } from '../types.ts'
 import { QuestionBuilder } from './utils.ts'
 
 /**
- * Generate structure-awareness questions across all datasets
+ * Generates structure-awareness questions across all datasets.
  *
  * These questions test format-native structural affordances:
- * - TOON's explicit array length [N] and field declarations {fields}
+ * - TOON's explicit array length `[N]` and field declarations `{fields}`
  * - CSV's header row (but no explicit length)
  * - JSON/YAML have neither unless the model counts manually
  */
@@ -20,9 +20,9 @@ export function generateStructureQuestions(
 ): Question[] {
   const questions: Question[] = []
 
-  // ========== TABULAR DATASET (Employees) ==========
+  // #region Tabular dataset (employees)
 
-  // Count: Total employees (tests array length awareness)
+  // Tests array length awareness.
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -34,7 +34,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field list: Employee fields (tests field name awareness)
+  // Tests field name awareness.
   const employeeFields = 'id,name,email,department,salary,yearsExperience,active'
   questions.push(
     new QuestionBuilder()
@@ -47,7 +47,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Positional: Third field name for employees (tests TOON {fields} syntax)
+  // Tests TOON's `{fields}` syntax.
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -59,7 +59,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Last row: Last employee's department (tests ability to find last row using length)
+  // Tests finding the last row from the declared length.
   const lastEmployee = employees.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -72,7 +72,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Last row: Last employee's name
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -84,7 +83,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field count: How many fields per employee (tests schema awareness)
+  // Tests schema awareness.
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -96,9 +95,10 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // ========== NESTED DATASET (Orders) ==========
+  // #endregion
 
-  // Count: Total orders
+  // #region Nested dataset (orders)
+
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -110,7 +110,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field list: Order fields
   const orderFields = 'orderId,customer,items,subtotal,tax,total,status,orderDate'
   questions.push(
     new QuestionBuilder()
@@ -123,7 +122,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Nested count: Items in specific order
   const orderWithManyItems = orders.reduce((max, order) =>
     order.items.length > max.items.length ? order : max,
   )
@@ -138,7 +136,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Nested field list: Item fields
   const itemFields = 'sku,name,quantity,price'
   questions.push(
     new QuestionBuilder()
@@ -151,7 +148,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Last row: Last order's status
   const lastOrder = orders.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -164,7 +160,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Customer field list
   const customerFields = 'id,name,email,phone'
   questions.push(
     new QuestionBuilder()
@@ -177,9 +172,10 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // ========== ANALYTICS DATASET (Metrics) ==========
+  // #endregion
 
-  // Count: Total metrics
+  // #region Analytics dataset (metrics)
+
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -191,7 +187,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field list: Metric fields
   const metricFields = 'date,views,clicks,conversions,revenue,bounceRate'
   questions.push(
     new QuestionBuilder()
@@ -204,7 +199,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Positional: Fifth field name for metrics (tests TOON {fields} syntax)
+  // Tests TOON's `{fields}` syntax.
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -216,7 +211,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Last row: Last metric's date
   const lastMetric = metrics.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -229,7 +223,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field count: How many fields per metric
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -241,9 +234,10 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // ========== GITHUB DATASET (Repositories) ==========
+  // #endregion
 
-  // Count: Total repositories
+  // #region GitHub dataset (repositories)
+
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -255,7 +249,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field list: Repository fields
   const repoFields = 'id,name,repo,description,stars,watchers,forks,defaultBranch,createdAt,updatedAt,pushedAt'
   questions.push(
     new QuestionBuilder()
@@ -268,7 +261,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Positional: Seventh field name for repos (tests TOON {fields} syntax)
+  // Tests TOON's `{fields}` syntax.
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -280,7 +273,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Last row: Last repo's name
   const lastRepo = repos.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -293,7 +285,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field count: How many fields per repository
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -305,9 +296,10 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // ========== EVENT LOGS DATASET ==========
+  // #endregion
 
-  // Count: Total logs
+  // #region Event logs dataset
+
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -319,7 +311,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Field list: Base log fields (including optional error)
+  // Includes the optional `error` field, hence the unordered comparison.
   const logFields = 'timestamp,level,endpoint,statusCode,responseTime,userId,error'
   questions.push(
     new QuestionBuilder()
@@ -332,7 +324,6 @@ export function generateStructureQuestions(
       .build(),
   )
 
-  // Last row: Last log's level
   const lastLog = logs.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -344,6 +335,8 @@ export function generateStructureQuestions(
       .answerType('string')
       .build(),
   )
+
+  // #endregion
 
   return questions
 }

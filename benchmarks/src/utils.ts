@@ -2,15 +2,7 @@ import * as fsp from 'node:fs/promises'
 import { encode } from 'gpt-tokenizer'
 
 /**
- * Generate visual progress bar using ASCII characters
- *
- * @param value - Current value
- * @param max - Maximum value
- * @param width - Width of the bar in characters (default: 25)
- * @param chars - Characters to use for filled and empty sections
- * @param chars.filled - Character for filled portion (default: '█')
- * @param chars.empty - Character for empty portion (default: '░')
- * @returns ASCII progress bar string
+ * Generates a visual progress bar using ASCII characters.
  *
  * @example
  * createProgressBar(75, 100, 20) // "███████████████░░░░░"
@@ -29,10 +21,7 @@ export function createProgressBar(
 }
 
 /**
- * Count tokens in text using gpt-tokenizer (o200k_base encoding)
- *
- * @param text - Text to tokenize
- * @returns Number of tokens
+ * Counts tokens in text using gpt-tokenizer (o200k_base encoding).
  *
  * @example
  * tokenize("Hello, world!") // 4
@@ -41,27 +30,22 @@ export function tokenize(text: string): number {
   return encode(text).length
 }
 
-/**
- * Ensure a directory exists, creating it recursively if needed
- *
- * @param dirPath - Directory path to ensure exists
- */
 export async function ensureDir(dirPath: string): Promise<void> {
   await fsp.mkdir(dirPath, { recursive: true })
 }
 
 /** Bounds of a Wilson score confidence interval for a proportion. */
 export interface WilsonInterval {
-  /** Lower bound of the interval, in 0..1 */
+  /** Lower bound of the interval, in 0..1. */
   lower: number
-  /** Upper bound of the interval, in 0..1 */
+  /** Upper bound of the interval, in 0..1. */
   upper: number
-  /** Half-width of the interval, in 0..1, equal to (upper - lower) / 2 */
+  /** Half-width of the interval, in 0..1, equal to `(upper - lower) / 2`. */
   halfWidth: number
 }
 
 /**
- * Wilson score confidence interval for a binomial proportion.
+ * Computes the Wilson score confidence interval for a binomial proportion.
  *
  * @remarks
  * Unlike the normal approximation, the Wilson interval stays inside 0..1 and
@@ -75,7 +59,7 @@ export function wilsonInterval(
   totalCount: number,
   confidenceZ = 1.959963984540054, // 95%
 ): WilsonInterval {
-  // A zero sample has no proportion to bound – avoid dividing by totalCount
+  // A zero sample has no proportion to bound – avoid dividing by `totalCount`.
   if (totalCount === 0)
     return { lower: 0, upper: 0, halfWidth: 0 }
 

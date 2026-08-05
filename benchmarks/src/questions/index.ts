@@ -14,7 +14,7 @@ import { generateTabularQuestions } from './tabular.ts'
 import { createIdGenerator } from './utils.ts'
 
 /**
- * Generate questions from all datasets
+ * Generates questions from all datasets.
  *
  * @remarks
  * - Field Retrieval: Direct field access with no computation
@@ -23,7 +23,7 @@ import { createIdGenerator } from './utils.ts'
  *   Examples: "How many X?", "What is the total/average?", "How many X > threshold?"
  * - Filtering: Multi-condition queries requiring complex logical operations
  *   Examples: "How many X WHERE condition1 AND condition2?"
- * - Structure Awareness: Tests format-native structural affordances (TOON's [N] and {fields}, CSV's header)
+ * - Structure Awareness: Tests format-native structural affordances (TOON's `[N]` and `{fields}`, CSV's header)
  *   Examples: "How many records?", "List the field names", "What is the last record's field?"
  */
 export function generateQuestions(): Question[] {
@@ -31,7 +31,6 @@ export function generateQuestions(): Question[] {
   const idGen = createIdGenerator()
   const getId = () => idGen.next().value
 
-  // Get datasets with proper typing
   const tabular = (ACCURACY_DATASETS.find(d => d.name === 'tabular')?.data.employees as Employee[]) ?? []
   const nested = (ACCURACY_DATASETS.find(d => d.name === 'nested')?.data.orders as Order[]) ?? []
   const analytics = (ACCURACY_DATASETS.find(d => d.name === 'analytics')?.data.metrics as AnalyticsMetric[]) ?? []
@@ -41,7 +40,6 @@ export function generateQuestions(): Question[] {
   const keyed = (ACCURACY_DATASETS.find(d => d.name === 'keyed')?.data.flags as Record<string, FeatureFlag>) ?? {}
   const nestedGroup = (ACCURACY_DATASETS.find(d => d.name === 'nested-group')?.data.contacts as Contact[]) ?? []
 
-  // Generate questions for each dataset
   questions.push(...generateTabularQuestions(tabular, getId))
   questions.push(...generateNestedQuestions(nested, getId))
   questions.push(...generateAnalyticsQuestions(analytics, getId))
@@ -51,10 +49,8 @@ export function generateQuestions(): Question[] {
   questions.push(...generateKeyedQuestions(keyed, getId))
   questions.push(...generateNestedGroupQuestions(nestedGroup, getId))
 
-  // Generate structure-awareness questions (tests format-native affordances)
   questions.push(...generateStructureQuestions(tabular, nested, analytics, github, eventLogs, getId))
 
-  // Generate structural-validation questions (tests ability to detect corrupted data)
   questions.push(...generateStructuralValidationQuestions(getId))
 
   return questions

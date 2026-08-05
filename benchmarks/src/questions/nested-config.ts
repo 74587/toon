@@ -3,14 +3,12 @@ import type { Question } from '../types.ts'
 import { QUESTION_LIMITS } from '../constants.ts'
 import { QuestionBuilder } from './utils.ts'
 
-/** Generate nested configuration questions */
 export function generateNestedConfigQuestions(config: NestedConfig | undefined, getId: () => string): Question[] {
   const questions: Question[] = []
 
   if (!config)
     return questions
 
-  // Field retrieval: top-level config values
   const fieldRetrievalQuestions = [
     {
       prompt: 'What is the environment in the configuration?',
@@ -77,7 +75,6 @@ export function generateNestedConfigQuestions(config: NestedConfig | undefined, 
     )
   }
 
-  // Aggregation: counts of nested structures
   const roleCount = Object.keys(config.permissions.roles).length
   const groupCount = Object.keys(config.permissions.groups).length
   const providerCount = config.authentication.providers.length
@@ -127,7 +124,6 @@ export function generateNestedConfigQuestions(config: NestedConfig | undefined, 
       .build(),
   )
 
-  // Aggregation: providers with admin scope
   const adminScopeProviderCount = config.authentication.providers.filter(p => p.scopes.includes('admin')).length
   questions.push(
     new QuestionBuilder()
@@ -140,7 +136,6 @@ export function generateNestedConfigQuestions(config: NestedConfig | undefined, 
       .build(),
   )
 
-  // Aggregation: feature flag details
   const enabledFeatures = Object.entries(config.features).filter(([_, f]) => f.enabled).length
   questions.push(
     new QuestionBuilder()
@@ -153,7 +148,6 @@ export function generateNestedConfigQuestions(config: NestedConfig | undefined, 
       .build(),
   )
 
-  // Aggregation: role permissions
   const adminPermissions = config.permissions.roles.admin?.permissions.length ?? 0
   questions.push(
     new QuestionBuilder()
@@ -166,7 +160,6 @@ export function generateNestedConfigQuestions(config: NestedConfig | undefined, 
       .build(),
   )
 
-  // Aggregation: additional nested counts
   const totalPermissions = Object.values(config.permissions.roles).reduce((sum, role) => sum + role.permissions.length, 0)
   const distinctPermissions = new Set(Object.values(config.permissions.roles).flatMap(r => r.permissions)).size
   const totalVariants = Object.values(config.features).reduce((sum, f) => sum + f.variants.length, 0)
@@ -225,7 +218,6 @@ export function generateNestedConfigQuestions(config: NestedConfig | undefined, 
       .build(),
   )
 
-  // Filtering: complex multi-condition queries
   const filteringQuestions = [
     {
       prompt: 'How many feature flags are enabled with rollout greater than 50%?',

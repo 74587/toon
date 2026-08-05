@@ -10,7 +10,7 @@ function printHead(label: string, encoded: string): void {
   console.log(encoded.split('\n').slice(0, 5).join('\n'))
 }
 
-// Keyed tabular form: `flags[N:]{fields}:` with one entry row per flag
+// Keyed tabular form: `flags[N:]{fields}:` with one entry row per flag.
 function verifyKeyed(label: string, dataset: Dataset): void {
   const flags = dataset.data.flags as Record<string, FeatureFlag>
   const encoded = encode(dataset.data)
@@ -27,14 +27,14 @@ function verifyKeyed(label: string, dataset: Dataset): void {
     )
   }
 
-  // A plain-object fallback would emit a bare `flags:` header with per-key expansion
+  // A plain-object fallback would emit a bare `flags:` header with per-key expansion.
   assert(
     !/^flags:\s*$/m.test(encoded),
     `${label}: encoder fell back to plain per-key objects (bare \`flags:\` header present)`,
   )
 }
 
-// Nested field groups: a tabular header carrying an inner field list
+// Nested field groups: a tabular header carrying an inner field list.
 function verifyNestedGroup(label: string, dataset: Dataset): void {
   const contacts = dataset.data.contacts as Contact[]
   const encoded = encode(dataset.data)
@@ -52,7 +52,7 @@ function verifyNestedGroup(label: string, dataset: Dataset): void {
   }
 }
 
-// Re-derive each generated ground truth from the dataset object in code
+// Re-derives each generated ground truth from the dataset object in code.
 function verifyKeyedGroundTruth(): void {
   const flags = findDataset(ACCURACY_DATASETS, 'keyed').data.flags as Record<string, FeatureFlag>
   const entries = Object.entries(flags)

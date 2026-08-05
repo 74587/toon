@@ -10,17 +10,16 @@ import { compareAnswers } from './normalize.ts'
 
 /** A model paired with its rate limit and lazy provider constructor. */
 export interface ModelDescriptor {
-  /** Provider model id; must equal the underlying LanguageModelV4.modelId */
+  /** Provider model id; must equal the underlying `LanguageModelV4.modelId`. */
   id: string
-  /** Requests-per-minute cap, or undefined for no limit */
+  /** Requests-per-minute cap, or `undefined` for no limit. */
   rpm?: number
-  /** Reasoning override for models that reject the default `none` (e.g. `grok-4.5` floors at `low`) */
+  /** Reasoning override for models that reject the default `none` (e.g. `grok-4.5` floors at `low`). */
   reasoning?: LanguageModelV4CallOptions['reasoning']
-  /** Lazily construct the provider model */
+  /** Constructs the provider model, lazily. */
   create: () => LanguageModelV4
 }
 
-/** Models used for evaluation */
 export const MODELS: ModelDescriptor[] = [
   { id: 'claude-haiku-4-5-20251001', rpm: 50, create: () => anthropic('claude-haiku-4-5-20251001') },
   { id: 'gemini-3.6-flash', rpm: 25, create: () => google('gemini-3.6-flash') },
@@ -28,7 +27,6 @@ export const MODELS: ModelDescriptor[] = [
   { id: 'grok-4.5', rpm: 25, reasoning: 'low', create: () => xai('grok-4.5') },
 ]
 
-/** Evaluate a single question with a specific format and model */
 export async function evaluateQuestion(
   {
     question,

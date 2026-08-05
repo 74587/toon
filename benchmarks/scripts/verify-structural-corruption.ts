@@ -9,7 +9,7 @@ function encode(formatName: string, name: string): string {
   return encodeDataset(FORMATS[formatName]!, findDataset(ACCURACY_DATASETS, name))
 }
 
-// TOON row lines are every line after the `employees[N]{...}:` header
+// TOON row lines are every line after the `employees[N]{...}:` header.
 function toonRowLines(text: string): string[] {
   return text.split('\n').slice(1)
 }
@@ -19,7 +19,7 @@ function toonDeclaredCount(text: string): number {
   return match ? Number(match[1]) : Number.NaN
 }
 
-// CSV data lines follow the `# employees` marker and the column header row
+// CSV data lines follow the `# employees` marker and the column header row.
 function csvDataLines(text: string): string[] {
   return text.split('\n').slice(2)
 }
@@ -28,7 +28,7 @@ function cellCount(line: string): number {
   return line.split(',').length
 }
 
-// --- TOON: length metadata still declares the original shape ---
+// #region TOON: length metadata still declares the original shape
 
 const toonTruncated = encode('toon', 'structural-validation-truncated')
 assert(toonDeclaredCount(toonTruncated) === 20, 'TOON truncated: header still declares [20]')
@@ -62,7 +62,9 @@ assert(
   'TOON missing-fields: exactly four rows have 6 cells (informational)',
 )
 
-// --- JSON/YAML/XML: corrupted variants stay parseable ---
+// #endregion
+
+// #region JSON/YAML/XML: corrupted variants stay parseable
 
 const jsonParsableFormats = ['json-pretty', 'json-compact'] as const
 const corruptedDatasets = [
@@ -105,7 +107,9 @@ for (const name of corruptedDatasets) {
   assert(isParsed, `xml ${name}: XMLParser.parse succeeds`)
 }
 
-// --- CSV: no length metadata, but a narrower row still surfaces width loss ---
+// #endregion
+
+// #region CSV: no length metadata, but a narrower row still surfaces width loss
 
 const csvTruncated = encode('csv', 'structural-validation-truncated')
 assert(csvDataLines(csvTruncated).length === 17, 'CSV truncated: 17 data lines remain')
@@ -116,5 +120,7 @@ assert(
   csvDataLines(csvWidth).filter(line => cellCount(line) === csvColumnCount - 1).length === 1,
   'CSV width-mismatch: exactly one data line is one cell short',
 )
+
+// #endregion
 
 reportAndExit('All structural corruption assertions passed')

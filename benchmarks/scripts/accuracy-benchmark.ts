@@ -16,7 +16,6 @@ import { getAllModelResults, hasModelResults, saveModelResults } from '../src/st
 import { encodeDataset } from '../src/structural-corruption.ts'
 import { ensureDir } from '../src/utils.ts'
 
-// Constants
 const PROGRESS_UPDATE_INTERVAL = 10
 const RATE_LIMIT_INTERVAL_MS = 60_000
 
@@ -28,7 +27,6 @@ function generateEvaluationTasks(questions: Question[]): { question: Question, f
 
   for (const question of questions) {
     for (const format of Object.values(FORMATS)) {
-      // Skip CSV for datasets that don't support it
       const dataset = ACCURACY_DATASETS.find(d => d.name === question.dataset)
       if (format.name === 'csv' && dataset && !supportsCSV(dataset))
         continue
@@ -40,7 +38,6 @@ function generateEvaluationTasks(questions: Question[]): { question: Question, f
   return tasks
 }
 
-/** Check which models already have saved results */
 async function checkExistingResults(activeModels: ModelDescriptor[]) {
   const existingModelResults: Record<string, boolean> = {}
 
@@ -53,7 +50,6 @@ async function checkExistingResults(activeModels: ModelDescriptor[]) {
   return existingModelResults
 }
 
-/** Create a progress updater function */
 function createProgressUpdater(spinner: ReturnType<typeof prompts.spinner>, total: number) {
   let completed = 0
 
@@ -66,7 +62,6 @@ function createProgressUpdater(spinner: ReturnType<typeof prompts.spinner>, tota
   }
 }
 
-/** Create a rate-limited queue for model evaluation */
 function createEvaluationQueue(rpm: number | undefined) {
   return new PQueue({
     concurrency: DEFAULT_CONCURRENCY,
@@ -75,7 +70,6 @@ function createEvaluationQueue(rpm: number | undefined) {
   })
 }
 
-// Prompt user to select which models to benchmark
 const modelChoices = MODELS.map(({ id }) => ({
   value: id,
   label: id,
@@ -108,7 +102,6 @@ if (DRY_RUN) {
 
 let questions = generateQuestions()
 
-// Apply dry run limits if enabled
 if (DRY_RUN && DRY_RUN_LIMITS.maxQuestions) {
   questions = questions.slice(0, DRY_RUN_LIMITS.maxQuestions)
 }
@@ -116,11 +109,11 @@ if (DRY_RUN && DRY_RUN_LIMITS.maxQuestions) {
 prompts.log.info(`Evaluating ${questions.length} questions`)
 prompts.log.info(`Testing ${Object.keys(FORMATS).length} formats`)
 
-// Evaluate each model separately and save results incrementally
+// Evaluate each model separately and save its results before moving on, so an
+// interrupted run keeps what it already paid for.
 for (const descriptor of activeModels) {
   const modelId = descriptor.id
 
-  // Skip if results already exist
   if (existingModelResults[modelId]) {
     prompts.log.info(`Skipping ${modelId} (results already exist)`)
     continue
@@ -139,10 +132,9 @@ for (const descriptor of activeModels) {
 
   const updateProgress = createProgressUpdater(evalSpinner, total)
 
-  // Queue all tasks
   const modelResultPromises = tasks.map(task =>
     queue.add(async () => {
-      // Format data on-demand
+      // Encode on demand, inside the queued task, rather than up front.
       const dataset = ACCURACY_DATASETS.find(d => d.name === task.question.dataset)!
       const formattedData = encodeDataset(task.format, dataset)
 
@@ -164,16 +156,14 @@ for (const descriptor of activeModels) {
 
   evalSpinner.stop(`Evaluation complete for ${modelId}`)
 
-  // Save results immediately for this model
   await saveModelResults(modelId, modelResults)
   prompts.log.success(`Saved results for ${modelId}`)
 }
 
-// Generate/regenerate markdown report from all available model results
 const reportSpinner = prompts.spinner()
 reportSpinner.start('Generating report from all model results')
 
-// Load all available model results (including any that were skipped)
+// Load every model's results, including the ones this run skipped.
 const allModelResults = await getAllModelResults()
 const allResults = Object.values(allModelResults).flat()
 

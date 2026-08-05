@@ -4,24 +4,16 @@ import * as url from 'node:url'
 export const ROOT_DIR: string = url.fileURLToPath(new URL('../../', import.meta.url))
 export const BENCHMARKS_DIR: string = url.fileURLToPath(new URL('../', import.meta.url))
 
-/** Default concurrency for parallel evaluations to prevent bursting */
+/** Default concurrency for parallel evaluations to prevent bursting. */
 export const DEFAULT_CONCURRENCY = 10
 
-/**
- * Enable dry run mode for quick testing with limited AI requests
- *
- * @remarks
- * Set via environment variable: `DRY_RUN=true`.
- */
+/** Dry run mode, which trades coverage for a quick run with few AI requests. */
 export const DRY_RUN: boolean = process.env.DRY_RUN === 'true'
 
-/** Limits applied during dry run mode */
 export const DRY_RUN_LIMITS = {
-  /** Maximum number of questions to evaluate */
   maxQuestions: 10,
 }
 
-/** Question type identifiers */
 export const QUESTION_TYPES = [
   'field-retrieval',
   'retrieval',
@@ -31,7 +23,6 @@ export const QUESTION_TYPES = [
   'structural-validation',
 ] as const
 
-/** Display names for question types */
 export const QUESTION_TYPE_LABELS = {
   'field-retrieval': 'Field Retrieval',
   'retrieval': 'Retrieval',
@@ -41,7 +32,6 @@ export const QUESTION_TYPE_LABELS = {
   'structural-validation': 'Structural Validation',
 } as const
 
-/** Dataset identifiers */
 export const DATASET_NAMES = [
   'tabular',
   'nested',
@@ -59,7 +49,6 @@ export const DATASET_NAMES = [
   'nested-group',
 ] as const
 
-/** Structure class identifiers */
 export const STRUCTURE_CLASSES = [
   'uniform',
   'semi-uniform',
@@ -67,7 +56,7 @@ export const STRUCTURE_CLASSES = [
   'deep',
 ] as const
 
-/** Threshold values for filtering and aggregation questions */
+/** Threshold values for filtering and aggregation questions. */
 export const QUESTION_THRESHOLDS = {
   tabular: {
     salaryRanges: [60000, 80000, 100000],
@@ -110,7 +99,6 @@ export const QUESTION_THRESHOLDS = {
   },
 } as const
 
-/** Question generation configuration */
 export const QUESTION_LIMITS = {
   tabular: {
     fieldRetrieval: 12,

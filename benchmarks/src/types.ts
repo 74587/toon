@@ -22,13 +22,13 @@ export interface DatasetMetadata {
  */
 export type StructuralCorruption
   = | { kind: 'control' }
-  // Number of trailing records to remove
+  // Number of trailing records to remove.
     | { kind: 'truncated', removeRecordCount: number }
-  // Records appended beyond the declared length
+  // Records appended beyond the declared length.
     | { kind: 'extra-rows', appendRecords: Record<string, unknown>[] }
-  // Record indices to narrow and the field dropped from each
+  // Record indices to narrow and the field dropped from each.
     | { kind: 'width-mismatch', targetRecordIndices: number[], targetFieldName: string }
-  // Record indices to edit and the field removed from each
+  // Record indices to edit and the field removed from each.
     | { kind: 'missing-fields', targetRecordIndices: number[], targetFieldName: string }
 
 /** Kind of structural corruption applied to a dataset's encoded text. */
@@ -39,7 +39,7 @@ export interface Dataset {
   description: string
   data: Record<string, any>
   metadata: DatasetMetadata
-  /** Post-encode text corruption applied only to structural-validation datasets */
+  /** Post-encode text corruption applied only to structural-validation datasets. */
   corruption?: StructuralCorruption
 }
 
@@ -54,7 +54,6 @@ export interface Question {
    * @default 'string'
    */
   answerType?: AnswerType
-  /** Options for answer normalization and comparison. */
   normalizationOptions?: Partial<NormalizationOptions>
 }
 

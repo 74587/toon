@@ -3,11 +3,9 @@ import type { Question } from '../types.ts'
 import { QUESTION_LIMITS } from '../constants.ts'
 import { QuestionBuilder, rotateQuestions, SAMPLE_STRIDES } from './utils.ts'
 
-/** Generate event log questions */
 export function generateEventLogsQuestions(logs: EventLog[], getId: () => string): Question[] {
   const questions: Question[] = []
 
-  // Field retrieval: log metadata
   const logFieldGenerators: Array<(log: EventLog, getId: () => string) => Question> = [
     (log, getId) => new QuestionBuilder()
       .id(getId())
@@ -51,7 +49,6 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
     getId,
   ))
 
-  // Aggregation: basic statistics
   const totalLogs = logs.length
   const avgResponseTime = logs.reduce((sum, l) => sum + l.responseTime, 0) / logs.length
 
@@ -75,7 +72,6 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
       .build(),
   )
 
-  // Aggregation: by level
   const levels = [...new Set(logs.map(l => l.level))]
   for (const level of levels) {
     const count = logs.filter(l => l.level === level).length
@@ -91,7 +87,6 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
     )
   }
 
-  // Aggregation: by endpoint
   const endpoints = [...new Set(logs.map(l => l.endpoint))]
   for (const endpoint of endpoints.slice(0, QUESTION_LIMITS.eventLogs.aggregationEndpoints)) {
     const count = logs.filter(l => l.endpoint === endpoint).length
@@ -107,7 +102,6 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
     )
   }
 
-  // Aggregation: by status code range
   const errorCount = logs.filter(l => l.statusCode >= 400).length
   const successCount = logs.filter(l => l.statusCode >= 200 && l.statusCode < 300).length
 
@@ -130,7 +124,6 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
       .build(),
   )
 
-  // Aggregation: retryable errors
   const retryableErrorCount = logs.filter(l => l.error?.retryable === true).length
   questions.push(
     new QuestionBuilder()
@@ -143,9 +136,8 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
       .build(),
   )
 
-  // Filtering: multi-condition (level AND status)
   for (const level of levels.slice(0, QUESTION_LIMITS.eventLogs.filteringLevelAndStatus)) {
-    // Skip `info` level as it never has status >= 400 by design
+    // Skip the `info` level as it never has status >= 400 by design.
     if (level === 'info')
       continue
 
@@ -162,7 +154,6 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
     )
   }
 
-  // Filtering: endpoint AND status
   for (const endpoint of endpoints.slice(0, QUESTION_LIMITS.eventLogs.filteringEndpointAndStatus)) {
     const count = logs.filter(l => l.endpoint === endpoint && l.statusCode >= 500).length
     questions.push(
@@ -177,7 +168,6 @@ export function generateEventLogsQuestions(logs: EventLog[], getId: () => string
     )
   }
 
-  // Filtering: endpoint AND retryable error
   for (const endpoint of endpoints.slice(0, QUESTION_LIMITS.eventLogs.filteringEndpointRetryable)) {
     const count = logs.filter(l => l.endpoint === endpoint && l.error?.retryable === true).length
     questions.push(

@@ -3,14 +3,12 @@ import type { Question } from '../types.ts'
 import { QUESTION_LIMITS } from '../constants.ts'
 import { QuestionBuilder, rotateQuestions, SAMPLE_STRIDES } from './utils.ts'
 
-/** Generate nested-group contact questions */
 export function generateNestedGroupQuestions(contacts: Contact[], getId: () => string): Question[] {
   const questions: Question[] = []
 
   if (contacts.length === 0)
     return questions
 
-  // Field retrieval: primitive and nested-object fields by contact name
   const contactFieldGenerators: Array<(contact: Contact, getId: () => string) => Question> = [
     (contact, getId) => new QuestionBuilder()
       .id(getId())
@@ -62,7 +60,6 @@ export function generateNestedGroupQuestions(contacts: Contact[], getId: () => s
     getId,
   ))
 
-  // Structure awareness: row count, top-level and nested field lists, positional field
   const lastContact = contacts.at(-1)!
 
   questions.push(

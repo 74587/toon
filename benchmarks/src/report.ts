@@ -11,16 +11,16 @@ import { createProgressBar, tokenize, wilsonInterval } from './utils.ts'
 const EFFICIENCY_CHART_STYLE: 'vertical' | 'horizontal' = 'horizontal'
 
 // Datasets flat enough for CSV to represent – the shared population every format
-// can answer, used to compare CSV against the other formats on equal footing
+// can answer, used to compare CSV against the other formats on equal footing.
 const FLAT_DATASET_NAMES: ReadonlySet<DatasetName> = new Set(
   ACCURACY_DATASETS.filter(supportsCSV).map(dataset => dataset.name),
 )
 
 /**
- * Calculate token counts for all format+dataset combinations
+ * Calculates token counts for all format+dataset combinations.
  *
  * @remarks
- * Includes primer tokens for fairer comparison across formats
+ * Includes primer tokens for a fairer comparison across formats.
  */
 export function calculateTokenCounts(
   formats: Record<string, Format>,
@@ -29,13 +29,11 @@ export function calculateTokenCounts(
 
   for (const [formatName, format] of Object.entries(formats)) {
     for (const dataset of ACCURACY_DATASETS) {
-      // Skip CSV for datasets that don't support it
       if (formatName === 'csv' && !supportsCSV(dataset))
         continue
 
       const formattedData = encodeDataset(format, dataset)
       const primer = format.primer
-      // Include primer in token count for fair comparison
       const fullPrompt = primer ? `${primer}\n\n${formattedData}` : formattedData
       const key = `${formatName}-${dataset.name}`
       tokenCounts[key] = tokenize(fullPrompt)
@@ -46,7 +44,7 @@ export function calculateTokenCounts(
 }
 
 /**
- * Calculate per-format statistics from evaluation results
+ * Calculates per-format statistics from evaluation results.
  *
  * @remarks
  * When `tokenDatasetNames` is provided, the average-token figure is restricted
@@ -66,14 +64,13 @@ export function calculateFormatResults(
     const totalCount = formatResults.length
     const accuracy = correctCount / totalCount
 
-    // Calculate average tokens across the in-scope datasets for this format
     const formatTokenEntries = Object.entries(tokenCounts)
       .filter(([key]) => {
         if (!key.startsWith(`${formatName}-`))
           return false
 
-        // Slice after the known formatName prefix – both format and dataset
-        // names contain hyphens, so splitting on '-' would be ambiguous
+        // Slice after the known `formatName` prefix – both format and dataset
+        // names contain hyphens, so splitting on '-' would be ambiguous.
         if (!tokenDatasetNames)
           return true
 
@@ -94,7 +91,6 @@ export function calculateFormatResults(
   }).sort((a, b) => b.accuracy - a.accuracy)
 }
 
-/** Generate consolidated retrieval accuracy report */
 export function generateAccuracyReport(
   results: EvaluationResult[],
   tokenCounts: Record<string, number>,
@@ -105,14 +101,14 @@ export function generateAccuracyReport(
   const modelNames = modelIds.filter(id => results.some(r => r.model === id))
 
   // Overall track excludes CSV entirely – it cannot represent nested datasets,
-  // so its numbers would otherwise cover an easier subset than every other format
+  // so its numbers would otherwise cover an easier subset than every other format.
   const allDatasetsFormatResults = calculateFormatResults(
     results.filter(r => r.format !== 'csv'),
     tokenCounts,
   )
 
   // Flat-only track puts every format on the same question population, the one
-  // CSV can actually represent, so CSV can be compared fairly here
+  // CSV can actually represent, so CSV can be compared fairly here.
   const flatQuestionIds = new Set(
     questions.filter(question => FLAT_DATASET_NAMES.has(question.dataset)).map(question => question.id),
   )
@@ -124,7 +120,7 @@ export function generateAccuracyReport(
   const flatOnlyCsvResult = flatOnlyFormatResults.find(r => r.format === 'csv')
 
   // Detailed breakdowns recompute accuracy from raw results, so keeping CSV in
-  // their full-population input is intentional
+  // their full-population input is intentional.
   const fullFormatResults = calculateFormatResults(results, tokenCounts)
 
   return `
@@ -152,7 +148,7 @@ ${generateDetailedAccuracyReport(fullFormatResults, results, questions, tokenCou
 }
 
 /**
- * Render the flat-only accuracy table, the one population CSV can also answer
+ * Renders the flat-only accuracy table, the one population CSV can also answer.
  *
  * @remarks
  * The all-datasets figures are not repeated here – the efficiency ranking above
@@ -182,13 +178,12 @@ ${rows}
 `.trim()
 }
 
-/** Generate dataset catalog section */
 function generateDatasetCatalog(datasets: Dataset[]): string {
   const rows = datasets.map((dataset) => {
     const csvSupport = supportsCSV(dataset) ? '✓' : '✗'
     const first = Object.values(dataset.data)[0]
     // Keyed maps expose their entries as an object, not an array – count keys so
-    // the catalog reports the real entry count instead of a misleading 1
+    // the catalog reports the real entry count instead of a misleading 1.
     const rowCount = Array.isArray(first)
       ? first.length
       : (first && typeof first === 'object' ? Object.keys(first).length : 1)
@@ -217,7 +212,6 @@ ${rows}
 `.trim()
 }
 
-/** Generate efficiency ranking report */
 function generateEfficiencyRankingReport(
   allDatasetsFormatResults: FormatResult[],
   flatOnlyCsvResult: FormatResult | undefined,
@@ -227,7 +221,7 @@ function generateEfficiencyRankingReport(
   const toon = allDatasetsFormatResults.find(r => r.format === 'toon')
   const json = allDatasetsFormatResults.find(r => r.format === 'json-pretty')
 
-  // Build efficiency ranking (accuracy per 1k tokens) – input is already CSV-free
+  // Build efficiency ranking (accuracy per 1k tokens) – input is already CSV-free.
   const efficiencyRanking = allDatasetsFormatResults
     .map((fr) => {
       const efficiency = (fr.accuracy * 100) / (fr.totalTokens / 1000)
@@ -246,7 +240,6 @@ function generateEfficiencyRankingReport(
     ? generateVerticalEfficiencyChart(efficiencyRanking)
     : generateHorizontalEfficiencyChart(efficiencyRanking)
 
-  // Build summary text
   let summary = ''
   if (toon && json) {
     const toonVsJson = `**${(toon.accuracy * 100).toFixed(1)}%** accuracy (vs JSON's ${(json.accuracy * 100).toFixed(1)}%)`
@@ -254,10 +247,10 @@ function generateEfficiencyRankingReport(
     summary = `TOON achieves ${toonVsJson} while using ${tokenSavings}.`
   }
 
-  // Add CSV note if available
   let csvNote = ''
   if (flatOnlyCsvResult) {
-    // CSV totalCount is evaluations (questions × models), so divide by number of models to get question count
+    // CSV `totalCount` is evaluations (questions × models), so divide by the
+    // number of models to get the question count.
     const csvQuestionCount = flatOnlyCsvResult.totalCount / modelCount
     csvNote = `> [!NOTE]\n> CSV is excluded from the ranking as it only supports ${csvQuestionCount} of ${totalQuestions} questions (flat tabular data only). While CSV is highly token-efficient for simple tabular data, it cannot represent nested structures that other formats handle.`
   }
@@ -278,7 +271,6 @@ ${csvNote}
 `.trim()
 }
 
-/** Generate detailed accuracy report with breakdowns and methodology */
 function generateDetailedAccuracyReport(
   formatResults: FormatResult[],
   results: EvaluationResult[],
@@ -296,7 +288,6 @@ function generateDetailedAccuracyReport(
   const questionTypeBreakdown = generateQuestionTypeBreakdown(formatResults, results, questions)
   const totalQuestions = [...new Set(results.map(r => r.questionId))].length
 
-  // Calculate number of formats and evaluations
   const formatCount = formatResults.length
   const totalEvaluations = totalQuestions * formatCount * modelNames.length
 
@@ -336,7 +327,7 @@ What the datasets contain, how the questions are generated, and how answers are 
 `.trim()
 }
 
-/** Generate ASCII bar chart showing per-model accuracy across formats */
+/** Generates an ASCII bar chart of per-model accuracy across formats. */
 function generateModelBreakdown(
   formatResults: FormatResult[],
   results: EvaluationResult[],
@@ -375,19 +366,18 @@ function generateModelBreakdown(
       return `${prefix}${displayName.padEnd(maxDisplayNameWidth)}   ${bar}   ${accuracyString} ${marginString} ${countString}`
     }).join('\n')
 
-    // Add blank line before model name, except for first model
+    // Add a blank line before the model name, except for the first model.
     return `${i > 0 ? '\n' : ''}${modelName}\n${formatLines}`
   }).join('\n')
 }
 
-/** Generate per-dataset performance breakdown tables */
 function generateDatasetBreakdown(
   formatResults: FormatResult[],
   results: EvaluationResult[],
   questions: Question[],
   tokenCounts: Record<string, number>,
 ): string {
-  // Build question ID to dataset mapping for O(1) lookups
+  // Build a question id to dataset mapping for O(1) lookups.
   const questionDatasetMap = new Map(questions.map(q => [q.id, q.dataset]))
 
   return ACCURACY_DATASETS.map((dataset) => {
@@ -404,7 +394,6 @@ function generateDatasetBreakdown(
       const totalCount = formatDatasetResults.length
       const accuracy = totalCount > 0 ? correctCount / totalCount : 0
 
-      // Get token count for this dataset+format
       const tokenKey = `${fr.format}-${dataset.name}`
       const tokens = tokenCounts[tokenKey] || fr.totalTokens
 
@@ -420,7 +409,6 @@ function generateDatasetBreakdown(
     if (datasetResults.length === 0)
       return ''
 
-    // Sort by efficiency
     datasetResults.sort((a, b) => {
       const effA = (a.accuracy ** 2) / (a.tokens / 1000)
       const effB = (b.accuracy ** 2) / (b.tokens / 1000)
@@ -442,18 +430,15 @@ ${tableRows}
   }).filter(Boolean).join('\n').trim()
 }
 
-/** Generate question type breakdown table */
 function generateQuestionTypeBreakdown(
   formatResults: FormatResult[],
   results: EvaluationResult[],
   questions: Question[],
 ): string {
-  // Build header
   const formatNames = formatResults.map(fr => getFormat(fr.format).displayName)
   const header = `| Question Type | ${formatNames.join(' | ')} |`
   const separator = `| ------------- | ${formatNames.map(() => '----').join(' | ')} |`
 
-  // Build rows
   const rows = QUESTION_TYPES.map((type) => {
     const questionIds = questions.filter(q => q.type === type).map(q => q.id)
     const typeResults = results.filter(r => questionIds.includes(r.questionId))
@@ -483,7 +468,6 @@ ${rows.join('\n')}
 `.trim()
 }
 
-/** Generate horizontal bar chart for efficiency ranking */
 function generateHorizontalEfficiencyChart(
   ranking: EfficiencyRanking[],
 ): string {
@@ -510,17 +494,14 @@ function generateHorizontalEfficiencyChart(
     .join('\n')
 }
 
-/** Generate vertical bar chart for efficiency ranking */
 function generateVerticalEfficiencyChart(
   ranking: EfficiencyRanking[],
 ): string {
   const maxEfficiency = Math.max(...ranking.map(r => r.efficiency))
   const chartHeight = 8
 
-  // Generate rows from top to bottom
   const rows: string[] = []
 
-  // Y-axis and bars
   for (let i = chartHeight; i >= 0; i--) {
     const threshold = (i / chartHeight) * maxEfficiency
     const yLabel = i === chartHeight || i === Math.floor(chartHeight / 2) || i === 0
@@ -532,7 +513,6 @@ function generateVerticalEfficiencyChart(
         const barHeight = (r.efficiency / maxEfficiency) * chartHeight
         let char = ' '
         if (barHeight >= i) {
-          // Use different characters for visual distinction
           if (ranking.indexOf(r) === 0)
             char = '▓' // Top format
           else if (ranking.indexOf(r) <= 2)
@@ -548,11 +528,10 @@ function generateVerticalEfficiencyChart(
     rows.push(`${yLabel}│  ${bars}`)
   }
 
-  // X-axis
   const axis = `    └──${ranking.map(() => '┴').join('────')}──`
   rows.push(axis)
 
-  // Format labels (split long names into multiple rows)
+  // Format labels, with a long name split across two rows.
   const formatRow1 = ranking
     .map((r) => {
       const parts = r.format.split('-')

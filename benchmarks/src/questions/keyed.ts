@@ -3,7 +3,6 @@ import type { Question } from '../types.ts'
 import { QUESTION_LIMITS } from '../constants.ts'
 import { QuestionBuilder, rotateQuestions, SAMPLE_STRIDES } from './utils.ts'
 
-/** Generate keyed feature flag questions */
 export function generateKeyedQuestions(flags: Record<string, FeatureFlag>, getId: () => string): Question[] {
   const questions: Question[] = []
   const entries = Object.entries(flags)
@@ -11,7 +10,6 @@ export function generateKeyedQuestions(flags: Record<string, FeatureFlag>, getId
   if (entries.length === 0)
     return questions
 
-  // Field retrieval: look up individual flags by their map key
   const flagFieldGenerators: Array<(entry: [string, FeatureFlag], getId: () => string) => Question> = [
     ([key, flag], getId) => new QuestionBuilder()
       .id(getId())
@@ -47,7 +45,6 @@ export function generateKeyedQuestions(flags: Record<string, FeatureFlag>, getId
     getId,
   ))
 
-  // Structure awareness: entry count, field lists, and positional field names
   const [lastKey, lastFlag] = entries.at(-1)!
 
   questions.push(

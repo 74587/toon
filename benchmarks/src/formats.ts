@@ -4,23 +4,17 @@ import { XMLBuilder } from 'fast-xml-parser'
 import { stringify as stringifyYAML } from 'yaml'
 import { encode as encodeToon } from '../../packages/toon/src/index.ts'
 
-/**
- * Everything a caller must know about one data format.
- *
- * @remarks
- * A single descriptor unifies the encoder, the neutral parse hint, the code
- * fence tag, and the human-readable label so a format is defined in one place.
- */
+/** Everything a caller must know about one data format, defined in one place. */
 export interface Format {
-  /** Stable id, also the `FORMATS` key and results/token-map key */
+  /** Stable id, also the `FORMATS` key and results/token-map key. */
   name: string
-  /** Dataset payload to textual representation */
+  /** Dataset payload to textual representation. */
   encode: (data: unknown) => string
-  /** Neutral parse hint prepended to prompts */
+  /** Neutral parse hint prepended to prompts. */
   primer: string
-  /** Code-fence language tag */
+  /** Code-fence language tag. */
   fence: string
-  /** Human-readable label for tables and charts */
+  /** Human-readable label for tables and charts. */
   displayName: string
 }
 
@@ -78,13 +72,11 @@ export const FORMATS: Record<string, Format> = {
 }
 
 /**
- * Look up a format descriptor by name.
+ * Looks up a format descriptor by name.
  *
  * @remarks
  * Throws on unknown names so a missing format fails loudly instead of degrading
  * silently.
- *
- * @param name - Format id, also the `FORMATS` key
  */
 export function getFormat(name: string): Format {
   const format = FORMATS[name]
@@ -95,7 +87,7 @@ export function getFormat(name: string): Format {
 }
 
 /**
- * Convert data to CSV format
+ * Converts data to CSV format.
  *
  * @remarks
  * Limitations: CSV is designed for flat tabular data only.
@@ -112,7 +104,6 @@ export function getFormat(name: string): Format {
 function toCSV(data: unknown): string {
   const sections: string[] = []
 
-  // Handle top-level object with arrays
   if (typeof data === 'object' && data !== null && !Array.isArray(data)) {
     for (const [key, value] of Object.entries(data)) {
       if (Array.isArray(value) && value.length > 0) {
@@ -123,7 +114,6 @@ function toCSV(data: unknown): string {
     return sections.join('\n').trim()
   }
 
-  // Root-level array
   if (Array.isArray(data) && data.length > 0) {
     return stringifyCSV(data, { header: true }).trim()
   }
@@ -131,15 +121,6 @@ function toCSV(data: unknown): string {
   return ''
 }
 
-/**
- * Convert data to XML format
- *
- * @remarks
- * Uses `fast-xml-parser` to generate well-formatted XML with:
- * - 2-space indentation for readability
- * - Empty nodes suppressed
- * - Proper escaping of special characters
- */
 function toXML(data: unknown): string {
   const builder = new XMLBuilder({
     format: true,
@@ -151,7 +132,7 @@ function toXML(data: unknown): string {
 }
 
 /**
- * Check if a dataset supports CSV format
+ * Checks whether a dataset supports CSV format.
  *
  * @remarks
  * CSV is only suitable for flat tabular data. Datasets with nested structures
