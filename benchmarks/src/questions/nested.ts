@@ -6,6 +6,7 @@ import { QuestionBuilder, rotateQuestions, SAMPLE_STRIDES } from './utils.ts'
 export function generateNestedQuestions(orders: Order[], getId: () => string): Question[] {
   const questions: Question[] = []
 
+  // #region Field retrieval: order totals and statuses
   const orderFieldGenerators: Array<(order: Order, getId: () => string) => Question> = [
     (order, getId) => new QuestionBuilder()
       .id(getId())
@@ -33,7 +34,9 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
     SAMPLE_STRIDES.ORDER_FIELD,
     getId,
   ))
+  // #endregion
 
+  // #region Field retrieval: customer info and order dates
   const customerFieldGenerators: Array<(order: Order, getId: () => string) => Question> = [
     (order, getId) => new QuestionBuilder()
       .id(getId())
@@ -79,12 +82,16 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
     1,
     getId,
   ))
+  // #endregion
 
+  // #region Aggregation: totals and averages
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0)
   const avgOrderValue = totalRevenue / orders.length
   const totalOrders = orders.length
   const maxOrderValue = Math.max(...orders.map(o => o.total))
+  // #endregion
 
+  // #region Count by status
   const statuses = [...new Set(orders.map(o => o.status))]
   for (const status of statuses.slice(0, QUESTION_LIMITS.nested.aggregationStatuses)) {
     const count = orders.filter(o => o.status === status).length
@@ -99,6 +106,7 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
         .build(),
     )
   }
+  // #endregion
 
   questions.push(
     new QuestionBuilder()
@@ -138,6 +146,7 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
       .build(),
   )
 
+  // #region Aggregation: high-value orders (single-condition filter)
   for (const threshold of QUESTION_THRESHOLDS.nested.highValueOrders) {
     const count = orders.filter(o => o.total > threshold).length
     questions.push(
@@ -151,7 +160,9 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
         .build(),
     )
   }
+  // #endregion
 
+  // #region Filtering: multi-condition queries (status AND value)
   const orderStatuses = [...new Set(orders.map(o => o.status))]
   for (const status of orderStatuses.slice(0, QUESTION_LIMITS.nested.filteringStatusAndValue)) {
     const count = orders.filter(
@@ -168,7 +179,9 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
         .build(),
     )
   }
+  // #endregion
 
+  // #region Filtering: status AND items count (multi-condition)
   for (const status of orderStatuses.slice(0, QUESTION_LIMITS.nested.filteringStatusAndItems)) {
     const count = orders.filter(
       o => o.status === status && o.items.length >= QUESTION_THRESHOLDS.nested.itemCountThreshold,
@@ -184,7 +197,9 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
         .build(),
     )
   }
+  // #endregion
 
+  // #region Filtering: total AND items count (multi-condition)
   for (const threshold of QUESTION_THRESHOLDS.nested.totalThresholdsForItems) {
     const count = orders.filter(
       o => o.total > threshold && o.items.length >= QUESTION_THRESHOLDS.nested.itemCountThreshold,
@@ -200,6 +215,7 @@ export function generateNestedQuestions(orders: Order[], getId: () => string): Q
         .build(),
     )
   }
+  // #endregion
 
   return questions
 }

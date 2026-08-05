@@ -34,6 +34,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
+  // #region Field list: Employee fields
   // Tests field name awareness.
   const employeeFields = 'id,name,email,department,salary,yearsExperience,active'
   questions.push(
@@ -46,6 +47,7 @@ export function generateStructureQuestions(
       .answerType('csv-list-ordered')
       .build(),
   )
+  // #endregion
 
   // Tests TOON's `{fields}` syntax.
   questions.push(
@@ -59,6 +61,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
+  // #region Last row: Last employee's department
   // Tests finding the last row from the declared length.
   const lastEmployee = employees.at(-1)!
   questions.push(
@@ -71,7 +74,9 @@ export function generateStructureQuestions(
       .answerType('string')
       .build(),
   )
+  // #endregion
 
+  // #region Last row: Last employee's name
   questions.push(
     new QuestionBuilder()
       .id(getId())
@@ -82,6 +87,7 @@ export function generateStructureQuestions(
       .answerType('string')
       .build(),
   )
+  // #endregion
 
   // Tests schema awareness.
   questions.push(
@@ -110,6 +116,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
+  // #region Field list: Order fields
   const orderFields = 'orderId,customer,items,subtotal,tax,total,status,orderDate'
   questions.push(
     new QuestionBuilder()
@@ -121,7 +128,9 @@ export function generateStructureQuestions(
       .answerType('csv-list-ordered')
       .build(),
   )
+  // #endregion
 
+  // #region Nested count: Items in specific order
   const orderWithManyItems = orders.reduce((max, order) =>
     order.items.length > max.items.length ? order : max,
   )
@@ -135,7 +144,9 @@ export function generateStructureQuestions(
       .answerType('integer')
       .build(),
   )
+  // #endregion
 
+  // #region Nested field list: Item fields
   const itemFields = 'sku,name,quantity,price'
   questions.push(
     new QuestionBuilder()
@@ -147,7 +158,9 @@ export function generateStructureQuestions(
       .answerType('csv-list-ordered')
       .build(),
   )
+  // #endregion
 
+  // #region Last row: Last order's status
   const lastOrder = orders.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -159,7 +172,9 @@ export function generateStructureQuestions(
       .answerType('string')
       .build(),
   )
+  // #endregion
 
+  // #region Customer field list
   const customerFields = 'id,name,email,phone'
   questions.push(
     new QuestionBuilder()
@@ -171,6 +186,7 @@ export function generateStructureQuestions(
       .answerType('csv-list-ordered')
       .build(),
   )
+  // #endregion
 
   // #endregion
 
@@ -187,6 +203,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
+  // #region Field list: Metric fields
   const metricFields = 'date,views,clicks,conversions,revenue,bounceRate'
   questions.push(
     new QuestionBuilder()
@@ -198,6 +215,7 @@ export function generateStructureQuestions(
       .answerType('csv-list-ordered')
       .build(),
   )
+  // #endregion
 
   // Tests TOON's `{fields}` syntax.
   questions.push(
@@ -211,6 +229,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
+  // #region Last row: Last metric's date
   const lastMetric = metrics.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -222,6 +241,7 @@ export function generateStructureQuestions(
       .answerType('string')
       .build(),
   )
+  // #endregion
 
   questions.push(
     new QuestionBuilder()
@@ -249,6 +269,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
+  // #region Field list: Repository fields
   const repoFields = 'id,name,repo,description,stars,watchers,forks,defaultBranch,createdAt,updatedAt,pushedAt'
   questions.push(
     new QuestionBuilder()
@@ -260,6 +281,7 @@ export function generateStructureQuestions(
       .answerType('csv-list-ordered')
       .build(),
   )
+  // #endregion
 
   // Tests TOON's `{fields}` syntax.
   questions.push(
@@ -273,6 +295,7 @@ export function generateStructureQuestions(
       .build(),
   )
 
+  // #region Last row: Last repo's name
   const lastRepo = repos.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -284,6 +307,7 @@ export function generateStructureQuestions(
       .answerType('string')
       .build(),
   )
+  // #endregion
 
   questions.push(
     new QuestionBuilder()
@@ -312,6 +336,7 @@ export function generateStructureQuestions(
   )
 
   // Includes the optional `error` field, hence the unordered comparison.
+  // #region Field list: Base log fields (including optional error)
   const logFields = 'timestamp,level,endpoint,statusCode,responseTime,userId,error'
   questions.push(
     new QuestionBuilder()
@@ -323,7 +348,9 @@ export function generateStructureQuestions(
       .answerType('csv-list-unordered')
       .build(),
   )
+  // #endregion
 
+  // #region Last row: Last log's level
   const lastLog = logs.at(-1)!
   questions.push(
     new QuestionBuilder()
@@ -335,6 +362,7 @@ export function generateStructureQuestions(
       .answerType('string')
       .build(),
   )
+  // #endregion
 
   // #endregion
 

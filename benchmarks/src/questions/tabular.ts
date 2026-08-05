@@ -6,6 +6,7 @@ import { QuestionBuilder, rotateQuestions, SAMPLE_STRIDES } from './utils.ts'
 export function generateTabularQuestions(employees: Employee[], getId: () => string): Question[] {
   const questions: Question[] = []
 
+  // #region Field retrieval: specific employees
   const fieldGenerators: Array<(emp: Employee, getId: () => string) => Question> = [
     (emp, getId) => new QuestionBuilder()
       .id(getId())
@@ -56,7 +57,9 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
     SAMPLE_STRIDES.EMPLOYEE_FIELD,
     getId,
   ))
+  // #endregion
 
+  // #region Aggregation: count by department
   const departments = [...new Set(employees.map(e => e.department))]
   for (const dept of departments.slice(0, QUESTION_LIMITS.tabular.aggregationDepartments)) {
     const count = employees.filter(e => e.department === dept).length
@@ -71,7 +74,9 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
         .build(),
     )
   }
+  // #endregion
 
+  // #region Aggregation: salary ranges (single-condition filters)
   for (const threshold of QUESTION_THRESHOLDS.tabular.salaryRanges) {
     const count = employees.filter(e => e.salary > threshold).length
     questions.push(
@@ -85,7 +90,9 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
         .build(),
     )
   }
+  // #endregion
 
+  // #region Aggregation: totals and averages
   const totalEmployees = employees.length
   const avgSalary = Math.round(employees.reduce((sum, e) => sum + e.salary, 0) / totalEmployees)
   const activeCount = employees.filter(e => e.active).length
@@ -125,7 +132,9 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
       .answerType('integer')
       .build(),
   )
+  // #endregion
 
+  // #region Filtering: count by department with salary filter (multi-condition)
   for (const dept of departments.slice(0, QUESTION_LIMITS.tabular.filteringMultiConditionDepartments)) {
     const count = employees.filter(
       e => e.department === dept && e.salary > QUESTION_THRESHOLDS.tabular.departmentSalaryThreshold,
@@ -141,7 +150,9 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
         .build(),
     )
   }
+  // #endregion
 
+  // #region Filtering: active employees by experience (multi-condition)
   for (const exp of QUESTION_THRESHOLDS.tabular.experienceYears.slice(0, QUESTION_LIMITS.tabular.filteringExperience)) {
     const count = employees.filter(e => e.yearsExperience > exp && e.active).length
     questions.push(
@@ -155,7 +166,9 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
         .build(),
     )
   }
+  // #endregion
 
+  // #region Filtering: department by experience (multi-condition)
   for (const dept of departments.slice(0, QUESTION_LIMITS.tabular.filteringDepartmentExp)) {
     const count = employees.filter(
       e => e.department === dept && e.yearsExperience > QUESTION_THRESHOLDS.tabular.departmentExperienceThreshold,
@@ -171,7 +184,9 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
         .build(),
     )
   }
+  // #endregion
 
+  // #region Filtering: department by active status (multi-condition)
   for (const dept of departments.slice(0, QUESTION_LIMITS.tabular.filteringDepartmentActive)) {
     const count = employees.filter(e => e.department === dept && e.active).length
     questions.push(
@@ -185,6 +200,7 @@ export function generateTabularQuestions(employees: Employee[], getId: () => str
         .build(),
     )
   }
+  // #endregion
 
   return questions
 }

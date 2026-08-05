@@ -9,6 +9,7 @@ export function generateNestedGroupQuestions(contacts: Contact[], getId: () => s
   if (contacts.length === 0)
     return questions
 
+  // #region Field retrieval: primitive and nested-object fields by contact name
   const contactFieldGenerators: Array<(contact: Contact, getId: () => string) => Question> = [
     (contact, getId) => new QuestionBuilder()
       .id(getId())
@@ -59,7 +60,9 @@ export function generateNestedGroupQuestions(contacts: Contact[], getId: () => s
     SAMPLE_STRIDES.CONTACT_FIELD,
     getId,
   ))
+  // #endregion
 
+  // #region Structure awareness: row count, top-level and nested field lists, positional field
   const lastContact = contacts.at(-1)!
 
   questions.push(
@@ -112,6 +115,7 @@ export function generateNestedGroupQuestions(contacts: Contact[], getId: () => s
       .answerType('string')
       .build(),
   )
+  // #endregion
 
   return questions
 }

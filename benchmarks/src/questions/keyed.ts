@@ -10,6 +10,7 @@ export function generateKeyedQuestions(flags: Record<string, FeatureFlag>, getId
   if (entries.length === 0)
     return questions
 
+  // #region Field retrieval: look up individual flags by their map key
   const flagFieldGenerators: Array<(entry: [string, FeatureFlag], getId: () => string) => Question> = [
     ([key, flag], getId) => new QuestionBuilder()
       .id(getId())
@@ -44,7 +45,9 @@ export function generateKeyedQuestions(flags: Record<string, FeatureFlag>, getId
     SAMPLE_STRIDES.FLAG_FIELD,
     getId,
   ))
+  // #endregion
 
+  // #region Structure awareness: entry count, field lists, and positional field names
   const [lastKey, lastFlag] = entries.at(-1)!
 
   questions.push(
@@ -89,6 +92,7 @@ export function generateKeyedQuestions(flags: Record<string, FeatureFlag>, getId
       .answerType('integer')
       .build(),
   )
+  // #endregion
 
   return questions
 }
