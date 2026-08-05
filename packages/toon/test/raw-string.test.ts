@@ -87,6 +87,10 @@ describe('rawString', () => {
       expect(() => rawString('note\n# hidden')).toThrowError(TypeError)
     })
 
+    it('throws when a byte-order mark precedes the comment marker', () => {
+      expect(() => rawString('\u{FEFF}#hi')).toThrowError(TypeError)
+    })
+
     it('allows the comment marker after other content on the same line', () => {
       expect(encode({ tag: rawString('a #tag') })).toBe('tag: a #tag')
     })

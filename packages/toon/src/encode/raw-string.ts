@@ -1,8 +1,9 @@
 import type { JsonPrimitive } from '../types.ts'
-import { COMMENT_MARKER } from '../constants.ts'
+import { BYTE_ORDER_MARK, COMMENT_MARKER } from '../constants.ts'
 
-// Decoders silently strip a line whose first non-space character is the comment marker.
-const COMMENT_LINE_PATTERN = new RegExp(`(?:^|\\n) *${COMMENT_MARKER}`)
+// Decoders silently strip a line whose first non-space character is the comment marker,
+// and they remove a leading byte-order mark before making that test.
+const COMMENT_LINE_PATTERN = new RegExp(`(?:^${BYTE_ORDER_MARK}?|\\n) *${COMMENT_MARKER}`)
 
 /**
  * Pre-formatted string that the encoder emits verbatim at a primitive value
