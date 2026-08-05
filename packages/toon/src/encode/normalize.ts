@@ -12,7 +12,7 @@ export function normalizeValue(value: unknown): JsonValue {
     return null
   }
 
-  // RawString markers pass through untouched, treated as primitives and never as objects.
+  // `RawString` markers pass through untouched, treated as primitives and never as objects.
   if (isRawString(value)) {
     return value as unknown as JsonValue
   }
@@ -25,7 +25,7 @@ export function normalizeValue(value: unknown): JsonValue {
     && typeof value.toJSON === 'function'
   ) {
     const next = value.toJSON()
-    // Avoid infinite recursion when toJSON returns the same object.
+    // Avoid infinite recursion when `toJSON` returns the same object.
     if (next !== value) {
       return normalizeValue(next)
     }

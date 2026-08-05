@@ -5,7 +5,7 @@ import { createRequire } from 'node:module'
 const require = createRequire(import.meta.url)
 
 /**
- * Loads spec fixture files via JSON.parse.
+ * Loads spec fixture files via `JSON.parse`.
  *
  * @remarks
  * Static JSON imports go through Vite's JSON-to-literal transform, where a

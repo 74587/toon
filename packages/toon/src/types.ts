@@ -14,7 +14,7 @@ export type JsonValue = JsonPrimitive | JsonObject | JsonArray
 export type { Delimiter, DelimiterKey }
 
 /**
- * A function that transforms or filters values during encoding.
+ * Transforms or filters values during encoding.
  *
  * Called for every value (root, object properties, array elements) during the encoding process.
  * Similar to `JSON.stringify`'s replacer, but with path tracking.
@@ -98,7 +98,6 @@ export interface DecodeOptions {
 
 export type ResolvedDecodeOptions = Readonly<Required<Omit<DecodeOptions, 'indent'>>>
 
-/** Options for streaming decode operations. */
 export type DecodeStreamOptions = DecodeOptions
 
 // #endregion

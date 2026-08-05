@@ -24,7 +24,7 @@ export default defineConfig({
   ],
 
   vite: {
-    // @ts-expect-error – UnoCSS types are not compatible with Vite yet
+    // @ts-expect-error – UnoCSS types are not compatible with Vite yet.
     plugins: [UnoCSS(), llmstxt()],
   },
 

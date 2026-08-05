@@ -98,7 +98,7 @@ const JSON_FORMAT_OPTIONS: { value: JsonFormat, label: string, indent: string | 
 const DEFAULT_JSON = JSON.stringify(PRESETS.weather, undefined, 2)
 const SHARE_URL_LIMIT = 8 * 1024
 
-// Input state
+// #region Input state
 const inputText = ref(DEFAULT_JSON)
 const inputFormat = ref<InputFormat>('json')
 const jsonFormat = ref<JsonFormat>('pretty-2')
@@ -114,12 +114,12 @@ const formattedInput = computed(() => {
     return inputText.value
   }
 })
+// #endregion
 
-// Encoder options
 const delimiter = ref<Delimiter>(DEFAULT_DELIMITER)
 const indent = ref(2)
 
-// Encoding output
+// #region Encoding output
 const encodingResult = computed(() => {
   try {
     const parsedInput = parseInput(inputText.value, inputFormat.value)
@@ -141,8 +141,9 @@ const encodingResult = computed(() => {
 })
 const toonOutput = computed(() => encodingResult.value.output)
 const error = computed(() => encodingResult.value.error)
+// #endregion
 
-// Token analysis
+// #region Token analysis
 const tokenizer = shallowRef<typeof import('gpt-tokenizer') | undefined>()
 const inputTokens = computed(() =>
   tokenizer.value?.encode(formattedInput.value).length,
@@ -160,8 +161,8 @@ const tokenSavings = computed(() => {
 
   return { diff, percent, sign, isSavings: diff > 0 }
 })
+// #endregion
 
-// UI state
 const canShareState = ref(true)
 const hasCopiedUrl = ref(false)
 
@@ -270,13 +271,11 @@ async function loadTokenizer() {
 <template>
   <div class="playground">
     <div class="playground-container">
-      <!-- Header -->
       <header class="playground-header">
         <h1>Playground</h1>
         <p>Convert JSON or YAML to TOON in real time.</p>
       </header>
 
-      <!-- Options Bar -->
       <div class="options-bar">
         <VPInput id="inputFormat" label="Input format">
           <select id="inputFormat" v-model="inputFormat">
@@ -363,7 +362,6 @@ async function loadTokenizer() {
         </button>
       </div>
 
-      <!-- Editor Container -->
       <div class="editor-container">
         <!-- Input -->
         <div class="editor-pane">

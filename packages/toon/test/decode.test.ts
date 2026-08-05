@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { decode, encode } from '../src/index'
 import { loadFixtures } from './utils'
 
-// Loaded via JSON.parse: a Vite JSON-to-literal transform would turn the
+// Loaded via `JSON.parse`: a Vite JSON-to-literal transform would turn the
 // prototype-safety fixtures' `__proto__` keys into prototype assignments.
 const fixtureFiles = loadFixtures('decode', [
   'primitives',

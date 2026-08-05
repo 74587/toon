@@ -344,7 +344,7 @@ describe('jsonStreamFromEvents', () => {
     it('throws on mismatched endObject event', async () => {
       const events = [
         { type: 'startArray' as const, length: 0 },
-        { type: 'endObject' as const }, // Wrong closing event.
+        { type: 'endObject' as const },
       ]
 
       await expect(async () => {
@@ -355,7 +355,7 @@ describe('jsonStreamFromEvents', () => {
     it('throws on mismatched endArray event', async () => {
       const events = [
         { type: 'startObject' as const },
-        { type: 'endArray' as const }, // Wrong closing event.
+        { type: 'endArray' as const },
       ]
 
       await expect(async () => {
@@ -408,7 +408,6 @@ async function* asyncEvents(events: JsonStreamEvent[]): AsyncIterable<JsonStream
   }
 }
 
-/** Joins chunks from an async iterable into a single string. */
 async function join(iter: AsyncIterable<string>): Promise<string> {
   const chunks: string[] = []
   for await (const chunk of iter) {

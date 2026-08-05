@@ -40,7 +40,6 @@ export function extractTabularFields(rows: readonly JsonObject[]): FieldNode[] |
 export function extractKeyedTabularFields(value: JsonObject): FieldNode[] | undefined {
   const entryValues = Object.values(value)
 
-  // At least two entries whose values are uniform non-empty objects.
   if (entryValues.length < 2) {
     return
   }
@@ -52,7 +51,7 @@ export function extractKeyedTabularFields(value: JsonObject): FieldNode[] | unde
   return extractTabularFields(entryValues as JsonObject[])
 }
 
-/** Reads one row's leaf cells in the field order extractTabularFields produced. */
+/** Reads one row's leaf cells in the field order `extractTabularFields` produced. */
 export function collectRowLeaves(row: JsonObject, fields: readonly FieldNode[]): EncodablePrimitive[] {
   const leaves: EncodablePrimitive[] = []
   collectLeafValues(row, fields, leaves)

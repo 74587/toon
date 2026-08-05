@@ -1,6 +1,4 @@
-/**
- * Colors Theme
- * -------------------------------------------------------------------------- */
+/* #region Colors Theme */
 
  :root {
   --vp-c-brand-1: #d97c06;
@@ -9,9 +7,9 @@
   --vp-nav-logo-height: 20px;
 }
 
-/**
- * Component: Home
- * -------------------------------------------------------------------------- */
+/* #endregion */
+
+/* #region Component: Home */
 
  :root {
   --vp-home-hero-name-color: transparent;
@@ -39,3 +37,5 @@
     --vp-home-hero-image-filter: blur(72px);
   }
 }
+
+/* #endregion */

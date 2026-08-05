@@ -588,7 +588,7 @@ function* decodeListItem(
     yield { type: 'startObject' }
     yield { type: 'key', key: header.key! }
 
-    // Use baseDepth + 1 for the array so rows are at baseDepth + 2.
+    // Use `baseDepth + 1` for the array so rows are at `baseDepth + 2`.
     yield* decodeArrayFromHeader(header, headerInfo.inlineValues, reader, baseDepth + 1, options, itemLine)
 
     yield* followSiblingFields(reader, baseDepth + 1, options, seenKeys)
