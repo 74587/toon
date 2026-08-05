@@ -51,9 +51,10 @@ export function parseLineIncremental(
   // Without this, `- ` would be an item carrying an empty token instead of the bare list-item marker.
   const content = trimTrailingSpaces(raw.slice(indent))
 
+  // Only spaces may precede the marker, so a tab in the indentation rules the line out.
   // Comment lines vanish before blank-line tracking and strict validation, so they
   // never count as rows, items, entries, or blank lines.
-  if (content[0] === COMMENT_MARKER) {
+  if (firstTabIndex === -1 && content[0] === COMMENT_MARKER) {
     return undefined
   }
 
