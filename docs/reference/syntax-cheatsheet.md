@@ -17,7 +17,7 @@ Quick reference for mapping JSON to TOON format. For rigorous, normative syntax 
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 id: 1
 name: Ada
 ```
@@ -37,7 +37,7 @@ name: Ada
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 user:
   id: 1
   name: Ada
@@ -55,7 +55,7 @@ user:
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 tags[3]: foo,bar,baz
 ```
 
@@ -74,7 +74,7 @@ tags[3]: foo,bar,baz
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 items[2]{id,qty}:
   1,5
   2,3
@@ -92,7 +92,7 @@ items[2]{id,qty}:
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 items[3]:
   - 1
   - a: 1
@@ -106,7 +106,7 @@ items[3]:
 
 ::: code-group
 
-```yaml [Multi-field object]
+```toon [Multi-field object]
 items[1]:
   - users[2]{id,name}:
       1,Ada
@@ -114,7 +114,7 @@ items[1]:
     status: active
 ```
 
-```yaml [Single-field object]
+```toon [Single-field object]
 items[1]:
   - users[2]{id,name}:
       1,Ada
@@ -133,7 +133,7 @@ items[1]:
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 pairs[2]:
   - [2]: 1,2
   - [2]: 3,4
@@ -149,7 +149,7 @@ pairs[2]:
 ["x", "y", "z"]
 ```
 
-```yaml [TOON]
+```toon [TOON]
 [3]: x,y,z
 ```
 
@@ -163,7 +163,7 @@ pairs[2]:
 {}
 ```
 
-```yaml [Empty Object]
+```toon [Empty Object]
 (empty output)
 ```
 
@@ -177,7 +177,7 @@ pairs[2]:
 }
 ```
 
-```yaml [Empty Array]
+```toon [Empty Array]
 items: []
 ```
 
@@ -196,7 +196,7 @@ items: []
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 version: "123"
 enabled: "true"
 ```
@@ -215,7 +215,7 @@ These strings must be quoted because they look like numbers/booleans.
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 note: "hello, world"
 ```
 
@@ -233,7 +233,7 @@ Strings must be quoted when they contain the active delimiter (inside an array s
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 message: " padded "
 ```
 
@@ -249,7 +249,7 @@ message: " padded "
 }
 ```
 
-```yaml [TOON]
+```toon [TOON]
 name: ""
 ```
 
@@ -270,7 +270,7 @@ Strings **must** be quoted if they:
 
 Otherwise, strings can be unquoted. Unicode and emoji are safe:
 
-```yaml
+```toon
 message: Hello 世界 👋
 note: This has inner spaces
 ```
@@ -326,13 +326,13 @@ See [Format Overview – Nested Field Groups](/guide/format-overview#nested-fiel
 
 ::: code-group
 
-```yaml [Tab Delimiter]
+```toon [Tab Delimiter]
 items[2	]{id	name}:
   1	Ada
   2	Bob
 ```
 
-```yaml [Pipe Delimiter]
+```toon [Pipe Delimiter]
 items[2|]{id|name}:
   1|Ada
   2|Bob
@@ -346,7 +346,7 @@ The delimiter symbol appears inside the brackets and braces.
 
 An object of uniform objects collapses into a keyed header with one entry row per entry:
 
-```yaml
+```toon
 users[2:]{age,city}:
   alice: 30,Berlin
   bob: 25,Oslo
@@ -358,7 +358,7 @@ See [Format Overview – Keyed Tabular Objects](/guide/format-overview#keyed-tab
 
 Lines whose first non-space character is `#` are stripped before decoding:
 
-```yaml
+```toon
 # Full-line comments only; encoders never emit them
 host: example.com
 ```

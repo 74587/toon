@@ -33,7 +33,7 @@ Reformatted for reading – both JSON rows below are measured on real `JSON.stri
 
 ::: code-group
 
-```yaml [TOON v4]
+```toon [TOON v4]
 location:
   city: Berlin
   country: DE
@@ -49,7 +49,7 @@ stations[3:]{lat,lon,active}:
   dahlem: 52.46,13.3,true
 ```
 
-```yaml [TOON v3]
+```toon [TOON v3]
 location:
   city: Berlin
   country: DE
@@ -154,7 +154,7 @@ Specified in [spec#57](https://github.com/toon-format/spec/issues/57), building 
 
 A line whose first non-space character is `#` is a comment. It is removed in a lexical pre-pass, in both strict and non-strict mode, so it never terminates a scope and never counts toward a declared length:
 
-```yaml
+```toon
 # Weekly export, generated 2026-08-22
 forecast[2]{day,condition}:
   # Monday was revised after the frost warning
@@ -172,7 +172,7 @@ Requested in [spec#1](https://github.com/toon-format/spec/issues/1) by [@osjimen
 
 The `keyFolding` and `flattenDepth` encoder options and the `expandPaths` decoder option are gone, along with the CLI flags `--key-folding`, `--flatten-depth` and `--expand-paths`. A dotted key is now unconditionally a single literal key:
 
-```yaml
+```toon
 # v4 reads this as one key named "data.meta.items"
 data.meta.items[2]{id,name}:
 ```

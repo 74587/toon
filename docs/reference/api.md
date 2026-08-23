@@ -86,7 +86,7 @@ console.log(encode({ items }))
 
 **Output:**
 
-```yaml
+```toon
 items[2]{sku,qty,price}:
   A1,2,9.99
   B2,1,14.5
@@ -205,7 +205,7 @@ console.log(encode(data, { replacer }))
 
 **Output:**
 
-```yaml
+```toon
 user:
   name: Ada
   email: ada@example.com
@@ -227,7 +227,7 @@ console.log(encode(data, { replacer }))
 
 **Output:**
 
-```yaml
+```toon
 user: ALICE
 role: ADMIN
 ```
@@ -253,7 +253,7 @@ console.log(encode(data, { replacer }))
 
 **Output:**
 
-```yaml
+```toon
 metadata:
   created: "2025-01-01T00:00:00Z"
 user:
@@ -291,7 +291,7 @@ console.log(encode(data, {
 
 <!-- eslint-skip -->
 
-```yaml
+```toon
 name: "Ada"
 age: "30"
 ```
@@ -715,7 +715,7 @@ Tab delimiters (`\t`) often tokenize more efficiently than commas. Tabs are sing
 
 Example:
 
-```yaml
+```toon
 items[2	]{sku	name	qty	price}:
   A1	Widget	2	9.99
   B2	Gadget	1	14.5

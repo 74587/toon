@@ -16,7 +16,7 @@ Think of it as a translation layer: use JSON programmatically, and encode it as 
 
 LLM tokens cost money – and standard JSON is verbose. A weather forecast in TOON:
 
-```yaml
+```toon
 location:
   city: Berlin
   country: DE
@@ -182,7 +182,7 @@ console.log(encode(data))
 
 **Output:**
 
-```yaml
+```toon
 users[2]{id,name,role}:
   1,Ada,admin
   2,Bob,user

@@ -43,7 +43,7 @@ Most examples in these docs use root objects, but the format supports all three 
 
 Objects with primitive values use `key: value` syntax, with one field per line:
 
-```yaml
+```toon
 id: 123
 name: Ada
 active: true
@@ -55,7 +55,7 @@ Indentation replaces braces. One space follows the colon.
 
 Nested objects add one indentation level (default: 2 spaces):
 
-```yaml
+```toon
 user:
   id: 123
   name: Ada
@@ -71,7 +71,7 @@ An empty object at the root yields an empty document (no lines). A nested empty 
 
 When an object has at least two entries whose values are uniform objects (same keys, primitive or nested-uniform values), it collapses into a keyed tabular form: the shared field structure appears once in the header, and each entry becomes one row that carries its own key:
 
-```yaml
+```toon
 users[2:]{age,city}:
   alice: 30,Berlin
   bob: 25,Oslo
@@ -97,7 +97,7 @@ TOON detects array structure and chooses the most efficient representation. Arra
 
 Arrays of primitives (strings, numbers, booleans, null) are rendered inline:
 
-```yaml
+```toon
 tags[3]: admin,ops,dev
 ```
 
@@ -109,13 +109,13 @@ When all objects in an array share the same set of primitive-valued keys, TOON u
 
 ::: code-group
 
-```yaml [Basic Tabular]
+```toon [Basic Tabular]
 items[2]{sku,qty,price}:
   A1,2,9.99
   B2,1,14.5
 ```
 
-```yaml [Spaces and Quoting]
+```toon [Spaces and Quoting]
 users[2]{id,name,role}:
   1,Ada Lovelace,admin
   2,"Smith, Bob",user
@@ -137,7 +137,7 @@ Each row contains values in the same order as the field list. Values are encoded
 
 A column whose values are uniform sub-objects (same keys in every element, recursively primitive or nested-uniform) folds into the header as a nested field group, while rows stay flat:
 
-```yaml
+```toon
 orders[2]{id,customer{name,country},total}:
   1,Ada,DK,99
   2,Bob,UK,149
@@ -149,7 +149,7 @@ The header `customer{name,country}` declares a nested-object column; each row's 
 
 Arrays that don't meet the tabular requirements use list form with hyphen markers:
 
-```yaml
+```toon
 items[3]:
   - 1
   - a: 1
@@ -162,7 +162,7 @@ Each element starts with `- ` at one indentation level deeper than the parent ar
 
 When an array element is an object, it appears as a list item:
 
-```yaml
+```toon
 items[2]:
   - id: 1
     name: First
@@ -173,7 +173,7 @@ items[2]:
 
 When a tabular array is the first field of a list-item object, the tabular header appears on the hyphen line, with rows indented two levels deeper and other fields indented one level deeper:
 
-```yaml
+```toon
 items[1]:
   - users[2]{id,name}:
       1,Ada
@@ -183,7 +183,7 @@ items[1]:
 
 When the object has only a single tabular field, the same pattern applies:
 
-```yaml
+```toon
 items[1]:
   - users[2]{id,name}:
       1,Ada
@@ -196,7 +196,7 @@ This is the canonical encoding for list-item objects whose first field is a tabu
 
 When you have arrays containing primitive inner arrays:
 
-```yaml
+```toon
 pairs[2]:
   - [2]: 1,2
   - [2]: 3,4
@@ -206,7 +206,7 @@ Each inner array gets its own header on the list-item line.
 
 When the inner arrays are themselves arrays of objects or non-uniform arrays, the same `- [N]:` header appears on the hyphen line and the nested items follow one indent deeper:
 
-```yaml
+```toon
 items[3]:
   - summary
   - id: 1
@@ -220,7 +220,7 @@ items[3]:
 
 Empty arrays render as `key: []` for fields and `[]` at the root:
 
-```yaml
+```toon
 items: []
 ```
 
@@ -253,19 +253,19 @@ TOON supports three delimiters: comma (default), tab, and pipe. The delimiter is
 
 ::: code-group
 
-```yaml [Comma (default)]
+```toon [Comma (default)]
 items[2]{sku,name,qty,price}:
   A1,Widget,2,9.99
   B2,Gadget,1,14.5
 ```
 
-```yaml [Tab]
+```toon [Tab]
 items[2	]{sku	name	qty	price}:
   A1	Widget	2	9.99
   B2	Gadget	1	14.5
 ```
 
-```yaml [Pipe]
+```toon [Pipe]
 items[2|]{sku|name|qty|price}:
   A1|Widget|2|9.99
   B2|Gadget|1|14.5
@@ -282,7 +282,7 @@ Tab and pipe delimiters are explicitly encoded in the header brackets and field 
 
 Decoders strip every line whose first non-space character is `#` in a lexical pre-pass, before anything else:
 
-```yaml
+```toon
 # Server configuration
 host: example.com
 port: 8080
@@ -307,7 +307,7 @@ TOON quotes strings **only when necessary** to maximize token efficiency. A stri
 
 Otherwise, strings can be unquoted. Unicode, emoji, and strings with internal (non-leading/trailing) spaces are safe unquoted:
 
-```yaml
+```toon
 message: Hello 世界 👋
 note: This has inner spaces
 ```

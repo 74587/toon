@@ -14,6 +14,9 @@ hero:
       text: What is TOON?
       link: /guide/getting-started
     - theme: alt
+      text: New in v4
+      link: /guide/whats-new-in-v4
+    - theme: alt
       text: Benchmarks
       link: /guide/benchmarks
     - theme: alt
@@ -34,18 +37,18 @@ features:
     link: /guide/format-overview
   - title: LLM-Friendly Guardrails
     icon: 🛤️
-    details: Explicit [N] lengths and {fields} field lists in every header give models a clear schema to follow, improving parsing reliability.
-    link: /guide/format-overview#arrays
+    details: Array headers declare their length and tabular headers their field list, giving models fixed row widths and making truncated output detectable.
+    link: /guide/format-overview#array-headers
   - title: Minimal Syntax
     icon: 📐
     details: Uses indentation instead of braces and minimizes quoting, giving YAML-like readability with CSV-style compactness.
-    link: /guide/format-overview#arrays
+    link: /guide/format-overview#quoting-and-types
   - title: Tabular Forms
     icon: 🧺
-    details: Uniform arrays of objects – and objects of uniform objects – collapse into tables that declare the field list once and stream row values line by line.
+    details: Arrays of uniform objects – and objects of uniform objects – declare the field list once in the header, then stream the values one row per line.
     link: /guide/format-overview#the-four-forms
   - title: Multi-Language Ecosystem
     icon: 🌐
-    details: Spec-driven implementations in many languages.
+    details: Official implementations, plus dozens of community ports, all built on one spec and a shared test suite.
     link: /ecosystem/implementations
 ---

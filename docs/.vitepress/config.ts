@@ -103,6 +103,7 @@ export default defineConfig({
     config(md) {
       md.use(copyOrDownloadAsMarkdownButtons)
     },
+    languageAlias: { toon: 'yaml' },
     math: true,
   },
 })
