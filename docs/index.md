@@ -29,7 +29,7 @@ hero:
 features:
   - title: Token-Efficient & Accurate
     icon: 📊
-    details: TOON reaches 72.2% accuracy (vs JSON's 71.4%) while using 42.6% fewer tokens across 244 retrieval questions on 4 models.
+    details: TOON matches JSON's retrieval accuracy (72.2% vs 71.4%) while using 42.6% fewer tokens.
     link: /guide/benchmarks
   - title: JSON Data Model
     icon: 🔁
@@ -37,7 +37,7 @@ features:
     link: /guide/format-overview
   - title: LLM-Friendly Guardrails
     icon: 🛤️
-    details: Array headers declare their length and tabular headers their field list, giving models fixed row widths and making truncated output detectable.
+    details: "[N] declares how many rows, {fields} how wide – so truncated or malformed output can't slip through."
     link: /guide/format-overview#array-headers
   - title: Minimal Syntax
     icon: 📐
@@ -45,10 +45,10 @@ features:
     link: /guide/format-overview#quoting-and-types
   - title: Tabular Forms
     icon: 🧺
-    details: Arrays of uniform objects – and objects of uniform objects – declare the field list once in the header, then stream the values one row per line.
+    details: Uniform objects – in an array or under keys – declare the field list once, then stream one row each.
     link: /guide/format-overview#the-four-forms
   - title: Multi-Language Ecosystem
     icon: 🌐
-    details: Official implementations, plus dozens of community ports, all built on one spec and a shared test suite.
+    details: Official implementations, plus dozens of community ports, all targeting one spec with a shared conformance test suite.
     link: /ecosystem/implementations
 ---

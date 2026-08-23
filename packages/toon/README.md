@@ -145,14 +145,14 @@ Anything that fits none of these – mixed types, non-uniform objects – falls 
 
 - 📊 **Token-Efficient & Accurate:** Matches JSON's retrieval accuracy while using 42.6% fewer tokens – see [Benchmarks](#benchmarks).
 - 🔁 **JSON Data Model:** Encodes the same objects, arrays, and primitives as JSON with deterministic, lossless round-trips.
-- 🛤️ **LLM-Friendly Guardrails:** Explicit `[N]` lengths and `{fields}` field lists give models a clear schema to follow, improving parsing reliability.
+- 🛤️ **LLM-Friendly Guardrails:** `[N]` declares how many rows, `{fields}` how wide – so truncated or malformed output can't slip through.
 - 📐 **Minimal Syntax:** Uses indentation instead of braces and minimizes quoting, giving YAML-like readability with CSV-style compactness.
-- 🧺 **Tabular Forms:** Uniform arrays of objects – and objects of uniform objects – collapse into tables that declare the field list once and stream row values line by line.
-- 🌐 **Multi-Language Ecosystem:** Spec-driven implementations in many languages.
+- 🧺 **Tabular Forms:** Uniform objects – in an array or under keys – declare the field list once, then stream one row each.
+- 🌐 **Multi-Language Ecosystem:** Official implementations, plus dozens of community ports, all targeting one spec with a shared conformance test suite.
 
 ## When Not to Use TOON
 
-TOON excels with uniform arrays of objects. Reach for something else when:
+TOON excels with arrays of uniform objects. Reach for something else when:
 
 - **Structures are deeply nested or non-uniform** (tabular eligibility ≈ 0%) – compact JSON often wins outright.
 - **Arrays are semi-uniform** (~40–60% eligibility) – savings shrink; stay on JSON if your pipeline already speaks it.
