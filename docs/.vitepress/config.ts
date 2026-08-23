@@ -114,6 +114,7 @@ function sidebarPrimary(): DefaultTheme.SidebarItem[] {
       items: [
         { text: 'Getting Started', link: '/guide/getting-started' },
         { text: 'Format Overview', link: '/guide/format-overview' },
+        { text: 'What\'s New in v4', link: '/guide/whats-new-in-v4' },
         { text: 'Using TOON with LLMs', link: '/guide/llm-prompts' },
         { text: 'Benchmarks', link: '/guide/benchmarks' },
       ],
