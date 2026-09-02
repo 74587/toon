@@ -129,8 +129,8 @@ importers:
         specifier: ^1.3.0
         version: 1.3.0
       utilful:
-        specifier: link:../../../utils
-        version: link:../../../utils
+        specifier: ^3.2.0
+        version: 3.2.0(vitest@4.1.10(@types/node@26.1.1)(vite@8.1.5(@types/node@26.1.1)(jiti@2.7.0)(yaml@2.9.0)))
 
   packages/toon:
     devDependencies:
@@ -3644,6 +3644,14 @@ packages:
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
+
+  utilful@3.2.0:
+    resolution: {integrity: sha512-Xka53EZS2zHPvjS3qKnHNygcrqdwjWLNqVEHSE6bCnpCl6lVP4xfRI5fZVLv/kZbEF0OkbYaz5XKyi1hSfJA8A==}
+    peerDependencies:
+      vitest: '>=4'
+    peerDependenciesMeta:
+      vitest:
+        optional: true
 
   valid-data-url@3.0.1:
     resolution: {integrity: sha512-jOWVmzVceKlVVdwjNSenT4PbGghU0SBIizAev8ofZVgivk/TVHXSbNL8LP6M3spZvkR9/QolkyJavGSX5Cs0UA==}
@@ -7455,6 +7463,10 @@ snapshots:
       punycode: 2.3.1
 
   util-deprecate@1.0.2: {}
+
+  utilful@3.2.0(vitest@4.1.10(@types/node@26.1.1)(vite@8.1.5(@types/node@26.1.1)(jiti@2.7.0)(yaml@2.9.0))):
+    optionalDependencies:
+      vitest: 4.1.10(@types/node@26.1.1)(vite@8.1.5(@types/node@26.1.1)(jiti@2.7.0)(yaml@2.9.0))
 
   valid-data-url@3.0.1: {}
 
