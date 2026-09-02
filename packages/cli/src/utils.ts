@@ -3,7 +3,7 @@ import { createReadStream } from 'node:fs'
 import * as fsp from 'node:fs/promises'
 import * as path from 'node:path'
 import process from 'node:process'
-import { CliError } from './errors.ts'
+import { CliError } from 'utilful/cli'
 
 export function detectMode(
   input: InputSource,

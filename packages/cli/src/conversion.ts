@@ -5,10 +5,9 @@ import * as fsp from 'node:fs/promises'
 import * as path from 'node:path'
 import process from 'node:process'
 import { estimateTokenCount } from 'tokenx'
+import { CliError, log } from 'utilful/cli'
 import { decodeStream, encode, encodeLines } from '../../toon/src/index.ts'
-import { CliError } from './errors.ts'
 import { jsonStreamFromEvents } from './json-from-events.ts'
-import * as log from './log.ts'
 import { formatInputLabel, readInput, readLinesFromSource } from './utils.ts'
 
 export async function encodeToToon(config: {

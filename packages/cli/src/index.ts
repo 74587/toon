@@ -1,18 +1,29 @@
-import type { ArgsDef, CommandDef } from 'citty'
+import type { ArgsDef, CommandDef, RunMainOptions } from 'utilful/cli'
 import type { Delimiter } from '../../toon/src/index.ts'
 import type { InputSource } from './types.ts'
 import * as path from 'node:path'
-import { defineCommand } from 'citty'
-import { DEFAULT_DELIMITER } from '../../toon/src/index.ts'
+import { CliError, commonArgs, defineCommand } from 'utilful/cli'
+import { DEFAULT_DELIMITER, ToonDecodeError } from '../../toon/src/index.ts'
 import { assertValidDelimiter } from '../../toon/src/shared/validation.ts'
 import pkg from '../package.json' with { type: 'json' }
 import { decodeToJson, encodeToToon } from './conversion.ts'
-import { CliError, commonArgs, withCleanErrors } from './errors.ts'
+import { formatDecodeError } from './format-error.ts'
 import { detectMode } from './utils.ts'
 
 const { name, version } = pkg
 
-const args: ArgsDef = {
+interface ConvertArgs extends ArgsDef {
+  input: { type: 'positional', description: string, required: false }
+  output: { type: 'string', description: string, alias: string }
+  encode: { type: 'boolean', description: string, alias: string }
+  decode: { type: 'boolean', description: string, alias: string }
+  delimiter: { type: 'string', description: string, default: string }
+  indent: { type: 'string', description: string, default: string }
+  strict: { type: 'boolean', description: string, default: true }
+  stats: { type: 'boolean', description: string }
+}
+
+const args: ConvertArgs = {
   ...commonArgs,
   input: {
     type: 'positional',
@@ -52,11 +63,17 @@ const args: ArgsDef = {
   stats: {
     type: 'boolean',
     description: 'Show token statistics',
-    default: false,
   },
-} as const
+}
 
-export const mainCommand: CommandDef<ArgsDef> = withCleanErrors(defineCommand({
+export const cliOptions: RunMainOptions = {
+  expectedErrors: [ToonDecodeError],
+  describe: error => error instanceof ToonDecodeError && error.line !== undefined
+    ? formatDecodeError(error)
+    : undefined,
+}
+
+export const mainCommand: CommandDef<ConvertArgs> = defineCommand({
   meta: {
     name,
     description: 'TOON CLI – Convert between JSON and TOON',
@@ -87,7 +104,7 @@ export const mainCommand: CommandDef<ArgsDef> = withCleanErrors(defineCommand({
         output: outputPath,
         delimiter,
         indentSize,
-        shouldPrintStats: args.stats === true,
+        shouldPrintStats: args.stats,
       })
     }
     else {
@@ -95,11 +112,11 @@ export const mainCommand: CommandDef<ArgsDef> = withCleanErrors(defineCommand({
         input: inputSource,
         output: outputPath,
         indentSize,
-        strict: args.strict !== false,
+        strict: args.strict,
       })
     }
   },
-}))
+})
 
 /**
  * The library reports a bad delimiter as a `TypeError`, which the boundary would

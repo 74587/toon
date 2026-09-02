@@ -261,7 +261,7 @@ describe('toon CLI', () => {
       try {
         const { stdout, exitCode } = await runCli(['--decode', '--no-strict'])
 
-        expect(exitCode).toBeUndefined()
+        expect(exitCode).toBe(0)
         expect(JSON.parse(stdout)).toEqual({ a: { b: 1 } })
       }
       finally {
